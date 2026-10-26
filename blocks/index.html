@@ -1,0 +1,77 @@
+<!doctype html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>CodyNick Block IDE</title><link rel="icon" href="/assets/favicon.ico"><link rel="stylesheet" href="editor.css"><link rel="stylesheet" href="/assets/tool-navigation.css"><link rel="stylesheet" href="stage.css"><link rel="stylesheet" href="webserial.css"><script src="vendor/blockly/blockly.min.js" defer></script><script src="ch340-usb.js" defer></script><script src="linux-help.js" defer></script><script src="serial.js" defer></script><script src="hardware.js" defer></script><script src="runtime.js" defer></script><script src="block-specs.js" defer></script><script src="blocks.js" defer></script><script src="project-menu.js" defer></script></head><body>
+<div class="app">
+  <header class="topbar">
+    <div class="brand">
+      <div class="logo">CN</div>
+      <div class="brand-title">
+        <strong>CodyNick Block IDE</strong>
+        <span>Scratch-like Blockly workspace · Web Serial</span>
+      </div>
+    </div>
+
+    <nav class="toolbar">
+      <a class="codynick-home-button" href="/">Main Panel</a>
+      <details id="projectMenu" class="project-menu">
+        <summary>Project ▾</summary>
+        <div class="project-menu-panel" aria-label="Project actions">
+          <button id="newProject" title="Clear the workspace">New</button>
+          <button id="menuSave" title="Save named design in this browser">Save</button>
+          <button id="loadNamed" title="Load a design saved in this browser">Load</button>
+          <hr>
+          <button id="menuUpload" title="Upload a CodyNick design">Upload</button>
+          <button id="saveProject" title="Download the current CodyNick design">Download</button>
+        </div>
+      </details>
+      <input id="importFile" type="file" accept=".codynick,.json" />
+      <button onclick="viewPython()" title="Preview generated Python in a pop-up">View Python</button>
+      <button id="connect" title="Connect to your CodyJoy Pro USB connection">Connect</button>
+      <button id="blockRunBtn" class="run-btn"  title="Run the blocks on your connected CJP">▶ Run</button>
+      <button id="blockStopBtn" class="stop-btn"  disabled title="Stop this browser program">&#9632; Stop</button>
+    </nav>
+  </header>
+
+  <main class="main stage-layout stage-collapsed">
+    <section class="workspace-shell">
+      <div class="design-bar"><label for="designName">Design</label><input id="designName" type="text" maxlength="120" placeholder="Untitled" autocomplete="off"><button id="saveNamed" title="Save named design in this browser">Save</button>
+        <div class="execution-controls"><span id="status" class="status" role="status">Disconnected</span><span id="device" class="status">Waiting for USB</span><select id="example" aria-label="Load example"><option value="">Examples…</option><option value="blink">Blink RGB</option><option value="temperature">Temperature display</option><option value="joystick">Joystick light</option></select><button id="toggleConsole">Console</button><button id="linuxSetup" hidden>Linux USB setup</button></div>
+      </div>
+      <div class="panel-head" title="Programs run in this browser while connected; Stop leaves hardware outputs unchanged.">
+        <nav class="toolbox-modes" style="flex-wrap:wrap" role="tablist" aria-label="Block categories" aria-orientation="horizontal">
+          <button id="generalToolboxTab" role="tab" aria-selected="true" aria-controls="toolboxWorkspace">General</button>
+          <button id="hardwareToolboxTab" role="tab" aria-selected="false" aria-controls="toolboxWorkspace">Hardware</button>
+        </nav>
+        <span id="workspaceStatus" class="status" role="status">Ready to edit.</span>
+      </div>
+      <div class="workspace-coding">
+        <div id="toolboxWorkspace" role="tabpanel" aria-labelledby="generalToolboxTab"><div id="blocklyDiv"></div></div>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<div id="pythonModal" class="modal-backdrop" onclick="closePythonModal(event)">
+  <section class="modal" role="dialog" aria-modal="true" aria-label="Generated Python">
+    <div class="modal-head">
+      <span>Generated Python</span>
+      <div class="modal-actions">
+        <button onclick="copyPythonPreview(event)">Copy</button>
+        <button onclick="closePythonModal(event)">Close</button>
+      </div>
+    </div>
+    <pre id="pythonPreview"># Click “View Python” to generate a preview.</pre>
+  </section>
+</div>
+
+<div id="toast" class="toast"></div>
+<dialog id="designDialog" class="design-dialog" aria-labelledby="designDialogTitle">
+  <h2 id="designDialogTitle">Load Design</h2>
+  <label for="designList">Saved on this device</label>
+  <select id="designList" size="8" ></select>
+  <p id="designListStatus" role="status">Saved in this browser</p>
+  <div class="design-actions"><button id="closeDesignDialog">Cancel</button><button id="loadNamedConfirm">Load</button></div>
+</dialog>
+
+<div id="consoleModal" class="modal-backdrop"><section class="modal" role="dialog" aria-modal="true" aria-label="Device console"><div class="modal-head"><span>Device console</span><div class="modal-actions"><button id="clearLog">Clear</button><button id="closeConsole">Close</button></div></div><div class="console-body"><p id="notice" role="status">Use desktop Chrome. Close other applications using the CJP serial port.</p><pre id="log" aria-label="Program and serial output"></pre></div></section></div><script src="python-preview.js" defer></script><dialog id="linuxHelpDialog" class="design-dialog" aria-labelledby="linuxHelpTitle"><h2 id="linuxHelpTitle">Linux USB setup</h2><p id="linuxHelpReason">On Ubuntu/Kubuntu, your account normally needs dialout membership to access the CJP serial port.</p><p><strong>Run this on the Linux computer connected to the CJP—not on the VPS.</strong></p><pre class="linux-command"><code id="linuxCommand">sudo usermod -aG dialout "$USER"</code></pre><button id="copyLinuxCommand">Copy command</button><p id="linuxCopyStatus" role="status"></p><p>Then <strong>fully log out of your desktop and log back in</strong>. Closing the terminal or refreshing the page is not enough. Reopen Chrome and reconnect.</p><p>Close Arduino Serial Monitor, serial terminals, and other tabs using the device. If opening still fails, check:</p><pre class="linux-command"><code>ls -l /dev/ttyUSB0
+id -nG
+sudo fuser -v /dev/ttyUSB0</code></pre><p>Replace ttyUSB0 if your selected device has a different name. These instructions apply to Ubuntu/Kubuntu; other Linux distributions may use a different serial-access group. Browser sandbox restrictions can also prevent access.</p><p>The website cannot change these operating-system permissions for you.</p><div class="design-actions"><button id="closeLinuxHelp">Close</button></div></dialog></body></html>

@@ -1,0 +1,18 @@
+/* Additions for the Web Serial controls; editor.css and stage.css are unchanged upstream styles. */
+.execution-controls{flex-wrap:wrap}.execution-controls .status{white-space:normal;font-size:11px;max-width:220px}.console-body{min-height:0;display:flex;flex-direction:column}#notice{padding:10px 16px;margin:0;background:var(--panel-soft);border-bottom:1px solid var(--line);font-size:12px;color:var(--muted)}#log{margin:0;padding:16px;overflow:auto;white-space:pre-wrap;overflow-wrap:anywhere;background:#0d1117;color:#dbeafe;font:13px/1.55 Consolas,Monaco,monospace;flex:1}button:focus-visible,a:focus-visible,.file-button:focus-visible{outline:3px solid #087d91;outline-offset:2px}#connect{border-color:#087d91;color:#087d91}button:disabled{opacity:.5;cursor:not-allowed}@media(min-width:981px){.topbar{height:auto;min-height:72px;flex-wrap:wrap}.app{grid-template-rows:auto minmax(0,1fr)}}
+
+/* Requested toolbar changes; original editor theme remains unchanged. */
+#connect.connected{background:#2da44e;color:#fff;border-color:rgba(27,31,36,.15)}
+#connect.connected:hover:enabled{background:#2c974b;color:#fff}
+.design-bar #saveNamed{flex:0 0 auto;min-height:34px;padding:0 13px}
+.project-menu{position:relative;display:inline-block}
+.project-menu>summary{list-style:none;min-height:40px;padding:0 15px;display:flex;align-items:center;justify-content:center;gap:7px;background:#fff;border:1px solid var(--line);border-radius:6px;font-size:13px;font-weight:900;cursor:pointer;user-select:none}
+.project-menu>summary::-webkit-details-marker{display:none}
+.project-menu>summary:hover{background:#f6f8fa;border-color:#d0d7de}
+.project-menu>summary:focus-visible{outline:3px solid #087d91;outline-offset:2px}
+.project-menu-panel{position:absolute;top:calc(100% + 6px);left:0;width:190px;padding:6px;background:#fff;border:1px solid var(--line);border-radius:8px;box-shadow:0 8px 24px rgba(15,23,42,.16);z-index:40}
+.project-menu-panel button{display:flex;width:100%;justify-content:flex-start;min-height:36px;padding:0 12px;border:0;border-radius:4px;background:#fff;font-weight:700}
+.project-menu-panel button:hover:enabled{background:#eef5ff}
+.project-menu-panel hr{border:0;border-top:1px solid var(--line);margin:5px 0}
+
+[hidden]{display:none!important}#linuxHelpDialog{width:min(620px,calc(100vw - 32px));max-height:85vh;overflow:auto;font-size:14px;line-height:1.5}.linux-command{padding:12px;background:#f1f5f9;border:1px solid var(--line);border-radius:6px;overflow:auto;white-space:pre;font-size:12px}#linuxCopyStatus{font-size:12px;color:var(--muted)}
