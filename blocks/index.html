@@ -1,11 +1,11 @@
-<!doctype html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>CodyNick Block IDE</title><link rel="icon" href="/assets/favicon.ico"><link rel="stylesheet" href="editor.css"><link rel="stylesheet" href="/assets/tool-navigation.css"><link rel="stylesheet" href="stage.css"><link rel="stylesheet" href="webserial.css"><script src="vendor/blockly/blockly.min.js" defer></script><script src="ch340-usb.js" defer></script><script src="linux-help.js" defer></script><script src="serial.js" defer></script><script src="hardware.js" defer></script><script src="runtime.js" defer></script><script src="block-specs.js" defer></script><script src="blocks.js" defer></script><script src="project-menu.js" defer></script></head><body>
+<!doctype html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>CodyNick Block IDE</title><link rel="icon" href="/assets/favicon.ico"><link rel="stylesheet" href="editor.css"><link rel="stylesheet" href="/assets/tool-navigation.css"><link rel="stylesheet" href="stage.css"><link rel="stylesheet" href="webserial.css"><script src="vendor/blockly/blockly.min.js" defer></script><script src="ch340-usb.js" defer></script><script src="linux-help.js" defer></script><script src="serial.js" defer></script><script src="hardware.js" defer></script><script src="runtime.js" defer></script><script src="block-specs.js" defer></script><script src="live-store.js" defer></script><script src="live-router.js" defer></script><script src="dashboard-blocks.js" defer></script><script src="blocks.js" defer></script><script src="project-menu.js" defer></script></head><body>
 <div class="app">
   <header class="topbar">
     <div class="brand">
       <div class="logo">CN</div>
       <div class="brand-title">
         <strong>CodyNick Block IDE</strong>
-        <span>Scratch-like Blockly workspace · Web Serial</span>
+        <span>Live mode · Per-block Hardware / Simulation</span>
       </div>
     </div>
 
@@ -25,28 +25,30 @@
       <input id="importFile" type="file" accept=".codynick,.json" />
       <button onclick="viewPython()" title="Preview generated Python in a pop-up">View Python</button>
       <button id="connect" title="Connect to your CodyJoy Pro USB connection">Connect</button>
+      <button id="toggleSpaces">Hide spaces</button>
       <button id="blockRunBtn" class="run-btn"  title="Run the blocks on your connected CJP">▶ Run</button>
       <button id="blockStopBtn" class="stop-btn"  disabled title="Stop this browser program">&#9632; Stop</button>
     </nav>
   </header>
 
-  <main class="main stage-layout stage-collapsed">
+  <main id="liveMain" class="main stage-layout">
     <section class="workspace-shell">
       <div class="design-bar"><label for="designName">Design</label><input id="designName" type="text" maxlength="120" placeholder="Untitled" autocomplete="off"><button id="saveNamed" title="Save named design in this browser">Save</button>
-        <div class="execution-controls"><span id="status" class="status" role="status">Disconnected</span><span id="device" class="status">Waiting for USB</span><select id="example" aria-label="Load example"><option value="">Examples…</option><option value="blink">Blink RGB</option><option value="temperature">Temperature display</option><option value="joystick">Joystick light</option></select><button id="toggleConsole">Console</button><button id="linuxSetup" hidden>Linux USB setup</button></div>
+        <div class="execution-controls"><span id="status" class="status" role="status">Disconnected</span><span id="device" class="status">Waiting for USB</span><select id="example" aria-label="Load example"><option value="">Examples…</option><option value="sim-dashboard">Simulation + dashboard</option><option value="mixed">Hardware sensor + simulated LED + dashboard</option><option value="blink">Blink RGB</option><option value="temperature">Temperature display</option><option value="joystick">Joystick light</option></select><button id="toggleConsole">Console</button><button id="linuxSetup" hidden>Linux USB setup</button></div>
       </div>
       <div class="panel-head" title="Programs run in this browser while connected; Stop leaves hardware outputs unchanged.">
         <nav class="toolbox-modes" style="flex-wrap:wrap" role="tablist" aria-label="Block categories" aria-orientation="horizontal">
           <button id="generalToolboxTab" role="tab" aria-selected="true" aria-controls="toolboxWorkspace">General</button>
           <button id="hardwareToolboxTab" role="tab" aria-selected="false" aria-controls="toolboxWorkspace">Hardware</button>
+          <button id="dashboardToolboxTab" role="tab" aria-selected="false" aria-controls="toolboxWorkspace">Dashboard</button>
         </nav>
-        <span id="workspaceStatus" class="status" role="status">Ready to edit.</span>
+        <span id="workspaceStatus" class="status" role="status">Live mode · Ready to edit.</span>
       </div>
       <div class="workspace-coding">
         <div id="toolboxWorkspace" role="tabpanel" aria-labelledby="generalToolboxTab"><div id="blocklyDiv"></div></div>
       </div>
     </section>
-
+    <aside id="liveSpaces" class="sprite-panel live-spaces"><div class="space-toolbar"><button id="show-simulator">Simulation</button><button id="show-dashboard">Dashboard</button><a href="/simulator/" target="_blank" rel="noopener">Open simulation ↗</a><a href="/dashboard/" target="_blank" rel="noopener">Open dashboard ↗</a></div><iframe id="simulatorFrame" title="Gadget simulation" src="/simulator/"></iframe><iframe id="dashboardFrame" title="Live dashboard" src="/dashboard/" hidden></iframe></aside>
   </main>
 </div>
 

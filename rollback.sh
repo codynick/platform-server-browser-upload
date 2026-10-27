@@ -6,7 +6,7 @@ target_dir=/var/www/code.codynick.com
 [[ -d "$target_dir" ]] || { echo 'Website directory not found.' >&2; exit 1; }
 # Keep a recoverable copy of the version being rolled back.
 current_dir="$(mktemp -d /root/codynick-before-rollback-XXXXXXXX)"
-for name in index.html landing.css blocks app.js style.css hardware.js runtime.js block-specs.js blocks.js; do
+for name in index.html landing.css blocks simulator dashboard app.js style.css hardware.js runtime.js block-specs.js blocks.js; do
  if [[ -e "$target_dir/$name" || -L "$target_dir/$name" ]]; then mv -- "$target_dir/$name" "$current_dir/$name"; fi
  if [[ -e "$backup_dir/$name" || -L "$backup_dir/$name" ]]; then cp -a -- "$backup_dir/$name" "$target_dir/$name"; fi
 done

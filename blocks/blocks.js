@@ -102,6 +102,8 @@ function defineEventBlocks() {
 
 
 B.defineBlocksWithJsonArray(specs.map(buildDynamicBlockJson));
+DashboardBlocks.definitions();
+for(const spec of specs.filter(s=>s.type!=='cn_log')){const def=B.Blocks[spec.type],init=def.init;def.init=function(){init.call(this);this.appendDummyInput('TARGET_ROW').appendField('target').appendField(new B.FieldDropdown([['Hardware','HARDWARE'],['Simulation','SIMULATION']]),'TARGET');};}
 defineEventBlocks();
 B.defineBlocksWithJsonArray([
 {type:'cn_wait',message0:'wait %1 seconds',args0:[{type:'input_value',name:'SECONDS',check:'Number'}],previousStatement:null,nextStatement:null,colour:'#ffab19'},
@@ -211,7 +213,7 @@ function buildToolbox() {
       }
   ];
   return {kind: 'categoryToolbox', contents: toolboxMode === 'general' ? general
-    : Array.from(dynamicCategories.values())};
+    : toolboxMode==='dashboard'?DashboardBlocks.categories():Array.from(dynamicCategories.values())};
 }
 
 const CodyNickTheme = Blockly.Theme.defineTheme('codynickScratchLike', {
@@ -242,15 +244,18 @@ const CodyNickTheme = Blockly.Theme.defineTheme('codynickScratchLike', {
 const categoryColours={'#59c059':['logic_compare','logic_operation','logic_negate','logic_boolean','math_number','math_arithmetic','math_single','math_round','math_random_int'],'#ffab19':['cn_wait','cn_forever','controls_if','controls_repeat_ext','controls_whileUntil','controls_flow_statements']};
 for(const [colour,types] of Object.entries(categoryColours))for(const type of types){const definition=B.Blocks[type],originalInit=definition.init;definition.init=function(){originalInit.call(this);this.setColour(colour);};}
 const workspace=B.inject('blocklyDiv',{toolbox:buildToolbox(),media:'/blocks/vendor/blockly/media/',renderer:'zelos',theme:CodyNickTheme,trashcan:true,move:{scrollbars:true,drag:true,wheel:true},grid:{spacing:32,length:3,colour:'#dbeafe',snap:true},zoom:{controls:true,wheel:true,startScale:.72,maxScale:2.2,minScale:.35,scaleSpeed:1.12}});
-const runtime=new BlockRuntime(new CjpHardware(window.CJP),specs,(kind,id)=>workspace.highlightBlock(id));
+const runtime=new BlockRuntime(new LiveRouter(new CjpHardware(window.CJP),window.CodyLiveStore),specs,(kind,id)=>workspace.highlightBlock(id));
 window.codyWorkspace=workspace;
-for(const mode of ['general','hardware'])$(mode+'ToolboxTab').onclick=()=>{toolboxMode=mode;workspace.updateToolbox(buildToolbox());for(const name of ['general','hardware'])$(name+'ToolboxTab').setAttribute('aria-selected',String(name===mode));$('toolboxWorkspace').setAttribute('aria-labelledby',mode+'ToolboxTab');B.svgResize(workspace);};
+for(const mode of ['general','hardware','dashboard'])$(mode+'ToolboxTab').onclick=()=>{toolboxMode=mode;workspace.updateToolbox(buildToolbox());for(const name of ['general','hardware','dashboard'])$(name+'ToolboxTab').setAttribute('aria-selected',String(name===mode));$('toolboxWorkspace').setAttribute('aria-labelledby',mode+'ToolboxTab');B.svgResize(workspace);};
 $('toggleConsole').onclick=()=>{$('consoleModal').classList.add('open');};
 $('closeConsole').onclick=()=>{$('consoleModal').classList.remove('open');};
+$('toggleSpaces').onclick=()=>{const main=$('liveMain');const hide=!main.classList.contains('stage-collapsed');main.classList.toggle('stage-collapsed',hide);$('toggleSpaces').textContent=hide?'Show spaces':'Hide spaces';B.svgResize(workspace);};
+for(const name of ['simulator','dashboard'])$('show-'+name).onclick=()=>{for(const other of ['simulator','dashboard'])$(other+'Frame').hidden=other!==name;};
 $('consoleModal').onclick=e=>{if(e.target===$('consoleModal'))$('consoleModal').classList.remove('open');};
 window.addEventListener('keydown',e=>{if(e.key==='Escape')$('consoleModal').classList.remove('open');});
 let saving=null,loading=false;
 const key='codynick-webserial-blocks-v2';
+B.serialization.registry.register('codynick_live_scene',{priority:5,save:ws=>ws===workspace?{scene:CodyLiveStore.read().scene}:undefined,load:(data,ws)=>{if(ws===workspace&&data?.scene)CodyLiveStore.simCommand({action:'scene',scene:data.scene});},clear:()=>{}});
 function status(s){$('workspaceStatus').textContent=s;}
 window.addEventListener('resize',()=>B.svgResize(workspace));
 function save(){try{localStorage.setItem(key,JSON.stringify(B.serialization.workspaces.save(workspace)));}catch(e){status('Could not save in this browser. Download your project: '+e.message);}}
@@ -258,9 +263,14 @@ workspace.addChangeListener(e=>{if(e.isUiEvent||loading)return;clearTimeout(savi
 function load(data){if(window.blockProgramRunning)throw Error('Stop the program before loading.');const types=new Set([...specs.map(s=>s.type),...BlockRuntime.types]);const roots=data?.blocks?.blocks;if(!Array.isArray(roots))throw Error('Not a Blockly workspace file.');let count=0;function check(b,depth=0){if(!b)return;if(depth>150||++count>2000)throw Error('Project too large or deeply nested.');if(!types.has(b.type))throw Error('Unsupported block in project: '+b.type);for(const v of Object.values(b.inputs||{})){check(v.block,depth+1);check(v.shadow,depth+1);}check(b.next?.block,depth+1);}roots.forEach(b=>check(b));const previous=B.serialization.workspaces.save(workspace);loading=true;try{B.serialization.workspaces.load(data,workspace);}catch(e){B.serialization.workspaces.load(previous,workspace);throw e;}finally{loading=false;}save();B.svgResize(workspace);}
 const number=n=>({type:'math_number',fields:{NUM:n}}),str=s=>({type:'text',fields:{TEXT:s}}),hardware=(type,fields={})=>({type,fields}),wait=n=>({type:'cn_wait',inputs:{SECONDS:{block:number(n)}}});
 function sequence(...blocks){for(let i=0;i<blocks.length-1;i++)blocks[i].next={block:blocks[i+1]};return blocks[0];}
-function example(name){let root;if(name==='blink')root={type:'cn_event_loop',x:60,y:50,inputs:{DO:{block:sequence(hardware('cn_rgb_matrix_set',{led:0,color:'#FF0000'}),wait(.5),hardware('cn_rgb_matrix_clear'),wait(.5))}}};
+function example(name){if(['sim-dashboard','mixed'].includes(name))return liveExample(name);let root;if(name==='blink')root={type:'cn_event_loop',x:60,y:50,inputs:{DO:{block:sequence(hardware('cn_rgb_matrix_set',{led:0,color:'#FF0000'}),wait(.5),hardware('cn_rgb_matrix_clear'),wait(.5))}}};
 else if(name==='temperature')root={type:'cn_event_loop',x:60,y:50,inputs:{DO:{block:sequence({type:'cn_seven_segment_display_value',fields:{device:"'STANDALONE'"},inputs:{value:{block:hardware('cn_temperature_read')}}},wait(1))}}};
 else root={type:'cn_event_loop',x:60,y:50,inputs:{DO:{block:sequence(hardware('cn_rgb_matrix_clear'),{type:'controls_if',inputs:{IF0:{block:hardware('cn_joystick_click',{device:"'CJP'"})},DO0:{block:hardware('cn_rgb_matrix_set',{led:0,color:'#00FF00'})}}},wait(.1))}}};return {blocks:{languageVersion:0,blocks:[root]}};}
+function liveExample(name){const target=name==='mixed'?'HARDWARE':'SIMULATION';const sensor={type:'cn_temperature_read',fields:{TARGET:target}};
+const start={type:'cn_event_start',x:30,y:30,inputs:{DO:{block:sequence({type:'dash_clear'},hardware('dash_create_gauge',{NAME:'temperature',TITLE:'Temperature'}),hardware('dash_create_graph',{NAME:'history',TITLE:'Temperature history'}))}}};
+const set={type:'variables_set',fields:{VAR:{name:'temperature'}},inputs:{VALUE:{block:sensor}}};const variable=()=>({type:'variables_get',fields:{VAR:{name:'temperature'}}});
+const loop={type:'cn_event_loop',x:30,y:270,inputs:{DO:{block:sequence(set,{type:'dash_gauge_set',fields:{NAME:'temperature'},inputs:{VALUE:{block:variable()}}},{type:'dash_append',fields:{NAME:'history'},inputs:{VALUE:{block:variable()}}},hardware('cn_rgb_matrix_set',{led:0,color:'#00FF00',TARGET:'SIMULATION'}),wait(.5))}}};
+return {codynick_live_scene:{scene:{...CodyLiveStore.read().scene,gadgets:{...CodyLiveStore.read().scene.gadgets,cjp:{x:40,y:40},temperature:{x:440,y:360}}}},blocks:{languageVersion:0,blocks:[start,loop]}};}
 function replaceWith(data){if(workspace.getAllBlocks(false).length&&!confirm('Replace the current workspace? Download it first if you want to keep a copy.'))return;load(data);}
 $('example').onchange=()=>{try{if($('example').value)replaceWith(example($('example').value));}catch(e){status(e.message);}finally{$('example').value='';}};
 $('newProject').onclick=()=>{try{replaceWith({blocks:{languageVersion:0,blocks:[{type:'cn_event_start',x:60,y:50}]}});}catch(e){status(e.message);}};
@@ -271,8 +281,8 @@ $('saveNamed').onclick=()=>{try{const name=($('designName').value||'Untitled').t
 $('loadNamed').onclick=()=>{try{const saved=JSON.parse(localStorage.getItem('codynick-named-designs')||'{}');$('designList').replaceChildren();for(const name of Object.keys(saved).sort()){const option=document.createElement('option');option.textContent=name;option.value=name;$('designList').append(option);}if(!Object.keys(saved).length){status('No named designs saved in this browser yet.');return;}$('designDialog').showModal();}catch(e){status('Load failed: '+e.message);}};
 $('loadNamedConfirm').onclick=()=>{try{const name=$('designList').value;if(!name)return;const saved=JSON.parse(localStorage.getItem('codynick-named-designs')||'{}');replaceWith(saved[name]);$('designName').value=name;$('designDialog').close();}catch(e){status('Load failed: '+e.message);}};
 $('closeDesignDialog').onclick=()=>$('designDialog').close();
-$('blockRunBtn').onclick=async()=>{if(!window.CJP.connected){status('Connect your CJP first.');return;}if(window.blockProgramRunning)return;if(window.CJP.occupied){status('Wait for the serial connection operation to finish.');return;}let snapshot;try{snapshot=new B.Workspace();B.serialization.workspaces.load(B.serialization.workspaces.save(workspace),snapshot);}catch(e){snapshot?.dispose();status(e.message);return;}lock(true);status('Running in this browser…');try{await runtime.run(snapshot);status('Program finished.');}catch(e){status(e.message==='Stopped'?'Program stopped.':'Program ended: '+(e.message||'Break/continue used outside a loop'));window.CJP.log('PROGRAM '+(e.message||e));}finally{snapshot.dispose();lock(false);}};
+$('blockRunBtn').onclick=async()=>{if(window.blockProgramRunning)return;if(window.CJP.occupied){status('Wait for the serial connection operation to finish.');return;}let snapshot;try{snapshot=new B.Workspace();B.serialization.workspaces.load(B.serialization.workspaces.save(workspace),snapshot);}catch(e){snapshot?.dispose();status(e.message);return;}lock(true);status('Running in this browser…');const token=Date.now()+'-'+Math.random();let heartbeat;try{runtime.preflight(snapshot);runtime.activeNeedsHardware=runtime.executable(snapshot).some(b=>specs.some(s=>s.type===b.type&&s.type!=='cn_log')&&(b.getFieldValue('TARGET')||'HARDWARE')==='HARDWARE');CodyLiveStore.start(token);heartbeat=setInterval(()=>CodyLiveStore.heartbeat(token),800);await runtime.run(snapshot);status('Program finished.');}catch(e){status(e.message==='Stopped'?'Program stopped.':'Program ended: '+(e.message||'Break/continue used outside a loop'));window.CJP.log('PROGRAM '+(e.message||e));}finally{clearInterval(heartbeat);CodyLiveStore.stop(token);snapshot.dispose();lock(false);}};
 $('blockStopBtn').onclick=()=>{runtime.stop();status('Stopping… Waiting for any active hardware reply.');};
-window.addEventListener('cjp-disconnected',()=>runtime.stop());
+window.addEventListener('cjp-disconnected',()=>{if(window.blockProgramRunning&&runtime.activeNeedsHardware)runtime.stop();});
 try{const previous=localStorage.getItem(key);if(previous)load(JSON.parse(previous));else load(example('blink'));}catch(e){status('Saved project could not be loaded: '+e.message);}
 })();

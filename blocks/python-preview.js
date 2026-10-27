@@ -2,7 +2,7 @@
 const workspace=window.codyWorkspace;
 const dynamicBlockSpecs=new Map(window.HARDWARE_SPECS.map(s=>[s.type,s]));
 const SpritePrototype={value:()=>null,statement:()=>null};
-const DashboardBlocks={statement:()=>null};
+
 const ExecutionTarget={programBlocks:ws=>ws.getAllBlocks(false).filter(b=>dynamicBlockSpecs.has(b.type)),initialization:()=> 'cody = CN()'};
 function quotePython(value) {
   return JSON.stringify(String(value ?? ''));
@@ -295,7 +295,8 @@ function generatePython() {
 }
 
 function viewPython() {
-  const code = updatePythonPreview(true);
+  const mixed=workspace.getAllBlocks(false).some(b=>b.getFieldValue('TARGET')==='SIMULATION'||b.type.startsWith('dash_'));
+  const code = mixed?'# This Live program uses browser simulation/dashboard targets.\n# A single Python hardware script cannot represent its routing.\n# Run the blocks using the Live runtime.':updatePythonPreview(true);
   document.getElementById('pythonPreview').textContent = code;
   document.getElementById('pythonModal').classList.add('open');
 }
@@ -316,7 +317,7 @@ async function copyPythonPreview(event) {
   if (event) event.stopPropagation();
   const code = document.getElementById('pythonPreview').textContent;
   await navigator.clipboard.writeText(code);
-  toast('Python copied.');
+  window.portalToast?.('Python copied.');
 }
 
 

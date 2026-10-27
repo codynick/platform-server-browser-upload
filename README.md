@@ -1,155 +1,162 @@
-# CodyNick Portal 3.4 — Linux connection help
+# CodyNick Portal 3.5 — Live hardware, simulation and dashboard
 
-## Install with MobaXterm
-Upload CodyNick_Portal_v3_4.zip to /root/. Run as root:
+Complete static website release for code.codynick.com. The working Windows/Linux
+Web Serial and Android CH340 WebUSB paths from v3.4 are retained. Upload-to-Uno
+mode and automatic firmware installation are NOT implemented in this release.
 
-```bash
-cd /root
-unzip -o CodyNick_Portal_v3_4.zip -d CodyNick_Portal_v3_4
-bash /root/CodyNick_Portal_v3_4/install.sh
+## Your Git workflow
+Extract all ZIP contents into the local platform-server-browser-upload repository
+root (beside .git). This ZIP contains no .git directory and does not require any
+files from v3.4 to be deleted locally. Commit/push manually:
+
+```powershell
+git add -A
+git commit -m "Release v3.5: integrated Live simulation and dashboard"
+git push origin main
 ```
 
-If unzip is unavailable, first run `apt install -y unzip`.
+Then run the same command as root on the already configured VPS:
 
-Home: https://code.codynick.com/
-Block IDE: https://code.codynick.com/blocks/
+```bash
+apt-get update && apt-get install -y git && (git -C /root/platform-server-browser-upload rev-parse --git-dir >/dev/null 2>&1 || git clone https://github.com/codynick/platform-server-browser-upload.git /root/platform-server-browser-upload) && git -C /root/platform-server-browser-upload pull --ff-only origin main && bash /root/platform-server-browser-upload/install.sh
+```
 
-Press Ctrl+F5 after installation. No Apache restart or certificate changes needed.
-The existing Apache document root must be /var/www/code.codynick.com.
+This assumes Apache, DNS, HTTPS and /var/www/code.codynick.com already exist,
+as on your configured VPS. The installer does not configure a blank server.
 
-## Android connection
-The Connect button automatically uses WebUSB on Android and native Web Serial
-on Windows/other desktop platforms. The WebUSB path is scoped to the user's
-CH340 board: VID 1A86, PID 7523. No firmware or Windows driver changes are needed.
-It initializes 115200 baud, 8N1, no hardware flow control and identifies the CJP
-before enabling block execution or showing the green Disconnect button.
-
-On your S23 FE:
-1. Disconnect and close the Android USB serial app so it releases the device.
-2. Unplug/replug the CJP with the known working adapter/cable.
-3. Open https://code.codynick.com/blocks/ directly in Chrome and reload the page.
-4. Keep Chrome's Desktop site option off if Android detection is not working.
-5. Tap Connect, choose the CH340/USB2.0-Serial device, and grant Android/Chrome USB
-   access if prompted. Wait for firmware identification.
-6. Run Blink RGB and test Stop. Test Disconnect and reconnect too.
-
-If it fails, open Console and send the connection error and any TX/RX lines.
-The log identifies the connection path; on the phone it should say
-Connecting using WebUSB CH340 1A86:7523. A successful identity is shown with
-WebUSB · CH340. On Windows the connection remains Web Serial.
-
-The USB interface/baud/control initialization, read/write behavior, cancellation,
-cleanup and Android routing were verified against simulated USB devices. Native
-Windows routing was regression tested. This is an unverified hardware build:
-actual CH340 operation on the S23 FE still needs the above physical test.
-Only the confirmed 1A86:7523 device is supported by this WebUSB implementation.
-Some Android/browser builds may still block USB access or interface claiming.
-No additional server services, certificates or permission headers are installed.
-
-## Original appearance
-The editor's editor.css is the original index.php inline stylesheet extracted
-verbatim, and stage.css and the shared navigation stylesheet are copied from the
-uploaded project. The header, toolbar, workspace shell, General/Hardware tabs,
-modal and named-design dialog markup come from that source. The original
-CodyNickTheme, block builder, event shapes, General toolbox, block recoloring,
-Zelos renderer, grid spacing and zoom defaults are reused.
-
-The toolbar now has one Connect button. Successful firmware identification changes
-it to Disconnect with a green background and white text. Press it again to
-close the connection. If an open port faults, Disconnect remains available to
-clean it up; green styling is removed until a successful reconnect.
-
-New, Save, Load, Upload and Download are in the Project dropdown. A second Save
-shortcut sits immediately after the design-name field and performs the same
-named-design save action. The menu closes on action, outside click, or Escape.
-Connection status and examples sit in the existing design bar. The console opens
-in a modal using the original modal appearance. View Python uses the original
-Python generator for reference; Run still executes through browser Web Serial.
-The extra webserial.css contains only connection/console additions and wrapping
-needed to fit the new buttons. It does not replace the original editor design.
-
-The original optional sprite stage is collapsed and excluded from this hardware
-edition; only General and Hardware modes are offered, as previously scoped.
-Sprites, dashboards, simulator and Python execution services are not included.
-The root landing page remains; RGB Studio is not restored.
-
-The installer backs up all replaced files and earlier RGB Studio assets to a
-unique /root/codynick-portal-backup-* directory. It prints a rollback command:
+Alternatively upload the ZIP to /root/, extract it and run its install.sh as root.
+The installer backs up replaced root files and the blocks/simulator/dashboard
+sections, prints a rollback command, and does not modify Apache or SSL. To undo
+use the exact command printed, e.g.:
 
     bash /root/codynick-portal-backup-EXAMPLE/rollback.sh
 
-Use the exact backup path printed. Rollback also preserves the version it replaces.
-Files outside this portal's known paths are left alone. Apache and SSL settings
-are not modified. This is a static site: no PHP, Node service, database, or Python
-service is installed. The tests are development tools, not server requirements.
+## Pages
+- / — landing page
+- /blocks/ — original project block-editor appearance, with shared Live runtime
+- /simulator/ — original gadget simulator interface adapted to browser-local state
+- /dashboard/ — original dashboard renderer adapted to browser-local widgets
 
-## Try it
-1. Open the editor in Chrome on your PC or Android phone.
-2. Plug the CJP into your computer, with the existing CodyPi firmware and gadgets.
-3. Keep the joystick centered during startup. Close other serial applications.
-4. Click Connect, choose its COM port, and wait for identification.
-5. Click Run on the default Blink RGB example; LED 0 should blink red.
-6. Click Stop. Hardware keeps its last commanded output.
-7. Try the temperature-display or joystick-light example with the relevant gadgets.
+Refresh the editor with Ctrl+F5 after installation. Simulator and Dashboard are
+available in the editor's right panel, with links for opening full-size tabs.
+Hide spaces restores the full-width coding workspace. On narrower screens the
+spaces stack below the editor. The open tabs must use the same origin and browser
+profile; they share the browser's local state. Different devices/profiles do not
+share projects or dashboard values. No PHP, Python server, MySQL or extra service
+is required: the original UI assets are retained, but server APIs are replaced
+by a browser-local model.
 
-## Blocks and execution
-Start once, main loop, wait, forever, repeat, while/until, if/else, comparisons,
-arithmetic, text, variables, timer, logging, and break/continue are supported.
-Hardware: RGB matrix (index or serpentine XY), LED matrix text/pixels/clear,
-sound, joystick, temperature, soil moisture, PIR, RFID, ultrasonic, seven-segment
-literal and computed values. Wi-Fi/IoT, sprites, dashboards, simulator, Python
-execution, OS keyboard and legacy library-update blocks are not included.
-Unsupported imported blocks are rejected before replacing the current project.
+## Target rules (confirmed design)
+Each gadget block has a target dropdown: Hardware or Simulation. Hardware is the
+default, including imports from v3.4 without a target field. The setting is saved
+with the block. There is no project-wide target selector or Set All action.
+Logic/math/variables/events/waits and logging run in the browser and have no target.
+Dashboard blocks always act on the Live dashboard and have no target dropdown.
 
-Programs execute in the visitor's browser and are not flashed onto the Uno.
-Keep the editor open and connected. Background-tab throttling may alter timing.
-Run uses a snapshot; edits during execution affect the next run.
-Enabled start sections execute in order, then enabled main-loop sections repeat.
-A forever loop inside a start section prevents reaching later sections.
+A Run snapshot is checked before execution. Enabled blocks under start/main-loop
+roots are considered, including branches that might execute; disabled blocks and
+loose unused blocks do not require devices. Hardware targets require a connected,
+identified CodyPi gateway. Simulated targets require the corresponding gadget on
+the simulation stage. A missing/unsupported target produces a block-specific
+error; there is no silent hardware/simulation fallback. Missing requirements
+prevent program actions from starting. Gadget availability is also checked during
+execution. Hardware-targeted blocks cannot execute without a CJP.
 
-Stop interrupts waits and prevents subsequent hardware commands. Already sent
-commands may finish. An active sensor request may take up to 2.5 seconds to time
-out; after a timeout, disconnect and reconnect before retrying to avoid stale
-reply confusion. Ultrasonic values may be cached by firmware. RGB commands have
-no hardware acknowledgments. Sound duration is limited to 32767 ms to avoid the
-Uno firmware's signed 16-bit parsing issue. LED matrix text is up to 49 printable
-ASCII characters; seven-segment values must fit the six-character field.
+The simulated CJP is always present. Add other gadgets using the original
+simulator's palette before Run. Stop before adding/removing simulated gadgets.
+Start sections run once; main-loop sections then repeat in workspace order.
+A forever in a start section prevents reaching later sections. Run uses a snapshot
+so edits affect the next run. Stop cancels waits, but an in-flight hardware read
+may take up to 2.5 s to finish/time out. Outputs retain their last commanded state.
 
-## Projects
-The workspace autosaves in this browser under the same key as the previous
-Block Studio package, so compatible existing workspaces are retained.
-Save/Load stores named designs in browser storage. Download/Upload transfers
-.codynick projects as files. No account or server storage is used. Use downloads
-for backups or transfer, and avoid multiple simultaneous editor tabs.
-The firmware and supported block IDs are unchanged from the previous release.
+## Getting started
+1. Open /blocks/ in Chrome. For a simulation-only test, no USB connection is needed.
+2. Select Examples -> Simulation + dashboard, and accept workspace replacement.
+3. This example adds a simulated temperature sensor to the stage and creates a
+   gauge/history graph through Dashboard blocks. Press Run.
+4. Adjust temperature in Simulation and switch the right panel to Dashboard.
+   The values and chart update. A simulated RGB LED lights green.
+5. Stop. Try the mixed example after connecting a real CJP and temperature sensor:
+   the real reading drives the dashboard while the LED action targets Simulation.
 
-## Verification
-JavaScript/installer syntax, HTML element references, local asset references,
-original stylesheet byte equality, real headless Blockly initialization and
-examples, original Python reference generation, runtime controls, firmware
-frames, reply matching/timeouts, upgrade cleanup and rollback were checked.
-Tests: `node blocks/tests/runtime.cjs`, `node blocks/tests/ui.cjs`,
-`node blocks/tests/serial.cjs`, and `node blocks/tests/menu.cjs`, `node blocks/tests/webusb.cjs`, and
-`node blocks/tests/android.cjs`.
-Graphical browser rendering was not verified in the build environment. Physical
-Web Serial and gadget behavior require testing with your CJP.
+The original Blink RGB, Temperature display and Joystick light examples still
+target Hardware by default. Change individual dropdowns to try their simulated
+counterparts, adding required gadgets to the stage yourself.
+
+## Supported gadgets
+- CJP RGB matrix: index and serpentine XY color, clear
+- CJP sound: note, duration, optional wait-until-finished
+- Joystick: CJP index 5 and standalone index 0 in simulation; hardware retains 0–5
+- LED matrix: scrolling text, pixel on/off/set, clear
+- Seven-segment: standalone index 0 and UltraSeg index 2
+- Temperature, soil moisture, ultrasonic (standalone 0 / UltraSeg 1), PIR, RFID
+
+Simulation reuses the original photos/SVGs, joystick controls, draggable stage,
+RGB visualization, seven-segment renderer, LED font/raster and optional sound.
+PIR, RFID and UltraSeg have added controls; UltraSeg's numeric display is a simple
+readout rather than an additional photorealistic seven-segment panel.
+Enable sound in the simulator to permit browser audio. Simulated reads represent
+values you enter, not a physical/environmental model. Hardware ultrasonic values
+can be cached by CodyPi. RGB hardware commands have no acknowledgments.
+
+The original simulator's Wi-Fi/IoT exploratory card is retained, but Wi-Fi/IoT
+coding blocks remain outside this release's palette. They were not available in
+v3.4. Legacy sensors, sprites, Upload mode, cloud accounts and autonomous programs
+are not implemented here.
+
+## Dashboard
+Dashboard toolbox groups are copied from the original project: Setup, Info,
+Gauge and Graph. Create a named widget before updating it. Supported blocks:
+clear, create, set value, append sample, history length, range, color/size and font.
+Gauge and graph values carry a Source label (Hardware, Simulation, mixed sources,
+or Program), including readings passed through variables. Values are local to
+this browser. Widgets persist after Stop; a program can clear/recreate them.
+There are at most 100 widgets, with graph history limited to 1000 samples each.
+The dashboard can be open in its iframe or another same-origin tab while Run
+continues in the editor. Closing the editor stops program execution; the session
+indicator expires after a few seconds. Only run one Live program per browser
+profile; a live-session check blocks another active editor from starting.
+
+## Projects and compatibility
+Save/Load named designs and autosave retain their existing browser keys. Download
+and Upload preserve per-block targets and stage arrangement/sensor settings.
+Dashboard creation blocks recreate widgets when you run a project; current graph
+history/output states are not part of the exported project. The simulator's
+layout/settings and dashboard state also persist separately in browser storage.
+Original supported hardware IDs are retained. Unsupported imported blocks are
+rejected before replacing the workspace. Back up work with Download before
+changing examples or loading another design.
+
+View Python remains a reference preview for hardware-only projects. Mixed-target
+and dashboard projects instead show a clear message that a single hardware Python
+script cannot represent the browser Live routing. The Run button always uses
+the JavaScript interpreter; nothing is flashed to the CJP.
+
+## Connections
+Windows/Linux desktop Chrome uses native Web Serial. Linux USB setup help
+explains dialout permissions, full logout/login and occupied ports. Android
+uses WebUSB for CH340 VID 1A86 / PID 7523; close other Android serial apps first.
+The Android connection path was physically confirmed on an S23 FE in v3.3.
+Existing firmware CodyPi 1.19.6 remains unchanged. Browser timing is not real time;
+background tab throttling may change update timing.
+
+## Tests and limits
+Run `node blocks/tests/live.cjs` for mixed routing, disconnected simulation,
+dashboard source labels, preflight validation, persistence and gadget-model checks.
+`frontends.cjs` checks original frontend initialization and graph parsing with a
+DOM stub. `ui.cjs` and `runtime.cjs` load real headless Blockly blocks and test
+Run/Stop/variables/loops and protocol frames. `serial.cjs`, `android.cjs`,
+`webusb.cjs`, `linux-help.cjs` and `menu.cjs` cover existing connection/menu paths.
+Node is only used for development tests; it is not required on the VPS.
+
+Installer/rollback was exercised in a temporary website tree; local HTML asset
+references and all scripts were checked. Mixed hardware replies are simulated in
+tests. Graphical layout/touch behavior and physical mixed-mode hardware execution
+still need testing in your browser after deployment.
 
 ## Attribution
-The user-provided platform-server.zip supplied the bundled Blockly engine and
-hardware block definitions. CodyNick.py and CodyPi.ino supplied protocol details.
-Bundled notices are retained; see blocks/vendor/blockly/LICENSE.
-Python templates in block-specs.js are reference metadata only. The browser
-interprets supported blocks directly without running Python or using eval.
-
-CH340 protocol reference and MIT notices: blocks/THIRD_PARTY.md.
-
-## Linux connection help (3.4)
-Linux desktops show a Linux USB setup button before connecting. The setup dialog
-also opens after a native SerialPort.open() failure on a detected Linux desktop.
-It explains dialout membership, full desktop logout/login, busy ports and browser
-sandbox restrictions. The failure is not diagnosed as definitely a permission
-problem. Copy command uses the clipboard; if unavailable, it highlights the
-command for manual copying. No permissions are changed by the webpage.
-Android is excluded from Linux detection; its proven WebUSB path is retained.
-ChromeOS is also excluded. The dialog appears on request or an open failure,
-not as an automatic first-visit interruption.
+Original block editor styles/theme/definitions, simulator interface/assets and
+dashboard HTML/CSS/renderer come from your supplied platform-server.zip. The
+simulator's bundled font license is preserved in simulator/FONT-LICENSE.txt.
+Blockly notices: blocks/vendor/blockly/LICENSE. CH340 protocol reference/notices:
+blocks/THIRD_PARTY.md. CodyPi firmware protocol is unchanged.
