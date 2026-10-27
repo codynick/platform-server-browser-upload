@@ -1,3 +1,12 @@
+# v3.7.0
+
+- Added Edit/Lock layout, grid-snapped card movement and corner resizing.
+- Added keyboard arrow controls, drag cancellation and Reset layout.
+- Preserve per-widget layout separately from program state across runs and tabs.
+- Compact info, medium gauge and wide graph defaults with responsive placement.
+- Smaller independent graph axis text, compact numbers and adaptive tick labels.
+- Make the mixed-display regression wait for a complete sample before Stop.
+
 # v3.6.1
 
 - Ask for the website domain during first setup; remember it for updates.

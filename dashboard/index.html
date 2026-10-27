@@ -403,6 +403,28 @@ body {
 .card-purple{border-top-color:#9254cc}.card-purple .gauge-fill{stroke:#9254cc}
 .card-cyan{border-top-color:#0891b2}.card-cyan .gauge-fill{stroke:#0891b2}
 .card-gray{border-top-color:#64748b}.card-gray .gauge-fill{stroke:#64748b}
+
+/* Editable layout: twelve columns on wide panels, six/two on smaller panels. */
+.grid { grid-template-columns:repeat(12,minmax(0,1fr)); grid-auto-rows:120px; gap:12px; align-items:stretch; }
+.card { position:relative; min-width:0; padding:12px; }
+.card-title { display:block; width:100%; flex-shrink:0; border:0; background:transparent; color:inherit; padding:0; text-align:left; margin:0 0 6px; font-size:14px; cursor:default; }
+.card-body { min-width:0; width:100%; }
+.card-description { flex-shrink:0; margin-top:5px; max-height:16px; white-space:nowrap; text-overflow:ellipsis; }
+.dash-info { height:100%; min-height:0; padding:2px 6px; border:0; background:transparent; }
+.graph-canvas,.chart-canvas { min-height:60px; height:0; flex:1 1 0; }
+.graph-note { flex-shrink:0; }
+.layout-toolbar { display:flex; gap:8px; align-items:center; flex-wrap:wrap; margin-bottom:16px; }
+.layout-toolbar button { border:1px solid #cbd5e1; border-radius:8px; padding:8px 12px; background:white; color:#1f2937; cursor:pointer; }
+.layout-toolbar button[aria-pressed="true"] { background:#dbeafe; border-color:#3b82f6; }
+#layoutStatus { font-size:12px; color:var(--muted); }
+.layout-resize { display:none; position:absolute; right:1px; bottom:1px; width:26px; height:26px; padding:0; border:0; border-radius:6px; background:#dbeafe; color:#1d4ed8; cursor:nwse-resize; touch-action:none; }
+.layout-editing .layout-resize { display:block; }
+.layout-editing .card-title { cursor:grab; touch-action:none; padding-right:14px; }
+.layout-editing .card { outline:1px dashed #93c5fd; }
+.layout-editing .layout-active { cursor:grabbing; }
+[data-layout-action]:focus-visible { outline:2px solid #2563eb; outline-offset:2px; }
+@media(max-width:560px){.container{padding:12px}.header{gap:10px}.header-title{font-size:16px}}
+
 </style>
 <link rel="icon" type="image/x-icon" href="/assets/favicon.ico"><link rel="stylesheet" href="/assets/tool-navigation.css"></head>
 <body>
@@ -420,12 +442,13 @@ body {
 </header>
 
 <main class="container">
+    <div class="layout-toolbar"><button id="editLayout" type="button" aria-pressed="false">Edit layout</button><button id="resetLayout" type="button" hidden>Reset layout</button><span id="layoutStatus" role="status" aria-live="polite">Layout locked. Choose Edit layout to move or resize cards.</span></div>
     <div class="grid" id="dashboardGrid">
         <div class="empty-state">Loading dashboard...</div>
     </div>
 </main>
 
-<script src="/blocks/live-store.js"></script><script>
+<script src="layout.js"></script><script src="/blocks/live-store.js"></script><script>
 const localFetch=async(url,options={})=>{try{if(url.includes("action=set"))window.CodyLiveStore.dashboardInput(options.body.get("id"),options.body.get("value"));return {json:async()=>({ok:true,cards:window.CodyLiveStore.cards()})};}catch(error){return {json:async()=>({ok:false,error:error.message})};}};
 const POLL_INTERVAL_MS = 150;
 const grid = document.getElementById('dashboardGrid');
@@ -563,9 +586,10 @@ function renderCardShell(card) {
 
     return `
         <div class="card card-span-${columnSpan} card-height-${heightMultiplier} ${isValid ? `card-${color}` : 'card-error'}" data-card-id="${id}" data-card-type="${escapeHtml(type)}" data-y-padding-percent="${yPaddingPercent}" data-x-axis-label="${xAxisLabel}" data-y-axis-label="${yAxisLabel}"${style ? ` style="${style}"` : ''}>
-            <div class="card-title">${title}</div>
+            <button type="button" class="card-title" data-layout-action="move" data-role="layout-move" tabindex="-1" aria-disabled="true" title="${title} — in Edit layout, drag or use arrow keys to move">${title}</button>
             <div class="card-body">${renderCardBody(card)}</div>
             ${description}
+            <button type="button" class="layout-resize" data-layout-action="resize" data-role="layout-resize" tabindex="-1" aria-disabled="true" aria-label="Resize ${title}" title="Drag or use arrow keys to resize">↘</button>
         </div>
     `;
 }
@@ -701,6 +725,7 @@ function renderAllCards(cards) {
 
     isRenderingCards = true;
     grid.innerHTML = cards.map(renderCardShell).join('');
+    window.CodyDashboardLayoutUI?.apply(cards);
     cards.forEach(updateCardValues);
     attachEvents();
 
@@ -713,7 +738,7 @@ function renderAllCards(cards) {
 
     if (focusedCardId && focusedRole) {
         const replacement = document.querySelector(`[data-card-id="${CSS.escape(focusedCardId)}"] [data-role="${CSS.escape(focusedRole)}"]`);
-        if (replacement && replacement.tagName !== 'BUTTON') {
+        if (replacement && (replacement.tagName !== 'BUTTON' || replacement.dataset.layoutAction)) {
             try { replacement.focus({ preventScroll: true }); } catch (e) { replacement.focus(); }
             if (focusedType === 'textarea' && focusedRole === 'input' && editingTextareaValues[focusedCardId] !== undefined) {
                 replacement.value = editingTextareaValues[focusedCardId];
@@ -885,11 +910,8 @@ function drawGraph(cardEl, rawValue) {
     const note = cardEl.querySelector('[data-role="graph-note"]');
     if (!canvas) return;
 
-    const surface = prepareCanvas(canvas);
-    const ctx = surface.ctx;
-    const w = surface.width;
-    const h = surface.height;
-    ctx.font = canvasFont(cardEl);
+    let {ctx,width:w,height:h} = prepareCanvas(canvas);
+    ctx.font = '11px Arial, sans-serif';
     ctx.textBaseline = 'middle';
 
     let seriesList = [];
@@ -934,16 +956,26 @@ function drawGraph(cardEl, rawValue) {
         note.title = `x: ${niceNumber(minX)} to ${niceNumber(maxX)} | y: ${niceNumber(minY)} to ${niceNumber(maxY)} | ${allPoints.length} points`;
     }
 
-    const padLeft = yAxisLabel ? 58 : 42;
-    const padRight = 10;
-    const padTop = 10;
-    const padBottom = xAxisLabel ? 40 : 28;
+    // The legend changes the remaining canvas height; measure after rendering it.
+    ({ctx,width:w,height:h}=prepareCanvas(canvas));
+    ctx.font='11px Arial, sans-serif';
+    ctx.textBaseline='middle';
+    const formatter=(low,high)=>{const digits=Math.min(8,Math.max(3,Math.ceil(Math.log10(Math.max(Math.abs(low),Math.abs(high),1)/Math.max(high-low,Number.EPSILON)))+2));return v=>window.CodyDashboardLayout.compactNumber(v,digits);};
+    const compact=formatter(minY,maxY),compactX=formatter(minX,maxX);
+    const fit=(text,width)=>window.CodyDashboardLayout.fitText(ctx,text,width);
+    const labelWidth=Math.max(...[minY,maxY,minY+rangeY/2].map(v=>ctx.measureText(compact(v)).width));
+    const padLeft = Math.min(w*0.4,Math.max(36,labelWidth+10+(yAxisLabel?16:0)));
+    const padRight = 12;
+    const padTop = 12;
+    const padBottom = xAxisLabel ? 40 : 26;
     const plotLeft = padLeft;
     const plotRight = w - padRight;
     const plotTop = padTop;
     const plotBottom = h - padBottom;
     const plotW = plotRight - plotLeft;
     const plotH = plotBottom - plotTop;
+    if(plotW<24||plotH<24){if(note)note.textContent='Enlarge this graph to see its axes.';return;}
+    canvas.title=[xAxisLabel,yAxisLabel].filter(Boolean).join(' / ');
 
     function sx(x) { return plotLeft + ((x - minX) / rangeX) * plotW; }
     function sy(y) { return plotBottom - ((y - minY) / rangeY) * plotH; }
@@ -952,7 +984,8 @@ function drawGraph(cardEl, rawValue) {
     ctx.strokeStyle = '#e5e7eb';
     ctx.fillStyle = '#6b7280';
 
-    const yTicks = Array.from({ length: 5 }, (_, index) => minY + rangeY * index / 4);
+    const yCount=Math.max(2,Math.min(5,Math.floor(plotH/32)+1));
+    const yTicks = Array.from({ length: yCount }, (_, index) => minY + rangeY * index / (yCount-1));
     yTicks.forEach(v => {
         const y = sy(v);
         ctx.beginPath();
@@ -960,33 +993,34 @@ function drawGraph(cardEl, rawValue) {
         ctx.lineTo(plotRight, y);
         ctx.stroke();
         ctx.textAlign = 'right';
-        ctx.fillText(niceNumber(v), plotLeft - 5, y);
+        ctx.fillText(fit(compact(v),padLeft-(yAxisLabel?22:6)), plotLeft - 5, y);
     });
 
     const uniqueXs = [...new Set(xs)].sort((a, b) => a - b);
-    const xTicks = uniqueXs.length <= 5
-        ? uniqueXs
-        : Array.from({ length: 5 }, (_, index) => uniqueXs[Math.round(index * (uniqueXs.length - 1) / 4)]);
+    const xLabelWidth=Math.max(...uniqueXs.map(v=>ctx.measureText(compactX(v)).width))+16;
+    const xCount=Math.max(2,Math.min(5,Math.floor(plotW/Math.max(56,xLabelWidth))));
+    const xTicks = uniqueXs.length <= xCount ? uniqueXs
+        : Array.from({ length: xCount }, (_, index) => uniqueXs[Math.round(index * (uniqueXs.length - 1) / (xCount-1))]);
     xTicks.forEach(v => {
         const x = sx(v);
         ctx.beginPath();
         ctx.moveTo(x, plotTop);
         ctx.lineTo(x, plotBottom);
         ctx.stroke();
-        ctx.textAlign = 'center';
-        ctx.fillText(niceNumber(v), x, plotBottom + 14);
+        ctx.textAlign = v===xTicks[0]?'left':v===xTicks[xTicks.length-1]?'right':'center';
+        ctx.fillText(fit(compactX(v),plotW/Math.max(2,xCount-1)), x, plotBottom + 14);
     });
 
     ctx.fillStyle = '#4b5563';
     ctx.textAlign = 'center';
     if (xAxisLabel) {
-        ctx.fillText(xAxisLabel, plotLeft + plotW / 2, h - 8);
+        ctx.fillText(fit(xAxisLabel,plotW), plotLeft + plotW / 2, h - 8);
     }
     if (yAxisLabel) {
         ctx.save();
         ctx.translate(10, plotTop + plotH / 2);
         ctx.rotate(-Math.PI / 2);
-        ctx.fillText(yAxisLabel, 0, 0);
+        ctx.fillText(fit(yAxisLabel,plotH), 0, 0);
         ctx.restore();
     }
 
@@ -1347,6 +1381,7 @@ function pollState() {
 
             // Because title/color/description/type may also change, the entire dashboard is AJAX-rendered.
             const signature=JSON.stringify(data.cards);
+            if(window.CodyDashboardLayoutUI?.busy)return;
             if(signature!==renderedState){renderAllCards(data.cards);renderedState=signature;}
         })
         .catch(error => {
@@ -1365,5 +1400,6 @@ document.addEventListener('visibilitychange',()=>{if(!document.hidden){renderedS
 pollState();
 setInterval(pollState, POLL_INTERVAL_MS);
 </script>
+<script src="layout-ui.js"></script>
 </body>
 </html>

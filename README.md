@@ -1,4 +1,4 @@
-# CodyNick Portal 3.6.1
+# CodyNick Portal 3.7.0
 
 ## One command: fresh server setup or update
 
@@ -34,7 +34,7 @@ rollback command is printed during deployment; it does not undo package, Apache,
 or certificate setup. For an existing custom site, its DocumentRoot must be
 `/var/www/<domain>`. Website rollback remembers the deployment domain. This release does not flash firmware onto the CJP.
 
-Open Project > About in the editor to see version 3.6.1. Refresh with Ctrl+F5
+Open Project > About in the editor to see version 3.7.0. Refresh with Ctrl+F5
 after deployment. For an already configured server, install.sh remains available
 as a website-only deployment command.
 
@@ -112,6 +112,22 @@ v3.4. Legacy sensors, sprites, Upload mode, cloud accounts and autonomous progra
 are not implemented here.
 
 ## Dashboard
+
+Use **Edit layout** to drag card titles and resize from the lower-right corner.
+Both actions snap to the grid; occupied cards move to free space. Focus a title
+or resize handle and use arrow keys for keyboard control. Escape cancels an
+active drag. **Lock layout** prevents accidental changes; **Reset layout**
+restores defaults. Info cards start compact, gauges medium, and graphs wide.
+
+Layout is saved independently in this browser by widget name, surviving refresh,
+Stop, dashboard clear/recreation, and subsequent runs. User layout overrides
+program size settings until reset. Layout is not exported in project files;
+reusing the same widget name in another project reuses its saved layout.
+Narrow panels adapt the grid without overwriting saved desktop sizes.
+
+Graph axes use an independent 11 px font, compact numbers, adaptive tick density,
+and truncated long axis titles; hover over the graph for full axis titles.
+
 Dashboard toolbox groups are copied from the original project: Setup, Info,
 Gauge and Graph. Create a named widget before updating it. Supported blocks:
 clear, create, set value, append sample, history length, range, color/size and font.
@@ -148,6 +164,14 @@ Existing firmware CodyPi 1.19.6 remains unchanged. Browser timing is not real ti
 background tab throttling may change update timing.
 
 ## Tests and limits
+
+`node blocks/tests/dashboard-layout.cjs` checks layout packing, persistence and
+axis formatting. With Playwright available, `node dashboard/tests/browser.cjs`
+checks real pointer/keyboard editing, live updates, graph label bounds, reload,
+cross-tab layout reset, mobile width and the embedded editor dashboard.
+Use `CODY_CHROME_PATH` for an installed Chrome executable, or install Playwright's
+Chromium. Optional `CODY_DASHBOARD_ARTIFACTS` selects the screenshot directory.
+
 Run `node blocks/tests/live.cjs` for mixed routing, disconnected simulation,
 dashboard source labels, preflight validation, persistence and gadget-model checks.
 `frontends.cjs` checks original frontend initialization and graph parsing with a

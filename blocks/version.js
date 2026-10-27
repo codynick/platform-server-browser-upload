@@ -1,2 +1,2 @@
 'use strict';
-window.CODYNICK_VERSION = '3.6.1';
+window.CODYNICK_VERSION = '3.7.0';

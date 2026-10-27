@@ -12,7 +12,7 @@ for label in "${labels[@]}"; do
 done
 [[ "$domain" != *. && ! "$domain" =~ ^[0-9.]+$ ]] || { echo 'Use a DNS domain name, not an IP address.' >&2; exit 1; }
 target_dir=/var/www/$domain
-for name in VERSION index.html landing.css blocks/version.js blocks/index.html blocks/editor.css blocks/serial.js blocks/blocks.js blocks/hardware.js blocks/runtime.js blocks/block-specs.js blocks/vendor/blockly/blockly.min.js blocks/stage.css blocks/webserial.css blocks/python-preview.js blocks/project-menu.js blocks/ch340-usb.js blocks/linux-help.js blocks/live-store.js blocks/live-scheduler.js blocks/live-timer-worker.js blocks/live-router.js blocks/dashboard-blocks.js blocks/examples/Real-temperature-Sim-distance.codynick simulator/index.html simulator/app.js dashboard/index.html assets/tool-navigation.css assets/favicon.ico; do
+for name in VERSION index.html landing.css blocks/version.js blocks/index.html blocks/editor.css blocks/serial.js blocks/blocks.js blocks/hardware.js blocks/runtime.js blocks/block-specs.js blocks/vendor/blockly/blockly.min.js blocks/stage.css blocks/webserial.css blocks/python-preview.js blocks/project-menu.js blocks/ch340-usb.js blocks/linux-help.js blocks/live-store.js blocks/live-scheduler.js blocks/live-timer-worker.js blocks/live-router.js blocks/dashboard-blocks.js blocks/examples/Real-temperature-Sim-distance.codynick simulator/index.html simulator/app.js dashboard/index.html dashboard/layout.js dashboard/layout-ui.js assets/tool-navigation.css assets/favicon.ico; do
  [[ -f "$source_dir/$name" ]] || { echo "Missing package file: $name" >&2; exit 1; }
 done
 [[ -d "$target_dir" ]] || { echo "Website directory does not exist: $target_dir" >&2; exit 1; }

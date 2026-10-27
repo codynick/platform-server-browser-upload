@@ -29,7 +29,17 @@ B.serialization.workspaces.load(project.workspace,ws);
 sent.length=0;
 const cross=els.blockRunBtn.onclick();
 setTimeout(()=>{const scene=ctx.CodyLiveStore.read().scene;scene.distance=123.4;ctx.CodyLiveStore.simCommand({action:'scene',scene});},650);
-setTimeout(()=>els.blockStopBtn.onclick(),1700);await cross;
+// Wait for a complete updated sample instead of stopping midway through a loop
+// on slower hosts (which previously left the dashboard at its preceding value).
+try {
+ const deadline=Date.now()+8000;
+ while(true){
+  const current=ctx.CodyLiveStore.read();
+  if(Number(current.widgets.distance?.value)===123.4 && current.widgets.distance_history?.history.length>=2 && Number(current.widgets.distance_history.history.at(-1)?.y)===123.4 && current.widgets.temperature_history?.history.length>=2)break;
+  assert(Date.now()<deadline,'Timed out waiting for the cross-display dashboard sample');
+  await new Promise(resolve=>setTimeout(resolve,20));
+ }
+} finally { els.blockStopBtn.onclick(); await cross; }
 state=ctx.CodyLiveStore.read();
 assert.equal(els.workspaceStatus.textContent,'Program stopped.');
 assert.equal(state.seven_segment,'27.4');
