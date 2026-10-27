@@ -4,8 +4,13 @@
  const key='codynick-live-state-v1';
  const defaults=()=>({scene:{gadgets:{cjp:{x:40,y:40}},temperature:21.1,distance:50,soil:50,wifi_link:true,cloud_link:true,motion:false,rfid:'00000000',ultraDistance:50},leds:Array(16).fill('#000000'),matrix:{text:'',speed:1,pixels:Array(64).fill(0),mode:'pixels',revision:0},seven_segment:'',ultra_segment:'',states:[],joystick_states:[],inputAt:0,joyAt:0,notes:[],sequence:0,widgets:{},run:null,wifi:{wifi:0,iot:0,ssid:'',slots:[]}});
  let memory=defaults();
+ let updates;
+ const changed=()=>window.dispatchEvent(new Event('codynick-live-change'));
+ try{updates=new BroadcastChannel('codynick-live-updates-v1');updates.onmessage=()=>changed();}catch{}
+ window.addEventListener('storage',event=>{if(event.key===key||event.key===null)changed();});
+
  function read(){try{const s=JSON.parse(localStorage.getItem(key)||'null');if(s&&s.scene?.gadgets&&s.widgets){memory={...defaults(),...s};}}catch{}return structuredClone(memory);}
- function update(fn){const s=read();const result=fn(s);memory=s;localStorage.setItem(key,JSON.stringify(s));window.dispatchEvent(new Event('codynick-live-change'));return result;}
+ function update(fn){const s=read();const result=fn(s);memory=s;localStorage.setItem(key,JSON.stringify(s));changed();updates?.postMessage('changed');return result;}
  const finite=(n,label)=>{n=Number(n);if(!Number.isFinite(n))throw Error(label+' must be a finite number');return n;};
  function scene(clean){const d=defaults().scene;const known=['cjp','seven','temperature','matrix','joystick','ultrasonic','soil','wifi','motion','rfid','ultraseg'];if(!clean?.gadgets||!clean.gadgets.cjp)throw Error('Simulation must contain CodyJoy Pro.');const out={...d,...clean,gadgets:{}};for(const [kind,p] of Object.entries(clean.gadgets)){if(!known.includes(kind))throw Error('Unsupported simulated gadget: '+kind);out.gadgets[kind]={x:Math.max(0,Math.min(1400,finite(p.x,'X'))),y:Math.max(0,Math.min(1500,finite(p.y,'Y')))};}for(const [n,lo,hi]of [['temperature',-55,125],['distance',2,400],['soil',0,100],['ultraDistance',2,400]]){out[n]=finite(out[n],n);if(out[n]<lo||out[n]>hi)throw Error('Invalid simulated '+n);}out.motion=!!out.motion;out.rfid=String(out.rfid).toUpperCase();if(!/^[0-9A-F]{8}$/.test(out.rfid))throw Error('RFID must have 8 hexadecimal characters');return out;}
  function simState(){const s=read();const now=Date.now();return {...s,now:now/1000,connected:!!s.run&&now-s.run.at<3500,states:now-s.inputAt<1000?s.states:[],joystick_states:now-s.joyAt<1000?s.joystick_states:[],error:''};}

@@ -3,7 +3,7 @@ set -euo pipefail
 if [[ ${EUID} -ne 0 ]]; then echo 'Run as root: bash install.sh' >&2; exit 1; fi
 source_dir="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
 target_dir=/var/www/code.codynick.com
-for name in index.html landing.css blocks/index.html blocks/editor.css blocks/serial.js blocks/blocks.js blocks/hardware.js blocks/runtime.js blocks/block-specs.js blocks/vendor/blockly/blockly.min.js blocks/stage.css blocks/webserial.css blocks/python-preview.js blocks/project-menu.js blocks/ch340-usb.js blocks/linux-help.js blocks/live-store.js blocks/live-router.js blocks/dashboard-blocks.js simulator/index.html simulator/app.js dashboard/index.html assets/tool-navigation.css assets/favicon.ico; do
+for name in index.html landing.css blocks/index.html blocks/editor.css blocks/serial.js blocks/blocks.js blocks/hardware.js blocks/runtime.js blocks/block-specs.js blocks/vendor/blockly/blockly.min.js blocks/stage.css blocks/webserial.css blocks/python-preview.js blocks/project-menu.js blocks/ch340-usb.js blocks/linux-help.js blocks/live-store.js blocks/live-scheduler.js blocks/live-timer-worker.js blocks/live-router.js blocks/dashboard-blocks.js simulator/index.html simulator/app.js dashboard/index.html assets/tool-navigation.css assets/favicon.ico; do
  [[ -f "$source_dir/$name" ]] || { echo "Missing package file: $name" >&2; exit 1; }
 done
 [[ -d "$target_dir" ]] || { echo "Website directory does not exist: $target_dir" >&2; exit 1; }
@@ -39,4 +39,4 @@ if [[ -e "$target_dir/vendor/blockly" || -L "$target_dir/vendor/blockly" ]]; the
  mv -- "$target_dir/vendor/blockly" "$backup_dir/vendor/blockly"
 fi
 cp -- "$source_dir/rollback.sh" "$backup_dir/rollback.sh"
-printf '\nInstalled CodyNick Portal 3.5 — Live hardware, simulation and dashboard\nHome: https://code.codynick.com/\nEditor: https://code.codynick.com/blocks/\nBackup: %s\nRollback: bash %s/rollback.sh\n\nOpen the site and press Ctrl+F5. Apache and SSL were not changed.\n' "$backup_dir" "$backup_dir"
+printf '\nInstalled CodyNick Portal 3.5.1 — separate-tab Live updates\nHome: https://code.codynick.com/\nEditor: https://code.codynick.com/blocks/\nBackup: %s\nRollback: bash %s/rollback.sh\n\nOpen the site and press Ctrl+F5. Apache and SSL were not changed.\n' "$backup_dir" "$backup_dir"

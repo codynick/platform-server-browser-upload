@@ -1,14 +1,8 @@
-# v3.5
+# v3.5.1
 
-- Added independent Hardware / Simulation targets to each gadget block.
-- Kept Hardware defaults and existing Windows/Linux/Android USB paths.
-- Reused original simulator and dashboard interfaces with a browser-local backend.
-- Added simulation/dashboard views beside the editor and full-page links.
-- Added Dashboard toolbox, source labels, simulator requirements and Run preflight.
-- Added simulation-only and mixed sensor/dashboard/LED examples.
-- Saved target fields and simulation layout with projects.
-- Updated installer/rollback to include all three sections; no server services added.
-- Upload mode, automatic firmware flashing, Wi-Fi/IoT block expansion remain deferred.
-
-For this release, extracting the full ZIP over the v3.4 Git working tree requires
-no obsolete-file deletion. The ZIP excludes .git and does not push to GitHub.
+- Fixed background-page scheduling that could stall Live programs when viewing a separate dashboard tab.
+- Added cross-tab change notifications and focus/visibility refresh for dashboards.
+- Kept polling as recovery, and avoided redraws when widget data is unchanged.
+- Added worker/scheduler and separate-tab info/graph regression checks.
+- No project migration or obsolete-file cleanup required; extract the full ZIP into the Git repository, commit and push as usual.
+- Browser tab freezing/suspension and device sleep remain outside Live-mode guarantees.

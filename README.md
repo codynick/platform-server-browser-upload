@@ -1,4 +1,4 @@
-# CodyNick Portal 3.5 — Live hardware, simulation and dashboard
+# CodyNick Portal 3.5.1 — separate-tab dashboard updates
 
 Complete static website release for code.codynick.com. The working Windows/Linux
 Web Serial and Android CH340 WebUSB paths from v3.4 are retained. Upload-to-Uno
@@ -11,7 +11,7 @@ files from v3.4 to be deleted locally. Commit/push manually:
 
 ```powershell
 git add -A
-git commit -m "Release v3.5: integrated Live simulation and dashboard"
+git commit -m "Release v3.5.1: fix separate-tab Live updates"
 git push origin main
 ```
 
@@ -160,3 +160,22 @@ dashboard HTML/CSS/renderer come from your supplied platform-server.zip. The
 simulator's bundled font license is preserved in simulator/FONT-LICENSE.txt.
 Blockly notices: blocks/vendor/blockly/LICENSE. CH340 protocol reference/notices:
 blocks/THIRD_PARTY.md. CodyPi firmware protocol is unchanged.
+
+## v3.5.1 separate-tab update fix
+The runtime previously yielded through setTimeout(0) for every block/value.
+Browsers can clamp those background-page timers, stretching a short loop into
+many seconds when the dashboard/simulator is the active tab. Zero-delay yields
+now use MessageChannel; program delays and heartbeat use a dedicated timer
+worker, with native timers as a compatibility fallback. Stop still cancels waits.
+
+Live-state writes now notify other pages through BroadcastChannel and storage
+events. Dashboards refresh on these notifications and on focus/visibility, with
+polling retained as a recovery path and unchanged states skipped. No appearance
+or block/project format changes were made.
+
+New regression tests: blocks/tests/scheduler.cjs and blocks/tests/tabs.cjs.
+They exercise actual worker-thread timing with simulated clamped page timers and
+three isolated JavaScript browser contexts sharing browser-style storage/events.
+Graphical browser behavior still needs your check. A suspended/frozen browser tab,
+closed editor, or sleeping/locked device cannot be guaranteed to keep running;
+this remains browser Live mode, not autonomous hardware execution.

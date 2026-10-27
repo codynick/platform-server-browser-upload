@@ -1336,6 +1336,7 @@ function attachEvents() {
     });
 }
 
+let renderedState=null;
 function pollState() {
     localFetch('cards.php?action=state', { cache: 'no-store' })
         .then(response => response.json())
@@ -1345,7 +1346,8 @@ function pollState() {
             }
 
             // Because title/color/description/type may also change, the entire dashboard is AJAX-rendered.
-            renderAllCards(data.cards);
+            const signature=JSON.stringify(data.cards);
+            if(signature!==renderedState){renderAllCards(data.cards);renderedState=signature;}
         })
         .catch(error => {
             if (!firstLoadComplete) {
@@ -1355,6 +1357,11 @@ function pollState() {
         });
 }
 
+// Refresh directly on cross-tab invalidations; polling is a recovery path.
+window.addEventListener('codynick-live-change',pollState);
+window.addEventListener('focus',()=>{renderedState=null;pollState();});
+window.addEventListener('resize',()=>{renderedState=null;pollState();});
+document.addEventListener('visibilitychange',()=>{if(!document.hidden){renderedState=null;pollState();}});
 pollState();
 setInterval(pollState, POLL_INTERVAL_MS);
 </script>

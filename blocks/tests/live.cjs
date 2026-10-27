@@ -17,8 +17,8 @@ await router.call('cn_rgb_matrix_set',{led:0,color:'#FF0000'},controller.signal,
 assert.throws(()=>router.check('cn_temperature_read',{},'SIMULATION'),/Add temperature/);
 // Load integrated simulation example and run it while CJP is disconnected.
 els.example.value='sim-dashboard';els.example.onchange();assert(ws.getAllBlocks(false).some(b=>b.type==='dash_gauge_set'));
-const running=els.blockRunBtn.onclick();setTimeout(()=>els.blockStopBtn.onclick(),350);await running;
-let state=ctx.CodyLiveStore.read();assert.equal(els.workspaceStatus.textContent,'Program stopped.');assert.equal(state.widgets.temperature.value,21.1);assert.equal(state.widgets.temperature.description,'Source: Simulation');assert(state.widgets.history.history.length>0);assert.equal(state.leds[0],'#00FF00');assert.equal(sent.length,0);
+const running=els.blockRunBtn.onclick();setTimeout(()=>{const scene=ctx.CodyLiveStore.read().scene;scene.temperature=32.7;ctx.CodyLiveStore.simCommand({action:'scene',scene});},650);setTimeout(()=>els.blockStopBtn.onclick(),1900);await running;
+let state=ctx.CodyLiveStore.read();assert.equal(els.workspaceStatus.textContent,'Program stopped.');assert.equal(state.widgets.temperature.value,32.7);assert.equal(state.widgets.temperature.description,'Source: Simulation');assert(state.widgets.history.history.length>0);assert.equal(state.leds[0],'#00FF00');assert.equal(sent.length,0);
 // A hardware-targeted block prevents all execution if CJP absent.
 els.example.value='mixed';els.example.onchange();let count=state.widgets.history.history.length;await els.blockRunBtn.onclick();assert(els.workspaceStatus.textContent.includes('Connect a CJP'));assert.equal(ctx.CodyLiveStore.read().widgets.history.history.length,count);
 // Mixed example uses actual serial sensor replies and simulation outputs together.
