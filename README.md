@@ -1,35 +1,35 @@
-# CodyNick Portal 3.5.2 — mixed sensor and display example
+# CodyNick Portal 3.6.0
 
-Complete static website release for code.codynick.com. The working Windows/Linux
-Web Serial and Android CH340 WebUSB paths from v3.4 are retained. Upload-to-Uno
-mode and automatic firmware installation are NOT implemented in this release.
+## One command: fresh server setup or update
 
-## Your Git workflow
-Extract all ZIP contents into the local platform-server-browser-upload repository
-root (beside .git). This ZIP contains no .git directory and does not require any
-files from v3.4 to be deleted locally. Commit/push manually:
-
-```powershell
-git add -A
-git commit -m "Release v3.5.2: add mixed sensor and display example"
-git push origin main
-```
-
-Then run the same command as root on the already configured VPS:
+Run as root on a Debian/Ubuntu server:
 
 ```bash
-apt-get update && apt-get install -y git && (git -C /root/platform-server-browser-upload rev-parse --git-dir >/dev/null 2>&1 || git clone https://github.com/codynick/platform-server-browser-upload.git /root/platform-server-browser-upload) && git -C /root/platform-server-browser-upload pull --ff-only origin main && bash /root/platform-server-browser-upload/install.sh
+(set -e; apt-get update; apt-get install -y curl ca-certificates; setup_file=$(mktemp); trap 'rm -f -- "$setup_file"' EXIT; curl -fsSL https://raw.githubusercontent.com/codynick/platform-server-browser-upload/main/setup.sh -o "$setup_file"; bash "$setup_file")
 ```
 
-This assumes Apache, DNS, HTTPS and /var/www/code.codynick.com already exist,
-as on your configured VPS. The installer does not configure a blank server.
+The command installs Git, Apache and Certbot, clones or fast-forwards the main
+branch, deploys the website with a rollback backup, configures an Apache site
+when the domain has no existing site, and enables HTTPS. Existing domain site
+configuration is reused. Existing Let's Encrypt HTTPS is retained.
 
-Alternatively upload the ZIP to /root/, extract it and run its install.sh as root.
-The installer backs up replaced root files and the blocks/simulator/dashboard
-sections, prints a rollback command, and does not modify Apache or SSL. To undo
-use the exact command printed, e.g.:
+Before fresh setup, point code.codynick.com DNS (including any AAAA record) to
+this server and allow inbound TCP ports 80 and 443. DNS resolution is checked;
+Certbot verifies reachability and domain ownership. DNS and firewall changes
+are not performed automatically. A failed certificate request reports an error;
+fix DNS/reachability and rerun the same command. HTTPS is required for USB use.
+Certificates are registered without an email contact; configure a Certbot email
+separately if you want certificate notices. Certbot manages automatic renewal.
 
-    bash /root/codynick-portal-backup-EXAMPLE/rollback.sh
+The server checkout must be clean, on main, and use the expected GitHub origin.
+The updater stops rather than overwriting local Git changes. The website-only
+rollback command is printed during deployment; it does not undo package, Apache,
+or certificate setup. For an existing custom site, its DocumentRoot must be
+/var/www/code.codynick.com. This release does not flash firmware onto the CJP.
+
+Open Project > About in the editor to see version 3.6.0. Refresh with Ctrl+F5
+after deployment. For an already configured server, install.sh remains available
+as a website-only deployment command.
 
 ## Pages
 - / — landing page

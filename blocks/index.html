@@ -1,4 +1,4 @@
-<!doctype html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>CodyNick Block IDE</title><link rel="icon" href="/assets/favicon.ico"><link rel="stylesheet" href="editor.css"><link rel="stylesheet" href="/assets/tool-navigation.css"><link rel="stylesheet" href="stage.css"><link rel="stylesheet" href="webserial.css"><script src="vendor/blockly/blockly.min.js" defer></script><script src="ch340-usb.js" defer></script><script src="linux-help.js" defer></script><script src="serial.js" defer></script><script src="live-scheduler.js" defer></script><script src="hardware.js" defer></script><script src="runtime.js" defer></script><script src="block-specs.js" defer></script><script src="live-store.js" defer></script><script src="live-router.js" defer></script><script src="dashboard-blocks.js" defer></script><script src="blocks.js" defer></script><script src="project-menu.js" defer></script></head><body>
+<!doctype html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>CodyNick Block IDE</title><link rel="icon" href="/assets/favicon.ico"><link rel="stylesheet" href="editor.css"><link rel="stylesheet" href="/assets/tool-navigation.css"><link rel="stylesheet" href="stage.css"><link rel="stylesheet" href="webserial.css"><script src="vendor/blockly/blockly.min.js" defer></script><script src="ch340-usb.js" defer></script><script src="linux-help.js" defer></script><script src="serial.js" defer></script><script src="live-scheduler.js" defer></script><script src="hardware.js" defer></script><script src="runtime.js" defer></script><script src="block-specs.js" defer></script><script src="live-store.js" defer></script><script src="live-router.js" defer></script><script src="dashboard-blocks.js" defer></script><script src="blocks.js" defer></script><script src="version.js" defer></script><script src="project-menu.js" defer></script></head><body>
 <div class="app">
   <header class="topbar">
     <div class="brand">
@@ -20,6 +20,7 @@
           <hr>
           <button id="menuUpload" title="Upload a CodyNick design">Upload</button>
           <button id="saveProject" title="Download the current CodyNick design">Download</button>
+          <hr><button id="menuAbout">About</button>
         </div>
       </details>
       <input id="importFile" type="file" accept=".codynick,.json" />
@@ -66,6 +67,13 @@
 </div>
 
 <div id="toast" class="toast"></div>
+<dialog id="aboutDialog" class="design-dialog" aria-labelledby="aboutTitle">
+  <h2 id="aboutTitle">About CodyNick</h2>
+  <p>CodyNick Portal <strong id="aboutVersion"></strong></p>
+  <p>Build programs with blocks, connect CodyJoy Pro hardware, explore simulated gadgets, and display readings on a live dashboard.</p>
+  <p>Live programs run in this browser while the editor stays open. Projects are saved locally in this browser.</p>
+  <div class="design-actions"><button id="closeAbout">Close</button></div>
+</dialog>
 <dialog id="designDialog" class="design-dialog" aria-labelledby="designDialogTitle">
   <h2 id="designDialogTitle">Load Design</h2>
   <label for="designList">Saved on this device</label>

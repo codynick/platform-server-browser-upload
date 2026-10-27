@@ -1,3 +1,12 @@
+# v3.6.0
+
+- Added setup.sh for fresh Debian/Ubuntu server setup and existing installations.
+- Install dependencies, clone/update main, deploy with backup, configure Apache
+  when needed, and request HTTPS through Certbot.
+- Preserve existing domain site configuration and stop on local repository changes.
+- Added Project > About with the installed application version.
+- Aligned VERSION, About and installer output at 3.6.0.
+
 # v3.5.1
 
 - Fixed background-page scheduling that could stall Live programs when viewing a separate dashboard tab.
