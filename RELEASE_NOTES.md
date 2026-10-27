@@ -1,3 +1,10 @@
+# v3.10.2 — 2026-10-27
+
+- Keep standalone tool branding, title and Block Editor on one compact header row.
+- Remove the forced empty navigation row; allow natural wrapping on narrow screens.
+- Preserve compact logo-free headers in embedded views.
+- Verify both desktop headers stay within 80 px in Chrome.
+
 # v3.10.1 — 2026-10-27
 
 - Right-align Block Editor in the top navigation row of standalone tool pages.
