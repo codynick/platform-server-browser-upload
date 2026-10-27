@@ -1,3 +1,10 @@
+# v3.6.1
+
+- Ask for the website domain during first setup; remember it for updates.
+- Use the selected domain for deployment paths, Apache, HTTPS and rollback.
+- Let Certbot reuse a valid matching certificate or obtain/renew it as needed.
+- Show version 3.6.1 in Project > About.
+
 # v3.6.0
 
 - Added setup.sh for fresh Debian/Ubuntu server setup and existing installations.

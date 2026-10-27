@@ -1,4 +1,4 @@
-# CodyNick Portal 3.6.0
+# CodyNick Portal 3.6.1
 
 ## One command: fresh server setup or update
 
@@ -8,26 +8,33 @@ Run as root on a Debian/Ubuntu server:
 (set -e; apt-get update; apt-get install -y curl ca-certificates; setup_file=$(mktemp); trap 'rm -f -- "$setup_file"' EXIT; curl -fsSL https://raw.githubusercontent.com/codynick/platform-server-browser-upload/main/setup.sh -o "$setup_file"; bash "$setup_file")
 ```
 
-The command installs Git, Apache and Certbot, clones or fast-forwards the main
-branch, deploys the website with a rollback backup, configures an Apache site
-when the domain has no existing site, and enables HTTPS. Existing domain site
-configuration is reused. Existing Let's Encrypt HTTPS is retained.
+On first setup, enter your website domain when prompted, for example
+`ide.codynick.com`. Enter only the domain (no scheme, path or port). The choice
+is saved in `/etc/codynick/domain`; subsequent runs reuse it without prompting.
+To select another domain explicitly, run the downloaded setup.sh with
+`CODYNICK_DOMAIN=other.example.com bash setup.sh` (this also changes the saved
+selection). A noninteractive first run requires CODYNICK_DOMAIN.
 
-Before fresh setup, point code.codynick.com DNS (including any AAAA record) to
-this server and allow inbound TCP ports 80 and 443. DNS resolution is checked;
-Certbot verifies reachability and domain ownership. DNS and firewall changes
-are not performed automatically. A failed certificate request reports an error;
-fix DNS/reachability and rerun the same command. HTTPS is required for USB use.
-Certificates are registered without an email contact; configure a Certbot email
-separately if you want certificate notices. Certbot manages automatic renewal.
+The command installs Git, Apache and Certbot, clones or fast-forwards main,
+deploys into `/var/www/<domain>` with a rollback backup, and configures an Apache
+site if needed. Existing domain configurations are reused. Certbot checks for a
+matching certificate and reuses it if valid, or obtains/renews it as needed,
+then configures HTTPS and redirects HTTP. Certbot manages automatic renewal.
+
+Before fresh setup, point the entered domain's DNS (including any AAAA record)
+to this server and allow inbound TCP ports 80 and 443. DNS resolution is checked;
+Certbot verifies reachability and ownership. DNS/firewall changes are not made
+automatically. If certificate issuance fails, fix DNS/reachability and rerun the
+same command. HTTPS is required for USB. Certificates are registered without an
+email contact; configure a Certbot email separately if you want notices.
 
 The server checkout must be clean, on main, and use the expected GitHub origin.
 The updater stops rather than overwriting local Git changes. The website-only
 rollback command is printed during deployment; it does not undo package, Apache,
 or certificate setup. For an existing custom site, its DocumentRoot must be
-/var/www/code.codynick.com. This release does not flash firmware onto the CJP.
+`/var/www/<domain>`. Website rollback remembers the deployment domain. This release does not flash firmware onto the CJP.
 
-Open Project > About in the editor to see version 3.6.0. Refresh with Ctrl+F5
+Open Project > About in the editor to see version 3.6.1. Refresh with Ctrl+F5
 after deployment. For an already configured server, install.sh remains available
 as a website-only deployment command.
 

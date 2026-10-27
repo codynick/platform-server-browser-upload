@@ -3,12 +3,21 @@ set -euo pipefail
 if [[ ${EUID} -ne 0 ]]; then echo 'Run as root: bash install.sh' >&2; exit 1; fi
 source_dir="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
 version="$(cat "$source_dir/VERSION")"
-target_dir=/var/www/code.codynick.com
+domain=${CODYNICK_DOMAIN:-code.codynick.com}
+domain=${domain,,}
+[[ ${#domain} -le 253 && "$domain" == *.* ]] || { echo 'Enter a valid domain name, without https://, a path, or a port.' >&2; exit 1; }
+IFS='.' read -r -a labels <<< "$domain"
+for label in "${labels[@]}"; do
+ [[ ${#label} -le 63 && "$label" =~ ^[a-z0-9]([a-z0-9-]*[a-z0-9])?$ ]] || { echo "Invalid domain name: $domain" >&2; exit 1; }
+done
+[[ "$domain" != *. && ! "$domain" =~ ^[0-9.]+$ ]] || { echo 'Use a DNS domain name, not an IP address.' >&2; exit 1; }
+target_dir=/var/www/$domain
 for name in VERSION index.html landing.css blocks/version.js blocks/index.html blocks/editor.css blocks/serial.js blocks/blocks.js blocks/hardware.js blocks/runtime.js blocks/block-specs.js blocks/vendor/blockly/blockly.min.js blocks/stage.css blocks/webserial.css blocks/python-preview.js blocks/project-menu.js blocks/ch340-usb.js blocks/linux-help.js blocks/live-store.js blocks/live-scheduler.js blocks/live-timer-worker.js blocks/live-router.js blocks/dashboard-blocks.js blocks/examples/Real-temperature-Sim-distance.codynick simulator/index.html simulator/app.js dashboard/index.html assets/tool-navigation.css assets/favicon.ico; do
  [[ -f "$source_dir/$name" ]] || { echo "Missing package file: $name" >&2; exit 1; }
 done
 [[ -d "$target_dir" ]] || { echo "Website directory does not exist: $target_dir" >&2; exit 1; }
 backup_dir="$(mktemp -d /root/codynick-portal-backup-XXXXXXXX)"
+printf '%s\n' "$domain" > "$backup_dir/deploy-domain"
 staging_dir="$(mktemp -d "$target_dir/.codynick-install-XXXXXXXX")"
 trap 'rm -rf -- "$staging_dir"' EXIT
 for section in blocks simulator dashboard; do cp -a -- "$source_dir/$section" "$staging_dir/$section"; done
@@ -40,4 +49,4 @@ if [[ -e "$target_dir/vendor/blockly" || -L "$target_dir/vendor/blockly" ]]; the
  mv -- "$target_dir/vendor/blockly" "$backup_dir/vendor/blockly"
 fi
 cp -- "$source_dir/rollback.sh" "$backup_dir/rollback.sh"
-printf '\nInstalled CodyNick Portal %s\nHome: https://code.codynick.com/\nEditor: https://code.codynick.com/blocks/\nBackup: %s\nRollback: bash %s/rollback.sh\n\nOpen the site and press Ctrl+F5. Website deployment complete.\n' "$version" "$backup_dir" "$backup_dir"
+printf '\nInstalled CodyNick Portal %s\nHome: https://%s/\nEditor: https://%s/blocks/\nBackup: %s\nRollback: bash %s/rollback.sh\n\nOpen the site and press Ctrl+F5. Website deployment complete.\n' "$version" "$domain" "$domain" "$backup_dir" "$backup_dir"
