@@ -79,5 +79,5 @@ certbot --apache --non-interactive --agree-tos --register-unsafely-without-email
 
 apache2ctl configtest
 systemctl reload apache2
-printf '\nCodyNick %s is ready: https://%s/blocks/\nCheck Project > About for the installed version.\n' "$(cat "$repo/VERSION")" "$domain"
+printf '\nCodyNick %s is ready: https://%s/blocks/\nCheck File > About for the installed version.\n' "$(cat "$repo/VERSION")" "$domain"
 echo 'Certificate renewal is managed by Certbot. Rerun the same command for future updates.'

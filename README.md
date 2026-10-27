@@ -1,4 +1,4 @@
-# CodyNick Portal 3.7.0
+# CodyNick Portal 3.8.0
 
 ## One command: fresh server setup or update
 
@@ -34,9 +34,21 @@ rollback command is printed during deployment; it does not undo package, Apache,
 or certificate setup. For an existing custom site, its DocumentRoot must be
 `/var/www/<domain>`. Website rollback remembers the deployment domain. This release does not flash firmware onto the CJP.
 
-Open Project > About in the editor to see version 3.7.0. Refresh with Ctrl+F5
+Open File > About in the editor to see version 3.8.0. Refresh with Ctrl+F5
 after deployment. For an already configured server, install.sh remains available
 as a website-only deployment command.
+
+## Editor controls (3.8.0)
+
+File contains New/Save/Load/Upload/Download Project, Examples and About.
+File → Examples opens a list; select an entry and choose Load Example (or
+double-click it). Names are explicit labels in blocks/index.html, mapped to
+internal IDs in blocks.js; they are independent of project filenames.
+Advanced contains Console, View Python and Linux USB help when applicable.
+Python preview behavior is unchanged. The one green Run button becomes a red
+Stop button while running; connection status appears below Connect/Run.
+The simulator's Add gadget button opens a picker that closes after adding one.
+About displays release version and calendar date.
 
 ## Pages
 - / — landing page
@@ -78,7 +90,7 @@ may take up to 2.5 s to finish/time out. Outputs retain their last commanded sta
 
 ## Getting started
 1. Open /blocks/ in Chrome. For a simulation-only test, no USB connection is needed.
-2. Select Examples -> Simulation + dashboard, and accept workspace replacement.
+2. Select File -> Examples -> Simulation + dashboard, and accept workspace replacement.
 3. This example adds a simulated temperature sensor to the stage and creates a
    gauge/history graph through Dashboard blocks. Press Run.
 4. Adjust temperature in Simulation and switch the right panel to Dashboard.
@@ -165,6 +177,11 @@ background tab throttling may change update timing.
 
 ## Tests and limits
 
+With Playwright available, `node blocks/browser-tests/editor.cjs` checks the
+File/Advanced menus, examples, Run/Stop colors, status placement, About date,
+gadget picker and narrow-screen toolbar. `CODY_EDITOR_ARTIFACTS` selects its
+screenshot folder; `CODY_CHROME_PATH` selects an installed Chrome executable.
+
 `node blocks/tests/dashboard-layout.cjs` checks layout packing, persistence and
 axis formatting. With Playwright available, `node dashboard/tests/browser.cjs`
 checks real pointer/keyboard editing, live updates, graph label bounds, reload,
@@ -213,4 +230,4 @@ this remains browser Live mode, not autonomous hardware execution.
 
 ## v3.5.2 mixed sensor example
 
-The Examples menu includes **Real temperature + simulated distance + cross displays**. The downloadable project is `blocks/examples/Real-temperature-Sim-distance.codynick`; instructions are beside it. Both sensors feed separate info cards and history graphs. Real temperature drives the simulated seven-segment display; simulated distance drives the real standalone seven-segment display.
+The File → Examples chooser includes **Real temperature + simulated distance + cross displays**. The downloadable project is `blocks/examples/Real-temperature-Sim-distance.codynick`; instructions are beside it. Both sensors feed separate info cards and history graphs. Real temperature drives the simulated seven-segment display; simulated distance drives the real standalone seven-segment display.

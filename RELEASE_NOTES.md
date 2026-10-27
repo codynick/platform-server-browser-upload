@@ -1,3 +1,13 @@
+# v3.8.0 — 2026-10-27
+
+- Replaced Project menu with File; added Project suffix to file actions.
+- Added an Examples chooser and moved Console/Python/Linux help into Advanced.
+- Removed Main Panel from the blocks toolbar; moved Hide Spaces before Connect.
+- Combined Run/Stop into one green/red button, with connection status beneath it.
+- Replaced the simulator's permanent gadget sidebar with an Add gadget picker.
+- Styled About with a border, version badge and release date.
+- Python reference preview behavior is unchanged.
+
 # v3.7.0
 
 - Added Edit/Lock layout, grid-snapped card movement and corner resizing.

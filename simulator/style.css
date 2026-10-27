@@ -22,3 +22,15 @@ dl{margin:28px 0;display:grid;grid-template-columns:80px 1fr;gap:16px 4px;font-s
 .wifi-device{width:330px}.wifi-device>img{height:116px;object-fit:cover;object-position:50% 62%}.sim-label{font-size:10px;color:#156d50;margin:10px 0}.network-controls{display:grid;gap:8px;font-size:12px}.network-controls input{accent-color:#157c5b}.wifi-status{display:grid;margin:12px 0;gap:6px;font-size:12px;grid-template-columns:56px 1fr}.cloud-editor{display:grid;grid-template-columns:1fr 65px;gap:8px}.cloud-editor label{display:grid;gap:4px;font-size:11px}.cloud-editor .cloud-value{grid-column:1/-1}.cloud-editor input,.cloud-editor select{width:100%;min-width:0;padding:5px;border:1px solid #b4c4ba;border-radius:4px;font:inherit}.cloud-editor button{grid-column:1/-1;padding:5px;font-size:12px}#cloudValues{font:11px/1.5 monospace;max-height:96px;overflow:auto;margin:12px 0 0;white-space:pre-wrap;overflow-wrap:anywhere}
 @media(max-width:640px){.toolbox{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:4px}.tool{width:100%;min-height:42px}.tool img{width:22px;height:28px}.tool span{font-size:10px}.toolbox .tool:nth-child(7){grid-column:auto}}
 #stage{height:1500px}
+
+/* The gadget picker overlays the stage only when requested. */
+main{display:block;position:relative}.workspace{height:100%}
+#gadgetPicker{width:min(440px,calc(100% - 24px));max-height:calc(100dvh - 30px);padding:0;border:2px solid #157d5c;border-radius:12px;color:#202a28;box-shadow:0 16px 60px #10251d40;background:white;overflow:auto}
+#gadgetPicker::backdrop{background:#12251d55}
+.picker-heading{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:14px 16px;border-bottom:1px solid #dce2df;background:#f4f9f6}.picker-heading h1{margin:0;font-size:18px;width:auto}.picker-heading button{padding:3px 10px;font-size:22px}
+#gadgetPicker aside{display:block;border:0;padding:14px;overflow:visible}
+#gadgetPicker .toolbox{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;width:100%}
+#gadgetPicker .tool{cursor:pointer;min-height:58px;padding:8px;width:100%;gap:7px}#gadgetPicker .tool img{width:32px;height:34px}#gadgetPicker .tool span{font-size:12px;overflow-wrap:anywhere}#gadgetPicker .tool b{display:none}
+#gadgetPicker dl{display:grid;margin:18px 0;gap:8px;font-size:12px}#gadgetPicker #sound{width:100%;font-size:13px}
+.toolbar{height:auto;min-height:46px;gap:7px;padding:8px;flex-wrap:wrap}.toolbar #addGadgets{width:auto;height:30px;padding:4px 9px;font-size:12px;background:#157d5c;color:white;border-color:#157d5c}.toolbar #selected{max-width:150px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.toolbar #saved{font-size:11px}
+@media(max-width:640px){main{grid-template-rows:none}.toolbar #selected{max-width:100px}}

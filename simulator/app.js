@@ -111,6 +111,7 @@ function fitStage(){
   }
   zoom(Math.max(.2,Math.min(1,(viewport.clientWidth-16)/right,(viewport.clientHeight-16)/bottom)));
 }
+$('addGadgets').onclick=()=>$('gadgetPicker').showModal();$('closeGadgets').onclick=()=>$('gadgetPicker').close();
 $('fit').onclick=fitStage;$('actual').onclick=()=>zoom(1);
 function showError(message) { $('error').textContent=message; $('error').hidden=!message; }
 function select(kind) {
@@ -156,6 +157,7 @@ async function addGadget(kind,pos) {
   if(!scene||scene.gadgets[kind]||pythonConnected) return;
   place(kind,(pos||defaults[kind]).x,(pos||defaults[kind]).y); select(kind); await saveScene();
   renderScene(scene);
+  $('gadgetPicker').close();
   if(innerWidth>640) fitStage(); else $('gadget-'+kind).scrollIntoView({block:'nearest',inline:'nearest'});
 }
 for(const button of document.querySelectorAll('[data-add]')) {
@@ -260,7 +262,7 @@ async function poll() {
     if(!dragging&&!pending&&!temperatureTimer) {renderScene(state.scene);$('saved').textContent='Saved';}
     if(!initialFit&&scene){initialFit=true;if(innerWidth>640)fitStage();}
     for(const button of document.querySelectorAll('[data-add]')) button.disabled=state.connected||!!scene?.gadgets[button.dataset.add];
-    $('remove').disabled=selected==='cjp'||state.connected;
+    $('remove').disabled=selected==='cjp'||state.connected;$('addGadgets').disabled=state.connected;
     if(state.error) showError(state.error);
     matrixUpdate(state.matrix);
     $('direction').textContent = state.states.join(' + ') || 'Neutral';
