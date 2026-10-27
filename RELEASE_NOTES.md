@@ -1,3 +1,13 @@
+# v3.10.0 — 2026-10-27
+
+- Added the supplied transparent wide CodyNick logo across page headers and About.
+- Put standalone Block Editor navigation on a separate left-aligned row.
+- Added pointer-anchored simulator wheel zoom and background drag-to-pan.
+- Added double-click/Home fit recovery and keyboard camera controls.
+- Added left-side gadget removal crosses and right-side drag grips.
+- Removed Fit Stage, 1:1, the global remove button and Browser simulator text.
+- Included the new logo in installer backups and rollback.
+
 # v3.9.0 — 2026-10-27
 
 - Matched simulator/dashboard headers; hide Block Editor links in embedded views.

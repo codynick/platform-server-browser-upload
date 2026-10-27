@@ -20,7 +20,7 @@ for name in index.html landing.css blocks simulator dashboard app.js style.css h
 done
 if [[ -d "$backup_dir/vendor/blockly" ]]; then mkdir -p "$target_dir/vendor"; cp -a -- "$backup_dir/vendor/blockly" "$target_dir/vendor/"; fi
 mkdir -p "$current_dir/assets" "$target_dir/assets"
-for name in tool-navigation.css favicon.ico; do
+for name in tool-navigation.css favicon.ico codynick-logo.png; do
  if [[ -e "$target_dir/assets/$name" ]]; then mv -- "$target_dir/assets/$name" "$current_dir/assets/$name"; fi
  if [[ -e "$backup_dir/assets/$name" ]]; then cp -a -- "$backup_dir/assets/$name" "$target_dir/assets/$name"; fi
 done

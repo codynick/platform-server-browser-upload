@@ -37,3 +37,14 @@ main{display:block;position:relative}.workspace{height:100%}
 
 /* Match the shared 72 px dashboard header. */
 main{height:calc(100dvh - 72px)}
+
+/* A camera pans/zooms the scene without changing saved gadget coordinates. */
+body{display:flex;flex-direction:column}header.tool-page-header{flex-shrink:0}main{flex:1;min-height:0;height:auto}
+#stageViewport{overflow:hidden;position:relative;touch-action:none;cursor:grab;background:#f1f4f2;background-image:radial-gradient(#c6d2ca .7px,transparent .7px);background-size:20px 20px}
+#stageViewport.panning{cursor:grabbing;user-select:none}#stageViewport:focus-visible{outline:2px solid #157d5c;outline-offset:-2px}
+#stage{transform-origin:0 0;will-change:transform;zoom:1;cursor:inherit}.stage-item{cursor:default}
+.gadget-header{display:flex;align-items:center;gap:3px;width:100%;height:32px;background:#ffffffed;border-radius:4px}
+.stage-item .gadget-header .handle{flex:1;min-width:0;width:auto;background:transparent;padding:4px 8px;gap:8px;justify-content:flex-start}
+.handle .gadget-title{font-size:12px;color:#202a28;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}.handle .drag-grip{margin-left:auto;flex-shrink:0;font-size:19px;color:#61746b}
+.gadget-remove{flex:0 0 26px;width:26px;height:26px;padding:0;margin-left:2px;border:0;background:#fff2ef;color:#a83329;font-size:20px;line-height:1;cursor:pointer}.gadget-remove:hover:enabled{background:#fcded8}
+#zoomLevel{font-size:11px;color:#52675b;min-width:35px;text-align:center}.view-help{font-size:17px;color:#61746b;cursor:help}

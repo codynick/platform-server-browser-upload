@@ -3,7 +3,6 @@ const localFetch=async(url,options={})=>{try{const data=url==='/state'?window.Co
 
 const $ = id => document.getElementById(id);
 const mainPanelUrl = new URL(window.location.href);
-mainPanelUrl.port = '';
 mainPanelUrl.pathname = '/blocks/';
 mainPanelUrl.search = '';
 mainPanelUrl.hash = '';
@@ -18,9 +17,10 @@ const newGadgets={
   soil:{title:'Soil-moisture sensor',body:'<div class="photo-device"><img class="soil-photo" src="/simulator/soil.png" alt="Soil-moisture sensor"><div class="sensor-controls"><label for="soilValue">Soil moisture (%)</label><input id="soilValue" type="number" min="0" max="100" step="1" value="50"><input id="soilSlider" type="range" min="0" max="100" step="1" value="50" aria-label="Simulated soil reading"></div></div>'},
   wifi:{title:'Wi-Fi / IoT',body:'<div class="photo-device wifi-device"><img src="/simulator/wifi.png" alt="Wi-Fi and IoT gadget"><p class="sim-label">SIMULATED NETWORK</p><div class="network-controls"><label><input id="wifiLink" type="checkbox" checked> Wi-Fi available</label><label><input id="cloudLink" type="checkbox" checked> Cloud available</label></div><dl class="wifi-status"><dt>Wi-Fi</dt><dd id="wifiState">Disconnected</dd><dt>IoT</dt><dd id="iotState">Disconnected</dd><dt>SSID</dt><dd id="wifiSSID">Not configured</dd></dl><div class="cloud-editor"><label>Type<select id="cloudType"><option value="0">Int</option><option value="1">Float</option><option value="2">Bool</option><option value="3">String</option></select></label><label>Index<input id="cloudIndex" type="number" min="0" max="3" value="0"></label><label class="cloud-value">Value<input id="cloudValue" maxlength="40" value="0"></label><button id="cloudApply">Set value</button></div><pre id="cloudValues" aria-label="Simulated cloud variables"></pre></div>'}
 };
+function gadgetHeader(kind,title){return `<div class="gadget-header"><button class="gadget-remove" data-remove="${kind}" title="Remove ${title}" aria-label="Remove ${title}">×</button><button class="handle" aria-label="Move ${title}" title="Drag to move ${title}"><span class="gadget-title">${title}</span><span class="drag-grip" aria-hidden="true">✥</span></button></div>`;}
 for(const [kind,data] of Object.entries(newGadgets)) {
   const item=document.createElement('section');item.className='stage-item';item.id='gadget-'+kind;item.dataset.kind=kind;item.hidden=true;
-  item.innerHTML=`<button class="handle" aria-label="Move ${data.title}" title="Move ${data.title}">${data.title}<span aria-hidden="true">&#10021;</span></button>${data.body}`;
+  item.innerHTML=`${gadgetHeader(kind,data.title)}${data.body}`;
   $('stage').append(item);
 }
 for(const [state,symbol] of [['UP','\u2191'],['LEFT','\u2190'],['CLICK','\u25cf'],['RIGHT','\u2192'],['DOWN','\u2193']]) {
@@ -28,6 +28,7 @@ for(const [state,symbol] of [['UP','\u2191'],['LEFT','\u2190'],['CLICK','\u25cf'
   document.querySelector('.standalone-stick').append(button);
 }
 for(const image of document.images) {
+  image.draggable=false;
   let retries=0;
   const retry=()=>{if(retries++<3)setTimeout(()=>{const url=new URL(image.src);url.searchParams.set('retry',retries);image.src=url.href;},400);};
   image.addEventListener('error',retry);
@@ -103,22 +104,24 @@ document.addEventListener('visibilitychange', () => {if (document.hidden)release
 const labels={cjp:'CodyJoy Pro',seven:'Seven-segment',temperature:'Temperature sensor',matrix:'LED matrix',...Object.fromEntries(Object.entries(newGadgets).map(([key,value])=>[key,value.title]))};
 const defaults={motion:{x:400,y:640},rfid:{x:700,y:640},ultraseg:{x:700,y:40},seven:{x:440,y:40},temperature:{x:440,y:360},matrix:{x:760,y:360},joystick:{x:40,y:640},ultrasonic:{x:400,y:720},soil:{x:740,y:720},wifi:{x:1050,y:760}};
 let scene=null, selected='cjp', dragging=null, pending=0, pythonConnected=false, z=1, temperatureTimer, stageZoom=1, initialFit=false;
-function zoom(value){stageZoom=value;$('stage').style.zoom=value;$('stageViewport').scrollTo(0,0);}
-function fitStage(){
-  if(!scene) return;
-  const viewport=$('stageViewport'); let right=380,bottom=600;
-  for(const [key,pos] of Object.entries(scene.gadgets)) {
-    const item=$('gadget-'+key);right=Math.max(right,pos.x+item.offsetWidth+24);bottom=Math.max(bottom,pos.y+item.offsetHeight+24);
-  }
-  zoom(Math.max(.2,Math.min(1,(viewport.clientWidth-16)/right,(viewport.clientHeight-16)/bottom)));
-}
+let camera={scale:1,x:0,y:0},panning=null,viewTouched=false;
+const viewport=$('stageViewport'),V=window.CodySimulatorViewport;
+function renderView(view){camera=view;stageZoom=view.scale;$('stage').style.transform=`translate(${view.x}px,${view.y}px) scale(${view.scale})`;$('zoomLevel').textContent=Math.round(view.scale*100)+'%';}
+function fitStage(){if(!scene||viewport.clientWidth<=0||viewport.clientHeight<=0)return;let left=Infinity,top=Infinity,right=0,bottom=0;for(const [kind,pos]of Object.entries(scene.gadgets)){const item=$('gadget-'+kind);left=Math.min(left,pos.x);top=Math.min(top,pos.y);right=Math.max(right,pos.x+item.offsetWidth);bottom=Math.max(bottom,pos.y+item.offsetHeight);}renderView(V.fit({left,top,right,bottom},viewport.clientWidth,viewport.clientHeight));viewTouched=false;}
+viewport.addEventListener('wheel',event=>{if(event.target.closest('input,select,textarea')||panning||dragging)return;event.preventDefault();const r=viewport.getBoundingClientRect();renderView(V.zoomAt(camera,{x:event.clientX-r.left,y:event.clientY-r.top},event.deltaY));viewTouched=true;},{passive:false});
+viewport.addEventListener('pointerdown',event=>{if(event.button!==0||event.target.closest('.stage-item')||panning)return;event.preventDefault();viewport.focus({preventScroll:true});viewport.setPointerCapture(event.pointerId);panning={id:event.pointerId,x:event.clientX,y:event.clientY,camera:{...camera}};viewport.classList.add('panning');});
+viewport.addEventListener('pointermove',event=>{if(!panning||event.pointerId!==panning.id)return;renderView(V.pan(panning.camera,event.clientX-panning.x,event.clientY-panning.y));viewTouched=true;});
+function endPan(){if(!panning)return;const id=panning.id;panning=null;viewport.classList.remove('panning');if(viewport.hasPointerCapture?.(id))viewport.releasePointerCapture(id);}
+for(const name of ['pointerup','pointercancel','lostpointercapture'])viewport.addEventListener(name,event=>{if(panning?.id===event.pointerId)endPan();});
+window.addEventListener('blur',endPan);
+viewport.addEventListener('dblclick',event=>{if(!event.target.closest('.stage-item')){event.preventDefault();fitStage();}});
+viewport.addEventListener('keydown',event=>{if(event.target!==viewport)return;const center={x:viewport.clientWidth/2,y:viewport.clientHeight/2},delta={ArrowLeft:[40,0],ArrowRight:[-40,0],ArrowUp:[0,40],ArrowDown:[0,-40]}[event.key];if(event.key==='Home'||event.key==='0'){event.preventDefault();fitStage();}else if(['+','=','-'].includes(event.key)){event.preventDefault();renderView(V.zoomAt(camera,center,event.key==='-'?100:-100));viewTouched=true;}else if(delta){event.preventDefault();renderView(V.pan(camera,...delta));viewTouched=true;}});
+window.addEventListener('resize',()=>{if(!viewTouched)fitStage();});
 $('addGadgets').onclick=()=>$('gadgetPicker').showModal();$('closeGadgets').onclick=()=>$('gadgetPicker').close();
-$('fit').onclick=fitStage;$('actual').onclick=()=>zoom(1);
 function showError(message) { $('error').textContent=message; $('error').hidden=!message; }
 function select(kind) {
   selected=kind; $('selected').textContent=labels[kind];
   for(const item of document.querySelectorAll('.stage-item')) item.classList.toggle('selected',item.dataset.kind===kind);
-  $('remove').disabled=kind==='cjp'||pythonConnected;
 }
 function renderScene(value) {
   scene=structuredClone(value);
@@ -159,7 +162,7 @@ async function addGadget(kind,pos) {
   place(kind,(pos||defaults[kind]).x,(pos||defaults[kind]).y); select(kind); await saveScene();
   renderScene(scene);
   $('gadgetPicker').close();
-  if(innerWidth>640) fitStage(); else $('gadget-'+kind).scrollIntoView({block:'nearest',inline:'nearest'});
+  fitStage();
 }
 for(const button of document.querySelectorAll('[data-add]')) {
   button.onclick=()=>addGadget(button.dataset.add);
@@ -175,10 +178,8 @@ $('stage').ondrop=event=>{
   const kind=event.dataTransfer.getData('text/plain'), rect=$('stage').getBoundingClientRect();
   if(defaults[kind]) addGadget(kind,{x:(event.clientX-rect.left)/stageZoom,y:(event.clientY-rect.top)/stageZoom});
 };
-$('remove').onclick=async()=>{
-  if(selected==='cjp'||pythonConnected||!scene) return;
-  delete scene.gadgets[selected]; renderScene(scene); await saveScene();
-};
+async function removeGadget(kind){if(kind==='cjp'||pythonConnected||window.CodyLiveStore.simState().connected||!scene)return;delete scene.gadgets[kind];renderScene(scene);await saveScene();}
+for(const cross of document.querySelectorAll('[data-remove]')){cross.onpointerdown=event=>event.stopPropagation();cross.onclick=event=>{event.stopPropagation();removeGadget(cross.dataset.remove);};}
 for(const item of document.querySelectorAll('.stage-item')) {
   const handle=item.querySelector('.handle');
   item.onpointerdown=()=>{select(item.dataset.kind);item.style.zIndex=++z;};
@@ -191,7 +192,7 @@ for(const item of document.querySelectorAll('.stage-item')) {
     if(!dragging||dragging.kind!==item.dataset.kind) return;
     place(dragging.kind,dragging.position.x+(event.clientX-dragging.x)/stageZoom,dragging.position.y+(event.clientY-dragging.y)/stageZoom);
   };
-  handle.onpointerup=handle.onpointercancel=()=>{if(dragging){dragging=null;saveScene();}};
+  handle.onpointerup=handle.onpointercancel=handle.onlostpointercapture=()=>{if(dragging){dragging=null;saveScene();}};
   handle.onkeydown=event=>{
     const delta={ArrowLeft:[-8,0],ArrowRight:[8,0],ArrowUp:[0,-8],ArrowDown:[0,8]}[event.key];
     if(delta&&scene){event.preventDefault();const p=scene.gadgets[item.dataset.kind];place(item.dataset.kind,p.x+delta[0],p.y+delta[1]);saveScene();}
@@ -258,12 +259,12 @@ async function poll() {
   try {
     const reply = await localFetch('/state', {cache:'no-store', signal:AbortSignal.timeout(2000)});
     if (!reply.ok) throw new Error(); const state = await reply.json();
-    $('connection').textContent = 'Browser simulator'; $('python').textContent = state.connected ? 'Connected' : 'Waiting';
+    $('python').textContent = state.connected ? 'Connected' : 'Waiting';
     pythonConnected=state.connected;
     if(!dragging&&!pending&&!temperatureTimer) {renderScene(state.scene);$('saved').textContent='Saved';}
-    if(!initialFit&&scene){initialFit=true;if(innerWidth>640)fitStage();}
+    if(!initialFit&&scene&&viewport.clientWidth>0&&viewport.clientHeight>0){initialFit=true;fitStage();}
     for(const button of document.querySelectorAll('[data-add]')) button.disabled=state.connected||!!scene?.gadgets[button.dataset.add];
-    $('remove').disabled=selected==='cjp'||state.connected;$('addGadgets').disabled=state.connected;
+    for(const cross of document.querySelectorAll('[data-remove]'))cross.disabled=state.connected;$('addGadgets').disabled=state.connected;
     if(state.error) showError(state.error);
     matrixUpdate(state.matrix);
     $('direction').textContent = state.states.join(' + ') || 'Neutral';
@@ -286,7 +287,7 @@ async function poll() {
     $('note').textContent=recent && state.now < recent.at+recent.duration/1000 ? `${recent.frequency} Hz` : 'Silent';
     online = true;
     if ((active||standaloneActive) && Date.now()-lastInput>250) {lastInput=Date.now();if(active)await input(active);if(standaloneActive)await input(standaloneActive,'joystick');}
-  } catch {online=false; stopTone(); $('connection').textContent='Simulator unavailable'; $('python').textContent='Unknown';}
+  } catch {online=false; stopTone(); showError('Simulator unavailable. Reload this page to retry.'); $('python').textContent='Unknown';}
   setTimeout(poll, 50);
 }
 poll();

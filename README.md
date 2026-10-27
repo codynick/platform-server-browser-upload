@@ -1,4 +1,4 @@
-# CodyNick Portal 3.9.0
+# CodyNick Portal 3.10.0
 
 ## One command: fresh server setup or update
 
@@ -34,7 +34,7 @@ rollback command is printed during deployment; it does not undo package, Apache,
 or certificate setup. For an existing custom site, its DocumentRoot must be
 `/var/www/<domain>`. Website rollback remembers the deployment domain. This release does not flash firmware onto the CJP.
 
-Open File > About in the editor to see version 3.9.0. Refresh with Ctrl+F5
+Open File > About in the editor to see version 3.10.0. Refresh with Ctrl+F5
 after deployment. For an already configured server, install.sh remains available
 as a website-only deployment command.
 
@@ -65,6 +65,21 @@ projects; loops and conditions retain nested statement bodies.
 Single-series graph legends use the graph title; explicitly named series keep
 their names. The example chooser uses friendly names while preserving internal
 IDs and existing project compatibility.
+
+## Simulator navigation and branding (3.10.0)
+
+The supplied transparent CodyNick logo is displayed at its original proportions
+on the landing page, editor, About dialog, simulator and dashboard. Standalone
+tool pages place Block Editor at the far left of a separate navigation row;
+embedded views continue to hide it.
+
+Scroll over the simulator to zoom at the pointer; drag empty stage space to pan.
+Double-click empty space, or focus the stage and press Home/0, to fit all gadgets.
+The focused stage also supports +/- zoom and arrow-key panning. Camera movement
+does not change saved gadget coordinates. Use the right-side grip to move a
+gadget and its left-side cross to remove it (while stopped). The built-in CJP
+remains required and non-removable. Fit Stage, 1:1 and the global remove button
+are replaced by these direct controls. Browser simulator text is removed.
 
 ## Pages
 - / — landing page
@@ -193,6 +208,13 @@ Existing firmware CodyPi 1.19.6 remains unchanged. Browser timing is not real ti
 background tab throttling may change update timing.
 
 ## Tests and limits
+
+`node blocks/tests/simulator-viewport.cjs` checks camera zoom/pan/fit math.
+With Playwright available, `node simulator/tests/browser.cjs` checks pointer and
+keyboard navigation, gadget dragging/removal, program locks, branding and mobile
+layouts. `CODY_SIMULATOR_ARTIFACTS` selects screenshots; CODY_CHROME_PATH selects
+the browser executable.
+
 
 With Playwright available, `node blocks/browser-tests/editor.cjs` checks the
 File/Advanced menus, examples, Run/Stop colors, status placement, About date,
