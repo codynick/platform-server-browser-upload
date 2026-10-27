@@ -23,6 +23,25 @@ let state=ctx.CodyLiveStore.read();assert.equal(els.workspaceStatus.textContent,
 els.example.value='mixed';els.example.onchange();let count=state.widgets.history.history.length;await els.blockRunBtn.onclick();assert(els.workspaceStatus.textContent.includes('Connect a CJP'));assert.equal(ctx.CodyLiveStore.read().widgets.history.history.length,count);
 // Mixed example uses actual serial sensor replies and simulation outputs together.
 ctx.CJP.connected=true;const mixed=els.blockRunBtn.onclick();setTimeout(()=>els.blockStopBtn.onclick(),350);await mixed;state=ctx.CodyLiveStore.read();assert.equal(state.widgets.temperature.value,27.4);assert.equal(state.widgets.temperature.description,'Source: Hardware');assert(sent.some(s=>s.startsWith('CN@@TEMP@@')));assert(!sent.some(s=>s.startsWith('CN@@RGB@@')));
+// Shipped cross-display project: real temp -> sim display, sim distance -> real display.
+const project=JSON.parse(fs.readFileSync(path.join(root,'examples/Real-temperature-Sim-distance.codynick'),'utf8'));
+B.serialization.workspaces.load(project.workspace,ws);
+sent.length=0;
+const cross=els.blockRunBtn.onclick();
+setTimeout(()=>{const scene=ctx.CodyLiveStore.read().scene;scene.distance=123.4;ctx.CodyLiveStore.simCommand({action:'scene',scene});},650);
+setTimeout(()=>els.blockStopBtn.onclick(),1700);await cross;
+state=ctx.CodyLiveStore.read();
+assert.equal(els.workspaceStatus.textContent,'Program stopped.');
+assert.equal(state.seven_segment,'27.4');
+assert(sent.some(frame=>frame.startsWith('CN@@7SEG@@00123.4')));
+assert(!sent.some(frame=>frame.startsWith('CN@@ULTRA')));
+assert.equal(Number(state.widgets.temperature.value),27.4);
+assert.equal(state.widgets.temperature.description,'Source: Hardware');
+assert.equal(Number(state.widgets.distance.value),123.4);
+assert.equal(state.widgets.distance.description,'Source: Simulation');
+assert(state.widgets.temperature_history.history.length>=2);
+assert(state.widgets.distance_history.history.length>=2);
+assert.equal(Object.keys(state.widgets).length,4);
 // Additional supported simulated gadgets and runtime type validation.
 ctx.CodyLiveStore.simCommand({action:'scene',scene:{...state.scene,gadgets:{...state.scene.gadgets,motion:{x:0,y:0},rfid:{x:0,y:0},ultraseg:{x:0,y:0}},motion:true,rfid:'ABCDEF12',ultraDistance:123}});
 assert.equal(await router.call('cn_motion_detect',{},controller.signal,'SIMULATION'),true);assert.equal(await router.call('cn_rfid_readuid',{},controller.signal,'SIMULATION'),'ABCDEF12');assert.equal(await router.call('cn_ultrasonic_read',{device:'ULTRASEG'},controller.signal,'SIMULATION'),123);

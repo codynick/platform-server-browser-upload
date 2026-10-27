@@ -1,4 +1,4 @@
-# CodyNick Portal 3.5.1 — separate-tab dashboard updates
+# CodyNick Portal 3.5.2 — mixed sensor and display example
 
 Complete static website release for code.codynick.com. The working Windows/Linux
 Web Serial and Android CH340 WebUSB paths from v3.4 are retained. Upload-to-Uno
@@ -11,7 +11,7 @@ files from v3.4 to be deleted locally. Commit/push manually:
 
 ```powershell
 git add -A
-git commit -m "Release v3.5.1: fix separate-tab Live updates"
+git commit -m "Release v3.5.2: add mixed sensor and display example"
 git push origin main
 ```
 
@@ -179,3 +179,7 @@ three isolated JavaScript browser contexts sharing browser-style storage/events.
 Graphical browser behavior still needs your check. A suspended/frozen browser tab,
 closed editor, or sleeping/locked device cannot be guaranteed to keep running;
 this remains browser Live mode, not autonomous hardware execution.
+
+## v3.5.2 mixed sensor example
+
+The Examples menu includes **Real temperature + simulated distance + cross displays**. The downloadable project is `blocks/examples/Real-temperature-Sim-distance.codynick`; instructions are beside it. Both sensors feed separate info cards and history graphs. Real temperature drives the simulated seven-segment display; simulated distance drives the real standalone seven-segment display.
