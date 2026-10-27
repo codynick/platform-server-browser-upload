@@ -1,3 +1,10 @@
+# v3.10.1 — 2026-10-27
+
+- Right-align Block Editor in the top navigation row of standalone tool pages.
+- Hide simulator/dashboard logos in embedded views and reduce header height.
+- Isolate the coding workspace stacking context so scrollbars stay behind menus.
+- Add actual scrollbar/menu overlap hit-testing to the Chrome regression suite.
+
 # v3.10.0 — 2026-10-27
 
 - Added the supplied transparent wide CodyNick logo across page headers and About.

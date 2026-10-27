@@ -1,4 +1,4 @@
-# CodyNick Portal 3.10.0
+# CodyNick Portal 3.10.1
 
 ## One command: fresh server setup or update
 
@@ -34,7 +34,7 @@ rollback command is printed during deployment; it does not undo package, Apache,
 or certificate setup. For an existing custom site, its DocumentRoot must be
 `/var/www/<domain>`. Website rollback remembers the deployment domain. This release does not flash firmware onto the CJP.
 
-Open File > About in the editor to see version 3.10.0. Refresh with Ctrl+F5
+Open File > About in the editor to see version 3.10.1. Refresh with Ctrl+F5
 after deployment. For an already configured server, install.sh remains available
 as a website-only deployment command.
 
@@ -70,8 +70,8 @@ IDs and existing project compatibility.
 
 The supplied transparent CodyNick logo is displayed at its original proportions
 on the landing page, editor, About dialog, simulator and dashboard. Standalone
-tool pages place Block Editor at the far left of a separate navigation row;
-embedded views continue to hide it.
+tool pages place Block Editor at the top right of a separate navigation row;
+embedded views hide that link and the duplicate logo, keeping their title.
 
 Scroll over the simulator to zoom at the pointer; drag empty stage space to pan.
 Double-click empty space, or focus the stage and press Home/0, to fit all gadgets.
