@@ -1,3 +1,13 @@
+# v3.9.0 — 2026-10-27
+
+- Matched simulator/dashboard headers; hide Block Editor links in embedded views.
+- Styled and left-aligned the panel's new-tab buttons.
+- Added grouped, polished File/Advanced menus with icons and clear focus states.
+- Use each graph title for its default legend, preserving named multi-series data.
+- Added child-friendly built-in example names without changing their IDs.
+- Enabled plain mouse-wheel canvas zoom; toolbox wheel scrolling is preserved.
+- Keep block arguments and target choices inline, including imported projects.
+
 # v3.8.0 — 2026-10-27
 
 - Replaced Project menu with File; added Project suffix to file actions.

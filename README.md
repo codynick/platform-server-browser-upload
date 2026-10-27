@@ -1,4 +1,4 @@
-# CodyNick Portal 3.8.0
+# CodyNick Portal 3.9.0
 
 ## One command: fresh server setup or update
 
@@ -34,11 +34,11 @@ rollback command is printed during deployment; it does not undo package, Apache,
 or certificate setup. For an existing custom site, its DocumentRoot must be
 `/var/www/<domain>`. Website rollback remembers the deployment domain. This release does not flash firmware onto the CJP.
 
-Open File > About in the editor to see version 3.8.0. Refresh with Ctrl+F5
+Open File > About in the editor to see version 3.9.0. Refresh with Ctrl+F5
 after deployment. For an already configured server, install.sh remains available
 as a website-only deployment command.
 
-## Editor controls (3.8.0)
+## Editor controls (3.9.0)
 
 File contains New/Save/Load/Upload/Download Project, Examples and About.
 File → Examples opens a list; select an entry and choose Load Example (or
@@ -49,6 +49,22 @@ Python preview behavior is unchanged. The one green Run button becomes a red
 Stop button while running; connection status appears below Connect/Run.
 The simulator's Add gadget button opens a picker that closes after adding one.
 About displays release version and calendar date.
+
+## Interface polish (3.9.0)
+
+Simulator and Dashboard share a consistent header. Embedded views hide the
+Block Editor link; standalone tabs retain it. Open Simulator/Open Dashboard
+buttons at the left of the panel toolbar open full-size tabs. File/Advanced
+menus use grouped, icon-assisted dropdowns.
+
+Mouse-wheel scrolling over the coding canvas zooms at the pointer. Toolbox
+lists still scroll normally; pan the canvas by dragging or using its scrollbars.
+Block arguments and target choices use one horizontal row, including imported
+projects; loops and conditions retain nested statement bodies.
+
+Single-series graph legends use the graph title; explicitly named series keep
+their names. The example chooser uses friendly names while preserving internal
+IDs and existing project compatibility.
 
 ## Pages
 - / — landing page
@@ -90,7 +106,8 @@ may take up to 2.5 s to finish/time out. Outputs retain their last commanded sta
 
 ## Getting started
 1. Open /blocks/ in Chrome. For a simulation-only test, no USB connection is needed.
-2. Select File -> Examples -> Simulation + dashboard, and accept workspace replacement.
+2. Open File → Examples, choose **Try a pretend sensor and draw a graph**,
+   click Load Example, and accept workspace replacement.
 3. This example adds a simulated temperature sensor to the stage and creates a
    gauge/history graph through Dashboard blocks. Press Run.
 4. Adjust temperature in Simulation and switch the right panel to Dashboard.
@@ -98,7 +115,7 @@ may take up to 2.5 s to finish/time out. Outputs retain their last commanded sta
 5. Stop. Try the mixed example after connecting a real CJP and temperature sensor:
    the real reading drives the dashboard while the LED action targets Simulation.
 
-The original Blink RGB, Temperature display and Joystick light examples still
+The Blink a light, Show the temperature, and Control a light with the joystick examples still
 target Hardware by default. Change individual dropdowns to try their simulated
 counterparts, adding required gadgets to the stage yourself.
 
@@ -230,4 +247,4 @@ this remains browser Live mode, not autonomous hardware execution.
 
 ## v3.5.2 mixed sensor example
 
-The File → Examples chooser includes **Real temperature + simulated distance + cross displays**. The downloadable project is `blocks/examples/Real-temperature-Sim-distance.codynick`; instructions are beside it. Both sensors feed separate info cards and history graphs. Real temperature drives the simulated seven-segment display; simulated distance drives the real standalone seven-segment display.
+The File → Examples chooser includes **Send real and pretend readings to displays**. The downloadable project is `blocks/examples/Real-temperature-Sim-distance.codynick`; instructions are beside it. Both sensors feed separate info cards and history graphs. Real temperature drives the simulated seven-segment display; simulated distance drives the real standalone seven-segment display.

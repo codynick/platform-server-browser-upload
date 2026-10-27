@@ -57,9 +57,11 @@ function buildDynamicBlockJson(spec) {
     }
   }
 
+  if(spec.type!=='cn_log')args0.push({type:'field_dropdown',name:'TARGET',options:[['Hardware','HARDWARE'],['Simulation','SIMULATION']]});
   const json = {
     type: spec.type,
-    message0: spec.label,
+    message0: spec.label+(spec.type==='cn_log'?'':' target %'+args0.length),
+    inputsInline: true,
     args0,
     colour: spec.colour || '#4c97ff',
     tooltip: spec.tooltip || '',
@@ -103,7 +105,6 @@ function defineEventBlocks() {
 
 B.defineBlocksWithJsonArray(specs.map(buildDynamicBlockJson));
 DashboardBlocks.definitions();
-for(const spec of specs.filter(s=>s.type!=='cn_log')){const def=B.Blocks[spec.type],init=def.init;def.init=function(){init.call(this);this.appendDummyInput('TARGET_ROW').appendField('target').appendField(new B.FieldDropdown([['Hardware','HARDWARE'],['Simulation','SIMULATION']]),'TARGET');};}
 defineEventBlocks();
 B.defineBlocksWithJsonArray([
 {type:'cn_wait',message0:'wait %1 seconds',args0:[{type:'input_value',name:'SECONDS',check:'Number'}],previousStatement:null,nextStatement:null,colour:'#ffab19'},
@@ -243,14 +244,17 @@ const CodyNickTheme = Blockly.Theme.defineTheme('codynickScratchLike', {
 
 const categoryColours={'#59c059':['logic_compare','logic_operation','logic_negate','logic_boolean','math_number','math_arithmetic','math_single','math_round','math_random_int'],'#ffab19':['cn_wait','cn_forever','controls_if','controls_repeat_ext','controls_whileUntil','controls_flow_statements']};
 for(const [colour,types] of Object.entries(categoryColours))for(const type of types){const definition=B.Blocks[type],originalInit=definition.init;definition.init=function(){originalInit.call(this);this.setColour(colour);};}
-const workspace=B.inject('blocklyDiv',{toolbox:buildToolbox(),media:'/blocks/vendor/blockly/media/',renderer:'zelos',theme:CodyNickTheme,trashcan:true,move:{scrollbars:true,drag:true,wheel:true},grid:{spacing:32,length:3,colour:'#dbeafe',snap:true},zoom:{controls:true,wheel:true,startScale:.72,maxScale:2.2,minScale:.35,scaleSpeed:1.12}});
+// Keep argument inputs inline; statement bodies in loops/conditions remain nested.
+for(const type of new Set([...specs.map(spec=>spec.type),...BlockRuntime.types])){const def=B.Blocks[type];if(!def?.init)continue;const init=def.init;def.init=function(){init.call(this);this.setInputsInline(true);};}
+const workspace=B.inject('blocklyDiv',{toolbox:buildToolbox(),media:'/blocks/vendor/blockly/media/',renderer:'zelos',theme:CodyNickTheme,trashcan:true,move:{scrollbars:true,drag:true,wheel:false},grid:{spacing:32,length:3,colour:'#dbeafe',snap:true},zoom:{controls:true,wheel:true,startScale:.72,maxScale:2.2,minScale:.35,scaleSpeed:1.12}});
 const runtime=new BlockRuntime(new LiveRouter(new CjpHardware(window.CJP),window.CodyLiveStore),specs,(kind,id)=>workspace.highlightBlock(id));
 window.codyWorkspace=workspace;
 for(const mode of ['general','hardware','dashboard'])$(mode+'ToolboxTab').onclick=()=>{toolboxMode=mode;workspace.updateToolbox(buildToolbox());for(const name of ['general','hardware','dashboard'])$(name+'ToolboxTab').setAttribute('aria-selected',String(name===mode));$('toolboxWorkspace').setAttribute('aria-labelledby',mode+'ToolboxTab');B.svgResize(workspace);};
 $('toggleConsole').onclick=()=>{$('consoleModal').classList.add('open');};
 $('closeConsole').onclick=()=>{$('consoleModal').classList.remove('open');};
 $('toggleSpaces').onclick=()=>{const main=$('liveMain');const hide=!main.classList.contains('stage-collapsed');main.classList.toggle('stage-collapsed',hide);$('toggleSpaces').textContent=hide?'Show Spaces':'Hide Spaces';B.svgResize(workspace);};
-for(const name of ['simulator','dashboard'])$('show-'+name).onclick=()=>{for(const other of ['simulator','dashboard'])$(other+'Frame').hidden=other!==name;};
+for(const name of ['simulator','dashboard'])$('show-'+name).onclick=()=>{for(const other of ['simulator','dashboard']){$(other+'Frame').hidden=other!==name;$('show-'+other).setAttribute('aria-pressed',String(other===name));}};
+$('show-simulator').setAttribute('aria-pressed','true');$('show-dashboard').setAttribute('aria-pressed','false');
 $('consoleModal').onclick=e=>{if(e.target===$('consoleModal'))$('consoleModal').classList.remove('open');};
 window.addEventListener('keydown',e=>{if(e.key==='Escape')$('consoleModal').classList.remove('open');});
 let saving=null,loading=false;
@@ -260,7 +264,7 @@ function status(s){$('workspaceStatus').textContent=s;}
 window.addEventListener('resize',()=>B.svgResize(workspace));
 function save(){try{localStorage.setItem(key,JSON.stringify(B.serialization.workspaces.save(workspace)));}catch(e){status('Could not save in this browser. Download your project: '+e.message);}}
 workspace.addChangeListener(e=>{if(e.isUiEvent||loading)return;clearTimeout(saving);saving=setTimeout(save,600);});
-function load(data){if(window.blockProgramRunning)throw Error('Stop the program before loading.');const types=new Set([...specs.map(s=>s.type),...BlockRuntime.types]);const roots=data?.blocks?.blocks;if(!Array.isArray(roots))throw Error('Not a Blockly workspace file.');let count=0;function check(b,depth=0){if(!b)return;if(depth>150||++count>2000)throw Error('Project too large or deeply nested.');if(!types.has(b.type))throw Error('Unsupported block in project: '+b.type);for(const v of Object.values(b.inputs||{})){check(v.block,depth+1);check(v.shadow,depth+1);}check(b.next?.block,depth+1);}roots.forEach(b=>check(b));const previous=B.serialization.workspaces.save(workspace);loading=true;try{B.serialization.workspaces.load(data,workspace);}catch(e){B.serialization.workspaces.load(previous,workspace);throw e;}finally{loading=false;}save();B.svgResize(workspace);}
+function load(data){if(window.blockProgramRunning)throw Error('Stop the program before loading.');const types=new Set([...specs.map(s=>s.type),...BlockRuntime.types]);const roots=data?.blocks?.blocks;if(!Array.isArray(roots))throw Error('Not a Blockly workspace file.');let count=0;function check(b,depth=0){if(!b)return;if(depth>150||++count>2000)throw Error('Project too large or deeply nested.');if(!types.has(b.type))throw Error('Unsupported block in project: '+b.type);for(const v of Object.values(b.inputs||{})){check(v.block,depth+1);check(v.shadow,depth+1);}check(b.next?.block,depth+1);}roots.forEach(b=>check(b));const previous=B.serialization.workspaces.save(workspace);loading=true;try{B.serialization.workspaces.load(data,workspace);for(const block of workspace.getAllBlocks(false))block.setInputsInline(true);}catch(e){B.serialization.workspaces.load(previous,workspace);throw e;}finally{loading=false;}save();B.svgResize(workspace);}
 const number=n=>({type:'math_number',fields:{NUM:n}}),str=s=>({type:'text',fields:{TEXT:s}}),hardware=(type,fields={})=>({type,fields}),wait=n=>({type:'cn_wait',inputs:{SECONDS:{block:number(n)}}});
 function sequence(...blocks){for(let i=0;i<blocks.length-1;i++)blocks[i].next={block:blocks[i+1]};return blocks[0];}
 function example(name){if(['sim-dashboard','mixed'].includes(name))return liveExample(name);let root;if(name==='blink')root={type:'cn_event_loop',x:60,y:50,inputs:{DO:{block:sequence(hardware('cn_rgb_matrix_set',{led:0,color:'#FF0000'}),wait(.5),hardware('cn_rgb_matrix_clear'),wait(.5))}}};

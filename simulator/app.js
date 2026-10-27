@@ -7,6 +7,7 @@ mainPanelUrl.port = '';
 mainPanelUrl.pathname = '/blocks/';
 mainPanelUrl.search = '';
 mainPanelUrl.hash = '';
+$('mainPanel').hidden=window.self!==window.top;
 $('mainPanel').href = mainPanelUrl.href;$('mainPanel').target='_top';
 const newGadgets={
   motion:{title:'PIR motion sensor',body:'<div class="sensor-controls"><label><input id="motionValue" type="checkbox"> Motion detected</label></div>'},

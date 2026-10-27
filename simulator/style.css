@@ -34,3 +34,6 @@ main{display:block;position:relative}.workspace{height:100%}
 #gadgetPicker dl{display:grid;margin:18px 0;gap:8px;font-size:12px}#gadgetPicker #sound{width:100%;font-size:13px}
 .toolbar{height:auto;min-height:46px;gap:7px;padding:8px;flex-wrap:wrap}.toolbar #addGadgets{width:auto;height:30px;padding:4px 9px;font-size:12px;background:#157d5c;color:white;border-color:#157d5c}.toolbar #selected{max-width:150px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.toolbar #saved{font-size:11px}
 @media(max-width:640px){main{grid-template-rows:none}.toolbar #selected{max-width:100px}}
+
+/* Match the shared 72 px dashboard header. */
+main{height:calc(100dvh - 72px)}

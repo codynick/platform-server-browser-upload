@@ -429,13 +429,13 @@ body {
 <link rel="icon" type="image/x-icon" href="/assets/favicon.ico"><link rel="stylesheet" href="/assets/tool-navigation.css"></head>
 <body>
 
-<header class="header">
-    <a class="codynick-home-button" href="/blocks/">Block Editor</a>
+<header class="header tool-page-header">
+    <a id="dashboardEditorLink" class="codynick-home-button" href="/blocks/">Block Editor</a>
     <div class="logo-box">
         <img src="/assets/favicon.ico" alt="Logo" onerror="this.style.display='none'; this.parentNode.querySelector('.logo-placeholder').style.display='block';">
         <div class="logo-placeholder" style="display:none;">IoT</div>
     </div>
-    <div>
+    <div class="tool-header-copy">
         <div class="header-title">CodyNick Live Dashboard</div>
         <div class="header-subtitle">Browser Live session</div>
     </div>
@@ -450,6 +450,8 @@ body {
 
 <script src="layout.js"></script><script src="/blocks/live-store.js"></script><script>
 const localFetch=async(url,options={})=>{try{if(url.includes("action=set"))window.CodyLiveStore.dashboardInput(options.body.get("id"),options.body.get("value"));return {json:async()=>({ok:true,cards:window.CodyLiveStore.cards()})};}catch(error){return {json:async()=>({ok:false,error:error.message})};}};
+const editorLink=document.getElementById('dashboardEditorLink');
+if(editorLink)editorLink.hidden=window.self!==window.top;
 const POLL_INTERVAL_MS = 150;
 const grid = document.getElementById('dashboardGrid');
 const saveTimers = {};
@@ -585,7 +587,7 @@ function renderCardShell(card) {
     const yAxisLabel = escapeHtml(card.y_axis_label || '');
 
     return `
-        <div class="card card-span-${columnSpan} card-height-${heightMultiplier} ${isValid ? `card-${color}` : 'card-error'}" data-card-id="${id}" data-card-type="${escapeHtml(type)}" data-y-padding-percent="${yPaddingPercent}" data-x-axis-label="${xAxisLabel}" data-y-axis-label="${yAxisLabel}"${style ? ` style="${style}"` : ''}>
+        <div class="card card-span-${columnSpan} card-height-${heightMultiplier} ${isValid ? `card-${color}` : 'card-error'}" data-card-id="${id}" data-card-type="${escapeHtml(type)}" data-y-padding-percent="${yPaddingPercent}" data-series-title="${title}" data-x-axis-label="${xAxisLabel}" data-y-axis-label="${yAxisLabel}"${style ? ` style="${style}"` : ''}>
             <button type="button" class="card-title" data-layout-action="move" data-role="layout-move" tabindex="-1" aria-disabled="true" title="${title} — in Edit layout, drag or use arrow keys to move">${title}</button>
             <div class="card-body">${renderCardBody(card)}</div>
             ${description}
@@ -870,7 +872,7 @@ function pointFromEntry(key, value) {
     return [numeric(key, NaN), numeric(value, NaN)];
 }
 
-function parseGraphSeries(raw) {
+function parseGraphSeries(raw, defaultName='Reading') {
     const parsed = JSON.parse(raw || '{}');
     if (!parsed || typeof parsed !== 'object') {
         throw new Error('Graph JSON must be an object or array');
@@ -899,7 +901,7 @@ function parseGraphSeries(raw) {
     if (isNested) {
         Object.keys(parsed).forEach(name => addSeries(name, parsed[name]));
     } else {
-        addSeries('value', parsed);
+        addSeries(defaultName, parsed);
     }
 
     return seriesList.filter(series => series.points.length > 0);
@@ -916,7 +918,7 @@ function drawGraph(cardEl, rawValue) {
 
     let seriesList = [];
     try {
-        seriesList = parseGraphSeries(rawValue);
+        seriesList = parseGraphSeries(rawValue,cardEl.dataset.seriesTitle||'Reading');
     } catch (e) {
         if (note) note.textContent = 'Invalid graph JSON';
         ctx.fillStyle = '#b91c1c';

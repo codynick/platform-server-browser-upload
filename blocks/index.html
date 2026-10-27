@@ -11,24 +11,24 @@
 
     <nav class="toolbar" aria-label="Editor controls">
       <details id="projectMenu" class="project-menu">
-        <summary>File ▾</summary>
-        <div class="project-menu-panel" aria-label="File actions">
-          <button id="newProject" title="Clear the workspace">New Project</button>
-          <button id="menuSave" title="Save named project in this browser">Save Project</button>
-          <button id="loadNamed" title="Load a project saved in this browser">Load Project</button>
+        <summary><svg class="menu-summary-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 7h7l2 2h9v11H3zM3 7V4h7l2 3"/></svg><span>File</span><svg class="menu-chevron" viewBox="0 0 16 16" aria-hidden="true"><path d="m4 6 4 4 4-4"/></svg></summary>
+        <div class="project-menu-panel" aria-label="File actions"><div class="menu-section-label">Your projects</div>
+          <button id="newProject" title="Clear the workspace"><span class="menu-item-icon" aria-hidden="true">＋</span><span>New Project</span></button>
+          <button id="menuSave" title="Save named project in this browser"><span class="menu-item-icon" aria-hidden="true">▣</span><span>Save Project</span></button>
+          <button id="loadNamed" title="Load a project saved in this browser"><span class="menu-item-icon" aria-hidden="true">▱</span><span>Load Project</span></button>
           <hr>
-          <button id="menuUpload" title="Upload a CodyNick project">Upload Project</button>
-          <button id="saveProject" title="Download the current CodyNick project">Download Project</button>
-          <hr><button id="menuExamples">Examples</button>
-          <hr><button id="menuAbout">About</button>
+          <button id="menuUpload" title="Upload a CodyNick project"><span class="menu-item-icon" aria-hidden="true">↥</span><span>Upload Project</span></button>
+          <button id="saveProject" title="Download the current CodyNick project"><span class="menu-item-icon" aria-hidden="true">↧</span><span>Download Project</span></button>
+          <hr><button id="menuExamples"><span class="menu-item-icon" aria-hidden="true">✧</span><span>Examples</span></button>
+          <hr><button id="menuAbout"><span class="menu-item-icon" aria-hidden="true">ⓘ</span><span>About</span></button>
         </div>
       </details>
       <details id="advancedMenu" class="project-menu">
-        <summary>Advanced ▾</summary>
-        <div class="project-menu-panel" aria-label="Advanced actions">
-          <button id="toggleConsole">Console</button>
-          <button id="viewPython" onclick="viewPython()">View Python</button>
-          <button id="linuxSetup" hidden>Linux USB setup</button>
+        <summary><svg class="menu-summary-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m8 5-5 7 5 7m8-14 5 7-5 7m-3-16-2 18"/></svg><span>Advanced</span><svg class="menu-chevron" viewBox="0 0 16 16" aria-hidden="true"><path d="m4 6 4 4 4-4"/></svg></summary>
+        <div class="project-menu-panel" aria-label="Advanced actions"><div class="menu-section-label">Tools</div>
+          <button id="toggleConsole"><span class="menu-item-icon" aria-hidden="true">›_</span><span>Console</span></button>
+          <button id="viewPython" onclick="viewPython()"><span class="menu-item-icon" aria-hidden="true">⌘</span><span>View Python</span></button>
+          <button id="linuxSetup" hidden><span class="menu-item-icon" aria-hidden="true">⚙</span><span>Linux USB setup</span></button>
         </div>
       </details>
       <input id="importFile" type="file" accept=".codynick,.json" />
@@ -57,7 +57,7 @@
         <div id="toolboxWorkspace" role="tabpanel" aria-labelledby="generalToolboxTab"><div id="blocklyDiv"></div></div>
       </div>
     </section>
-    <aside id="liveSpaces" class="sprite-panel live-spaces"><div class="space-toolbar"><button id="show-simulator">Simulation</button><button id="show-dashboard">Dashboard</button><a href="/simulator/" target="_blank" rel="noopener">Open simulation ↗</a><a href="/dashboard/" target="_blank" rel="noopener">Open dashboard ↗</a></div><iframe id="simulatorFrame" title="Gadget simulation" src="/simulator/"></iframe><iframe id="dashboardFrame" title="Live dashboard" src="/dashboard/" hidden></iframe></aside>
+    <aside id="liveSpaces" class="sprite-panel live-spaces"><div class="space-toolbar"><div class="space-links"><a class="space-open-button" href="/simulator/" target="_blank" rel="noopener">Open Simulator <span aria-hidden="true">↗</span></a><a class="space-open-button" href="/dashboard/" target="_blank" rel="noopener">Open Dashboard <span aria-hidden="true">↗</span></a></div><div class="space-tabs"><button id="show-simulator">Simulation</button><button id="show-dashboard">Dashboard</button></div></div><iframe id="simulatorFrame" title="Gadget simulation" src="/simulator/"></iframe><iframe id="dashboardFrame" title="Live dashboard" src="/dashboard/" hidden></iframe></aside>
   </main>
 </div>
 
@@ -86,7 +86,7 @@
 <dialog id="examplesDialog" class="design-dialog" aria-labelledby="examplesTitle">
   <h2 id="examplesTitle">Example Projects</h2>
   <label for="example">Choose an example</label>
-  <select id="example" size="6"><option value="sim-dashboard">Simulation + dashboard</option><option value="mixed">Hardware sensor + simulated LED + dashboard</option><option value="cross-displays">Real temperature + simulated distance + cross displays</option><option value="blink">Blink RGB</option><option value="temperature">Temperature display</option><option value="joystick">Joystick light</option></select>
+  <select id="example" size="6"><option value="sim-dashboard">Try a pretend sensor and draw a graph</option><option value="mixed">Use a real sensor to light a pretend LED</option><option value="cross-displays">Send real and pretend readings to displays</option><option value="blink">Blink a light</option><option value="temperature">Show the temperature</option><option value="joystick">Control a light with the joystick</option></select>
   <p class="examples-note">Loading an example replaces your workspace. Download your current project first if you want to keep it.</p>
   <div class="design-actions"><button id="closeExamples">Cancel</button><button id="loadExample">Load Example</button></div>
 </dialog>
