@@ -26,5 +26,5 @@
  default:throw Error('Unsupported dashboard block: '+action);}
  if(a.SOURCE&&['dash_set','dash_info_set','dash_gauge_set','dash_append'].includes(action))w.description='Source: '+a.SOURCE;
  });}
- window.CodyLiveStore={reset(){memory=defaults();localStorage.removeItem(key);changed();updates?.postMessage('changed');},read,update,scene,simState,simCommand,dashboard,cards:()=>Object.values(read().widgets),dashboardInput:(id,value)=>update(s=>{widget(s,id).value=value;}),start(token){update(s=>{if(s.run&&Date.now()-s.run.at<3500)throw Error('Another Live program is running in this browser. Stop it first.');s.run={token,at:Date.now()};});},heartbeat(token){update(s=>{if(s.run?.token===token)s.run.at=Date.now();});},stop(token){update(s=>{if(s.run?.token===token)s.run=null;});}};
+ window.CodyLiveStore={read,update,scene,simState,simCommand,dashboard,cards:()=>Object.values(read().widgets),dashboardInput:(id,value)=>update(s=>{widget(s,id).value=value;}),start(token){update(s=>{if(s.run&&Date.now()-s.run.at<3500)throw Error('Another Live program is running in this browser. Stop it first.');s.run={token,at:Date.now()};});},heartbeat(token){update(s=>{if(s.run?.token===token)s.run.at=Date.now();});},stop(token){update(s=>{if(s.run?.token===token)s.run=null;});}};
 })();

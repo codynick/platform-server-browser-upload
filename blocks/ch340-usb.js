@@ -70,6 +70,9 @@ class Ch340UsbPort {
       this.stopped=false;
     }catch(e){try{await this.close();}catch{}throw e;}
   }
+  async setSignals({dataTerminalReady=false,requestToSend=false}){
+    await this.out(0xa4,(~((dataTerminalReady?0x20:0)|(requestToSend?0x40:0)))&0xff);
+  }
   async read(){
     while(!this.stopped){
       try{

@@ -254,14 +254,11 @@ function animateMatrix(now) {
   requestAnimationFrame(animateMatrix);
 }
 requestAnimationFrame(animateMatrix);
-window.CodyAccountViewReset=()=>{const state=CodyLiveStore.read();dragging=null;stopTone();renderScene(state.scene);for(let i=0;i<16;i++)leds.get(i).style.background='#000000';displayNumber('');matrixRevision=-1;matrixUpdate(state.matrix);$('direction').textContent='Neutral';$('note').textContent='Silent';};
 select('cjp');
 async function poll() {
-  const accountGeneration=window.CodyAccounts?.generation;
   try {
     const reply = await localFetch('/state', {cache:'no-store', signal:AbortSignal.timeout(2000)});
     if (!reply.ok) throw new Error(); const state = await reply.json();
-    if(accountGeneration!==window.CodyAccounts?.generation){setTimeout(poll,50);return;}
     $('python').textContent = state.connected ? 'Connected' : 'Waiting';
     pythonConnected=state.connected;
     if(!dragging&&!pending&&!temperatureTimer) {renderScene(state.scene);$('saved').textContent='Saved';}

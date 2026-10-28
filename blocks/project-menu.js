@@ -13,7 +13,6 @@
  // Parse as local noon so the calendar date cannot shift with UTC offsets.
  get('aboutDate').textContent=new Date(released+'T12:00:00').toLocaleDateString(undefined,{year:'numeric',month:'long',day:'numeric'});
  get('menuAbout').onclick=()=>about.showModal();get('closeAbout').onclick=()=>about.close();
- get('headerExamples').onclick=()=>get('menuExamples').click();
  get('menuExamples').onclick=()=>{get('example').value='sim-dashboard';get('examplesDialog').showModal();};
  get('closeExamples').onclick=()=>get('examplesDialog').close();
  get('example').addEventListener('dblclick',()=>get('loadExample').click());

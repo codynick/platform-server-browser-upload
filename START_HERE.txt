@@ -1,0 +1,23 @@
+CodyNick Portal 3.11.2 (Not Mature)
+
+INSTALL OR UPGRADE
+
+Run this command in an interactive terminal on your Debian/Ubuntu VPS:
+
+wget -4 -O /tmp/codynick-browser-setup.sh "https://raw.githubusercontent.com/codynick/platform-server-browser-upload/main/setup.sh?$(date +%s)" && sudo bash /tmp/codynick-browser-setup.sh
+
+First installation asks for the website domain and CAS settings. Upgrades reuse
+the saved domain and existing CAS configuration and preserve private projects.
+DNS must point to the VPS; inbound ports 80 and 443 must be open.
+The repository checkout is /root/platform-server-browser-upload.
+This does not require deleting or changing an older repository checkout.
+
+After setup succeeds, close old CodyNick tabs, open your site's /blocks/ path,
+and press Ctrl+F5. Connect the CJP to the computer/phone running the browser.
+The editor checks bundled CodyPi 1.19.6 and asks before installing if needed.
+Keep USB connected during installation and verification.
+
+See README.md for CAS registration and configuration, and
+blocks/firmware/README.md for firmware releases and physical acceptance checks.
+Physical desktop and Android CJP upload testing remains required before release
+is considered mature.

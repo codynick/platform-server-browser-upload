@@ -1,14 +1,32 @@
-# v3.11.0 — 2026-10-27
+## 3.11.2 — CJP firmware installation
 
-- Integrated CAS login/confirmation/logout and private project CRUD with SQLite.
-- Added automatic Guest mode, separate Guest drafts and account-only Save/Load.
-- Added header account controls and a direct Examples button with responsive layout.
-- Guard all private project responses across account changes; clear undo/private views.
-- Keep the UI usable during account API outages and retry automatically.
-- Unified one-command setup/update with the CAS backend and existing config preservation.
-- Added full-release backups, failure rollback and optional database snapshot restore.
-- Rollback retains the latest saved project database by default.
-- Adapted the supplied cumulative CAS patch; no live CAS latency fix is claimed.
+- Check the deployed CodyPi firmware version on connection; bundle release 1.19.6.
+- Request confirmation before installing older or unidentified firmware.
+- Add Uno STK500v1 upload through Web Serial and CH340 WebUSB, with MCU signature checks, page read-back verification, post-reset identity confirmation and retry handling.
+- Keep simulation available after declining installation; block hardware for mismatched versions without downgrading newer firmware.
+- Add checksum-addressed firmware packaging and update instructions.
+- Use codynick/platform-server-browser-upload for bootstrap, checkout, and documentation.
+- Automated upload/connection tests pass; physical CJP desktop/Android acceptance remains required.
+
+## 3.11.1 — clean installation repair
+
+- Create HTTP and HTTPS site before deploying any application/CAS components.
+- Correct bootstrap repository to codynick/platform-server-browser-upload.
+- Install complete extracted ZIP directly without fetching other source.
+- Retry/repeat installation tests and early DNS/TLS failure checks.
+- Include latest centered header controls and dedicated Examples button.
+- First-install CAS endpoint/attribute prompts; preserve configured installs.
+
+## 3.11.0
+
+- Bundle CAS and private projects into the same setup.sh install/update flow.
+- Derive callback and central-logout return URLs from the selected domain.
+- Place account controls at top right with username only below the button.
+- Remove legacy-browser import and cleanup controls.
+- Preserve 3.10.2 compact standalone tool headers and current simulator features.
+- Refresh Apache integration on repeat installs, including confirmation policy.
+- Add sanitized request timing diagnostics; live login latency remains unverified.
+- Retain identity confirmation until CAS supports correlated automatic login.
 
 # v3.10.2 — 2026-10-27
 

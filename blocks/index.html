@@ -1,4 +1,4 @@
-<!doctype html><html lang="en"><head><script src="/blocks/account-guard.js"></script><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>CodyNick Block IDE</title><link rel="icon" href="/assets/favicon.ico"><link rel="stylesheet" href="editor.css"><link rel="stylesheet" href="/assets/tool-navigation.css"><link rel="stylesheet" href="stage.css"><link rel="stylesheet" href="webserial.css"><script src="vendor/blockly/blockly.min.js" defer></script><script src="ch340-usb.js" defer></script><script src="linux-help.js" defer></script><script src="serial.js" defer></script><script src="live-scheduler.js" defer></script><script src="hardware.js" defer></script><script src="runtime.js" defer></script><script src="block-specs.js" defer></script><script src="live-store.js" defer></script><script src="live-router.js" defer></script><script src="dashboard-blocks.js" defer></script><script src="blocks.js" defer></script><script src="version.js" defer></script><script src="project-menu.js" defer></script><script src="accounts.js" defer></script><link rel="stylesheet" href="accounts.css"></head><body>
+<!doctype html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>CodyNick Block IDE</title><link rel="icon" href="/assets/favicon.ico"><link rel="stylesheet" href="editor.css"><link rel="stylesheet" href="/assets/tool-navigation.css"><link rel="stylesheet" href="stage.css"><link rel="stylesheet" href="webserial.css"><script src="vendor/blockly/blockly.min.js" defer></script><script src="ch340-usb.js" defer></script><script src="linux-help.js" defer></script><script src="firmware.js" defer></script><script src="serial.js" defer></script><script src="live-scheduler.js" defer></script><script src="hardware.js" defer></script><script src="runtime.js" defer></script><script src="block-specs.js" defer></script><script src="live-store.js" defer></script><script src="live-router.js" defer></script><script src="dashboard-blocks.js" defer></script><script src="blocks.js" defer></script><script src="version.js" defer></script><script src="project-menu.js" defer></script><style>body{visibility:hidden}</style><script src="/blocks/accounts.js?v=20261027-header5" defer></script><link rel="stylesheet" href="/blocks/accounts.css?v=20261027-header5"></head><body>
 <div class="app">
   <header class="topbar">
     <div class="brand">
@@ -32,14 +32,13 @@
         </div>
       </details>
       <input id="importFile" type="file" accept=".codynick,.json" />
-      <button id="headerExamples">Examples</button>
+      <button id="headerExamples" title="Open example projects">Examples</button>
       <button id="toggleSpaces">Hide Spaces</button>
       <div class="connection-group">
         <button id="connect" title="Connect to your CodyJoy Pro USB connection">Connect</button>
         <button id="blockRunBtn" class="run-btn" aria-label="Run program" aria-pressed="false" title="Run this browser program">Run</button>
         <div class="connection-status" role="status" aria-live="polite"><span id="status">Disconnected</span><span id="device">Waiting for USB</span></div>
       </div>
-      <div class="account-controls" aria-label="CodyNick account"><button id="accountSignIn">Sign in</button><button id="accountSignOut" hidden>Sign out</button><span id="accountName" class="account-name">Guest</span></div>
     </nav>
   </header>
 
@@ -82,7 +81,7 @@
   <div class="about-tags"><span>Version <strong id="aboutVersion"></strong></span><span>Released <time id="aboutDate"></time></span></div>
   <p class="about-intro">Build with blocks. Bring your gadgets to life.</p>
   <p>Connect CodyJoy Pro hardware, explore simulated gadgets, and turn readings into live dashboards.</p>
-  <p class="about-note">Programs run while this browser stays open. Sign in to save private projects. Guest drafts stay in this browser; Download keeps a portable copy.</p>
+  <p class="about-note">Programs run while this browser stays open. Sign in to save private projects to your account. Download to keep guest work.</p>
   <div class="design-actions"><button id="closeAbout">Close</button></div>
 </dialog>
 <dialog id="examplesDialog" class="design-dialog" aria-labelledby="examplesTitle">

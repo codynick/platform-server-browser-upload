@@ -37,5 +37,3 @@ a.codynick-home-button:focus-visible { outline: 3px solid #edb94e; outline-offse
 /* Embedded panels retain their title while giving the stage/widgets more room. */
 .tool-page-header:has(.codynick-home-button[hidden]) .logo-box{display:none}
 .tool-page-header:has(.codynick-home-button[hidden]){min-height:58px;padding:10px 12px}
-
-.account-verifying main{visibility:hidden}.account-verifying body::after{content:"Checking account…";position:fixed;top:100px;left:24px;z-index:30;padding:12px;background:white;color:#52627b;font:14px Arial,sans-serif;border:1px solid #d8e1ed;border-radius:8px}

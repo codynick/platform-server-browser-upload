@@ -6,9 +6,6 @@ import requests
 from defusedxml import ElementTree as ET
 from flask import Flask, request, jsonify, redirect, render_template_string, abort, g
 
-if sqlite3.sqlite_version_info < (3,35,0):
-    raise RuntimeError('SQLite 3.35 or later is required for atomic CAS/session operations.')
-
 app = Flask(__name__)
 app.logger.setLevel('INFO')
 app.config['MAX_CONTENT_LENGTH'] = 2 * 1024 * 1024
@@ -176,14 +173,14 @@ def make_confirmation_page(candidate=None, error_message=None, status=200):
     nonce=secrets.token_urlsafe(24)
     response=app.make_response((render_template_string(CONFIRM_TEMPLATE,
         **(candidate or {}), error_message=error_message, nonce=nonce),status))
-    response.headers['Content-Security-Policy']=("default-src 'none'; img-src 'self'; style-src 'nonce-"+nonce+"'; form-action 'self'; frame-ancestors 'none'; base-uri 'none'")
+    response.headers['Content-Security-Policy']=("default-src 'none'; style-src 'nonce-"+nonce+"'; form-action 'self'; frame-ancestors 'none'; base-uri 'none'")
     return response
 
 CONFIRM_TEMPLATE = """<!doctype html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Continue to CodyNick</title>
 <style nonce="{{ nonce }}">
-*{box-sizing:border-box}body{margin:0;min-height:100vh;background:#f3f6fb;color:#17233b;font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;line-height:1.5}header{background:white;border-bottom:1px solid #e1e7f0;padding:20px 6vw}.brand{font-size:24px;font-weight:800;letter-spacing:-1px}.brand img{display:block;width:220px;height:auto;object-fit:contain}.tag{color:#66758d;font-size:13px;margin-top:2px}main{max-width:510px;margin:64px auto;padding:0 20px}.card{background:white;border:1px solid #e1e7f0;border-radius:20px;padding:32px;box-shadow:0 16px 48px #20345a0d}.badge{display:inline-block;color:#206748;background:#e9f7ef;border-radius:30px;font-size:12px;font-weight:700;padding:6px 12px}h1{font-size:28px;line-height:1.2;letter-spacing:-.7px;margin:20px 0 12px}p{color:#63718a;margin:0 0 24px}dl{margin:0 0 26px;border:1px solid #e4eaf2;border-radius:12px;padding:4px 18px}dl div{padding:12px 0;border-bottom:1px solid #e9edf4}dl div:last-child{border:0}dt{font-size:12px;color:#66758d}dd{margin:3px 0 0;font-weight:600;overflow-wrap:anywhere}button,.primary{display:block;width:100%;padding:13px 18px;border:0;border-radius:10px;background:#2364df;color:white;font:600 15px system-ui;cursor:pointer;text-align:center;text-decoration:none}button:hover,.primary:hover{background:#184fc0}a:focus-visible,button:focus-visible{outline:3px solid #90b9ff;outline-offset:3px}.cancel{display:block;text-align:center;margin-top:18px;color:#50617c;font-size:14px}.foot{text-align:center;font-size:12px;color:#79869b;margin-top:22px}@media(max-width:540px){main{margin:32px auto}.card{padding:24px}h1{font-size:25px}}
-</style></head><body><header><div class="brand"><img src="/assets/codynick-logo.png" alt="CodyNick"></div><div class="tag">Create. Connect. Explore.</div></header><main><section class="card">
+*{box-sizing:border-box}body{margin:0;min-height:100vh;background:#f3f6fb;color:#17233b;font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;line-height:1.5}header{background:white;border-bottom:1px solid #e1e7f0;padding:20px 6vw}.brand{font-size:24px;font-weight:800;letter-spacing:-1px}.brand span{color:#2364df}.tag{color:#66758d;font-size:13px;margin-top:2px}main{max-width:510px;margin:64px auto;padding:0 20px}.card{background:white;border:1px solid #e1e7f0;border-radius:20px;padding:32px;box-shadow:0 16px 48px #20345a0d}.badge{display:inline-block;color:#206748;background:#e9f7ef;border-radius:30px;font-size:12px;font-weight:700;padding:6px 12px}h1{font-size:28px;line-height:1.2;letter-spacing:-.7px;margin:20px 0 12px}p{color:#63718a;margin:0 0 24px}dl{margin:0 0 26px;border:1px solid #e4eaf2;border-radius:12px;padding:4px 18px}dl div{padding:12px 0;border-bottom:1px solid #e9edf4}dl div:last-child{border:0}dt{font-size:12px;color:#66758d}dd{margin:3px 0 0;font-weight:600;overflow-wrap:anywhere}button,.primary{display:block;width:100%;padding:13px 18px;border:0;border-radius:10px;background:#2364df;color:white;font:600 15px system-ui;cursor:pointer;text-align:center;text-decoration:none}button:hover,.primary:hover{background:#184fc0}a:focus-visible,button:focus-visible{outline:3px solid #90b9ff;outline-offset:3px}.cancel{display:block;text-align:center;margin-top:18px;color:#50617c;font-size:14px}.foot{text-align:center;font-size:12px;color:#79869b;margin-top:22px}@media(max-width:540px){main{margin:32px auto}.card{padding:24px}h1{font-size:25px}}
+</style></head><body><header><div class="brand">Cody<span>Nick</span></div><div class="tag">Create. Connect. Explore.</div></header><main><section class="card">
 {% if error_message %}<span class="badge">Sign-in needs attention</span><h1>Let's try that again</h1><p>{{ error_message }}</p><a class="primary" href="/auth/login">Restart sign-in</a><a class="cancel" href="/blocks/">Return to editor</a>
 {% else %}<span class="badge">Account verified</span><h1>Continue to CodyNick</h1><p>Check that this is your account before opening your private projects.</p>
 <dl><div><dt>Name</dt><dd>{{ name }}</dd></div><div><dt>CodyNick ID</dt><dd>{{ user_id }}</dd></div><div><dt>Email</dt><dd>{{ email or 'Not provided' }}</dd></div></dl>
