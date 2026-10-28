@@ -1,3 +1,15 @@
+# v3.11.0 — 2026-10-27
+
+- Integrated CAS login/confirmation/logout and private project CRUD with SQLite.
+- Added automatic Guest mode, separate Guest drafts and account-only Save/Load.
+- Added header account controls and a direct Examples button with responsive layout.
+- Guard all private project responses across account changes; clear undo/private views.
+- Keep the UI usable during account API outages and retry automatically.
+- Unified one-command setup/update with the CAS backend and existing config preservation.
+- Added full-release backups, failure rollback and optional database snapshot restore.
+- Rollback retains the latest saved project database by default.
+- Adapted the supplied cumulative CAS patch; no live CAS latency fix is claimed.
+
 # v3.10.2 — 2026-10-27
 
 - Keep standalone tool branding, title and Block Editor on one compact header row.

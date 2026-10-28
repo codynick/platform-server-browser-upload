@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
+<head><script src="/blocks/account-guard.js"></script>
 <meta charset="UTF-8">
 <title>CodyNick Live Dashboard</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -426,7 +426,7 @@ body {
 @media(max-width:560px){.container{padding:12px}.header{gap:10px}.header-title{font-size:16px}}
 
 </style>
-<link rel="icon" type="image/x-icon" href="/assets/favicon.ico"><link rel="stylesheet" href="/assets/tool-navigation.css"></head>
+<link rel="icon" type="image/x-icon" href="/assets/favicon.ico"><link rel="stylesheet" href="/assets/tool-navigation.css"><script src="/blocks/accounts.js" defer></script></head>
 <body>
 
 <header class="header tool-page-header">
@@ -1371,9 +1371,11 @@ function attachEvents() {
 
 let renderedState=null;
 function pollState() {
+    const accountGeneration=window.CodyAccounts?.generation;
     localFetch('cards.php?action=state', { cache: 'no-store' })
         .then(response => response.json())
         .then(data => {
+            if(accountGeneration!==window.CodyAccounts?.generation)return;
             if (!data.ok || !Array.isArray(data.cards)) {
                 throw new Error(data.error || 'Invalid API response');
             }

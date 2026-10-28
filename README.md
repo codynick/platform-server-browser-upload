@@ -1,42 +1,89 @@
-# CodyNick Portal 3.10.2
+# CodyNick Portal 3.11.0 — CAS accounts and Guest mode
 
-## One command: fresh server setup or update
+## Deploy or update
 
-Run as root on a Debian/Ubuntu server:
+Run the same command on an existing server or a fresh Debian/Ubuntu VPS
+(Ubuntu 22.04+ or Debian 12+ recommended; Python 3.9+ and SQLite 3.35+ required):
 
 ```bash
-(set -e; apt-get update; apt-get install -y curl ca-certificates; setup_file=$(mktemp); trap 'rm -f -- "$setup_file"' EXIT; curl -fsSL https://raw.githubusercontent.com/codynick/platform-server-browser-upload/main/setup.sh -o "$setup_file"; bash "$setup_file")
+wget -4 -O /tmp/codynick-browser-setup.sh "https://raw.githubusercontent.com/codynick/platform-server-browser-upload/main/setup.sh?$(date +%s)" && sudo bash /tmp/codynick-browser-setup.sh
 ```
 
-On first setup, enter your website domain when prompted, for example
-`ide.codynick.com`. Enter only the domain (no scheme, path or port). The choice
-is saved in `/etc/codynick/domain`; subsequent runs reuse it without prompting.
-To select another domain explicitly, run the downloaded setup.sh with
-`CODYNICK_DOMAIN=other.example.com bash setup.sh` (this also changes the saved
-selection). A noninteractive first run requires CODYNICK_DOMAIN.
+On first setup enter the domain, with DNS pointing to this server and ports 80/443
+open. The installer checks HTTPS through Certbot and deploys the frontend plus
+Flask/Gunicorn, SQLite and Apache proxy routes. Existing CAS identity settings
+and projects are preserved. Domain selection prefers CODYNICK_DOMAIN, then an
+existing CAS config, then /etc/codynick/domain, then prompts. One CAS deployment
+per VPS is supported. Apache must have an exact HTTPS ServerName for that domain.
 
-The command installs Git, Apache and Certbot, clones or fast-forwards main,
-deploys into `/var/www/<domain>` with a rollback backup, and configures an Apache
-site if needed. Existing domain configurations are reused. Certbot checks for a
-matching certificate and reuses it if valid, or obtains/renews it as needed,
-then configures HTTPS and redirects HTTP. Certbot manages automatic renewal.
+Close all old CodyNick tabs before deploying; reopen and Ctrl+F5 afterward.
+Verify File → About shows **3.11.0**. Node is not required on the server.
 
-Before fresh setup, point the entered domain's DNS (including any AAAA record)
-to this server and allow inbound TCP ports 80 and 443. DNS resolution is checked;
-Certbot verifies reachability and ownership. DNS/firewall changes are not made
-automatically. If certificate issuance fails, fix DNS/reachability and rerun the
-same command. HTTPS is required for USB. Certificates are registered without an
-email contact; configure a Certbot email separately if you want notices.
+## Accounts
 
-The server checkout must be clean, on main, and use the expected GitHub origin.
-The updater stops rather than overwriting local Git changes. The website-only
-rollback command is printed during deployment; it does not undo package, Apache,
-or certificate setup. For an existing custom site, its DocumentRoot must be
-`/var/www/<domain>`. Website rollback remembers the deployment domain. This release does not flash firmware onto the CJP.
+No sign-in means **Guest**, automatically. Guests can edit, run, simulate, use
+examples and Upload/Download. Save Project and Load Project require CAS sign-in.
+Guest drafts are saved separately in this browser. Private work is never written
+to that draft key. Old browser named projects remain intact and can be selected
+for explicit import in the signed-in Load dialog, then saved to the account.
 
-Open File > About in the editor to see version 3.10.2. Refresh with Ctrl+F5
-after deployment. For an already configured server, install.sh remains available
-as a website-only deployment command.
+The default identity provider is https://id.codynick.com/cas, using CAS principal
+as stable ID and `name` / `email` attributes. Existing settings in
+/etc/codynick-cas/config.json are retained. For a new installation, environment
+variables CAS_BASE_URL, CAS_VALIDATE_URL, CAS_ID_ATTRIBUTE, CAS_NAME_ATTRIBUTE and
+CAS_EMAIL_ATTRIBUTE can override defaults. The installer derives the public
+origin and logout return for the selected domain on every deployment.
+
+Register these **exact URLs in the CAS server** (the installer cannot change
+central identity-provider registration):
+
+- Login service: `https://<domain>/auth/callback`
+- Logout return: `https://<domain>/blocks/` (enable CAS post-logout redirection)
+
+A verified identity-confirmation page remains after CAS login. Sessions expire
+in eight hours. Account project APIs enforce ownership, write CSRF/Origin checks,
+2 MB request limits, 200 projects per account and revision-conflict detection.
+Signing out clears private browser content and visits central CAS logout.
+The account service retries automatically; if it is unavailable the editor stays
+usable as Guest while previously private content is cleared. Account changes
+cancel in-flight operations so late private responses cannot refill the workspace.
+
+Programs, sensor readings and dashboards still execute locally in the browser;
+only account/project storage is server-side. Dashboard layouts remain local.
+No autonomous board execution, public project sharing or account signup is added.
+
+## Rollback and database recovery
+
+Every application deployment snapshots website files/assets, existing CAS code,
+configuration, service state, affected Apache files and an existing SQLite database.
+A failed application deployment automatically restores the preceding release.
+The deployment prints its exact backup directory. To roll back the latest attempt:
+
+```bash
+sudo bash /root/codynick-last-backup/rollback.sh
+```
+
+Rollback restores website/CAS code and configuration, **retaining the latest
+private database**, so projects saved after deployment are not discarded. It
+keeps a recoverable copy of the replaced files and leaves the Git checkout intact.
+Packages and certificate provisioning are not reversed. Setup failures before
+application deployment report an error without claiming an application rollback.
+
+If you explicitly want to restore the older database snapshot as well:
+
+```bash
+sudo bash /root/codynick-last-backup/restore-database.sh /root/codynick-last-backup/database.sqlite3
+```
+
+That command stops the service, makes a safety copy of the newer database, restores
+the selected snapshot, then restarts the service if it was running. No database
+snapshot exists on the first-ever CAS installation. Keep off-server copies of
+/var/lib/codynick-cas and /etc/codynick-cas for disaster recovery.
+
+Useful diagnostics: `systemctl status codynick-cas`,
+`journalctl -u codynick-cas --since today`, and Apache's site error log.
+Auth request logs omit ticket query strings. Server-Timing is available to
+investigate latency; this release does not claim a live CAS timing diagnosis.
 
 ## Editor controls (3.9.0)
 
@@ -91,10 +138,9 @@ Refresh the editor with Ctrl+F5 after installation. Simulator and Dashboard are
 available in the editor's right panel, with links for opening full-size tabs.
 Hide spaces restores the full-width coding workspace. On narrower screens the
 spaces stack below the editor. The open tabs must use the same origin and browser
-profile; they share the browser's local state. Different devices/profiles do not
-share projects or dashboard values. No PHP, Python server, MySQL or extra service
-is required: the original UI assets are retained, but server APIs are replaced
-by a browser-local model.
+profile; they share the browser's local state. Different devices/profiles share explicitly saved private projects through
+the account API, while live values and layouts remain browser-local. Python and
+SQLite serve the account API; hardware/simulation execution stays in the browser.
 
 ## Target rules (confirmed design)
 Each gadget block has a target dropdown: Hardware or Simulation. Hardware is the
@@ -152,7 +198,7 @@ can be cached by CodyPi. RGB hardware commands have no acknowledgments.
 
 The original simulator's Wi-Fi/IoT exploratory card is retained, but Wi-Fi/IoT
 coding blocks remain outside this release's palette. They were not available in
-v3.4. Legacy sensors, sprites, Upload mode, cloud accounts and autonomous programs
+v3.4. Legacy sensors, sprites, Upload mode and autonomous programs
 are not implemented here.
 
 ## Dashboard
@@ -185,7 +231,7 @@ indicator expires after a few seconds. Only run one Live program per browser
 profile; a live-session check blocks another active editor from starting.
 
 ## Projects and compatibility
-Save/Load named designs and autosave retain their existing browser keys. Download
+Save/Load access private account projects; Guest drafts use a separate browser key. Download
 and Upload preserve per-block targets and stage arrangement/sensor settings.
 Dashboard creation blocks recreate widgets when you run a project; current graph
 history/output states are not part of the exported project. The simulator's
@@ -208,6 +254,16 @@ Existing firmware CodyPi 1.19.6 remains unchanged. Browser timing is not real ti
 background tab throttling may change update timing.
 
 ## Tests and limits
+
+Install backend test dependencies in a virtual environment from backend/requirements.txt.
+Run `python -m unittest discover -s backend -p "test_*.py"` for CAS, configuration
+and isolated deploy/rollback tests. Service commands in deployment fixtures are
+mocked; this does not claim a live VPS or CAS-provider test.
+With Playwright available, `node blocks/browser-tests/accounts.cjs` checks Guest
+mode, private Save/Load, separate drafts, cross-tab cleanup, late-response rejection,
+service outage recovery and the account header. CODY_ACCOUNT_ARTIFACTS selects
+its screenshot directory.
+
 
 `node blocks/tests/simulator-viewport.cjs` checks camera zoom/pan/fit math.
 With Playwright available, `node simulator/tests/browser.cjs` checks pointer and

@@ -6,6 +6,15 @@ command -v apt-get >/dev/null || { echo 'This installer supports Debian/Ubuntu s
 settings_dir=/etc/codynick
 saved_domain=$settings_dir/domain
 domain=${CODYNICK_DOMAIN:-}
+if [[ -z "$domain" && -f /etc/codynick-cas/config.json ]]; then
+ domain=$(python3 - <<'PYDOMAIN'
+import json
+from urllib.parse import urlsplit
+with open('/etc/codynick-cas/config.json') as f:config=json.load(f)
+print(config.get('DOMAIN') or urlsplit(config.get('PUBLIC_ORIGIN','')).hostname or '')
+PYDOMAIN
+)
+fi
 if [[ -z "$domain" && -f "$saved_domain" ]]; then
  domain=$(cat "$saved_domain")
 fi
@@ -30,7 +39,7 @@ webroot=/var/www/$domain
 export DEBIAN_FRONTEND=noninteractive
 echo '[1/5] Installing server dependencies'
 apt-get update
-apt-get install -y git ca-certificates apache2 certbot python3-certbot-apache
+apt-get install -y git ca-certificates apache2 certbot python3-certbot-apache python3-venv python3-pip curl
 
 echo '[2/5] Getting the latest CodyNick release'
 if [[ -e "$repo" ]]; then
@@ -43,11 +52,9 @@ else
  git clone --branch main --single-branch https://github.com/codynick/platform-server-browser-upload.git "$repo"
 fi
 
-echo '[3/5] Deploying website (with a rollback backup)'
-mkdir -p "$webroot"
-CODYNICK_DOMAIN="$domain" bash "$repo/install.sh"
+install -d -m 755 -o root -g root "$webroot"
 
-echo '[4/5] Checking Apache website configuration'
+echo '[3/5] Checking Apache website configuration'
 # Reuse an existing domain configuration, including its SSL settings.
 if ! apache2ctl -S 2>&1 | grep -F "$domain" >/dev/null; then
  config=/etc/apache2/sites-available/codynick-$domain.conf
@@ -71,7 +78,7 @@ apache2ctl configtest
 systemctl enable --now apache2
 systemctl reload apache2
 
-echo '[5/5] Checking HTTPS'
+echo '[4/5] Checking HTTPS'
 getent ahosts "$domain" >/dev/null || { echo "DNS does not resolve $domain. Point its DNS to this server, then rerun." >&2; exit 1; }
 echo "Certbot will reuse a valid certificate or obtain/renew one as needed for $domain."
 echo 'DNS must point to this server; inbound TCP ports 80 and 443 must be open.'
@@ -79,5 +86,7 @@ certbot --apache --non-interactive --agree-tos --register-unsafely-without-email
 
 apache2ctl configtest
 systemctl reload apache2
+echo '[5/5] Deploying the website, CAS service and private-project API'
+CODYNICK_DOMAIN="$domain" bash "$repo/install.sh"
 printf '\nCodyNick %s is ready: https://%s/blocks/\nCheck File > About for the installed version.\n' "$(cat "$repo/VERSION")" "$domain"
 echo 'Certificate renewal is managed by Certbot. Rerun the same command for future updates.'

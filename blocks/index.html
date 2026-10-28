@@ -1,4 +1,4 @@
-<!doctype html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>CodyNick Block IDE</title><link rel="icon" href="/assets/favicon.ico"><link rel="stylesheet" href="editor.css"><link rel="stylesheet" href="/assets/tool-navigation.css"><link rel="stylesheet" href="stage.css"><link rel="stylesheet" href="webserial.css"><script src="vendor/blockly/blockly.min.js" defer></script><script src="ch340-usb.js" defer></script><script src="linux-help.js" defer></script><script src="serial.js" defer></script><script src="live-scheduler.js" defer></script><script src="hardware.js" defer></script><script src="runtime.js" defer></script><script src="block-specs.js" defer></script><script src="live-store.js" defer></script><script src="live-router.js" defer></script><script src="dashboard-blocks.js" defer></script><script src="blocks.js" defer></script><script src="version.js" defer></script><script src="project-menu.js" defer></script></head><body>
+<!doctype html><html lang="en"><head><script src="/blocks/account-guard.js"></script><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>CodyNick Block IDE</title><link rel="icon" href="/assets/favicon.ico"><link rel="stylesheet" href="editor.css"><link rel="stylesheet" href="/assets/tool-navigation.css"><link rel="stylesheet" href="stage.css"><link rel="stylesheet" href="webserial.css"><script src="vendor/blockly/blockly.min.js" defer></script><script src="ch340-usb.js" defer></script><script src="linux-help.js" defer></script><script src="serial.js" defer></script><script src="live-scheduler.js" defer></script><script src="hardware.js" defer></script><script src="runtime.js" defer></script><script src="block-specs.js" defer></script><script src="live-store.js" defer></script><script src="live-router.js" defer></script><script src="dashboard-blocks.js" defer></script><script src="blocks.js" defer></script><script src="version.js" defer></script><script src="project-menu.js" defer></script><script src="accounts.js" defer></script><link rel="stylesheet" href="accounts.css"></head><body>
 <div class="app">
   <header class="topbar">
     <div class="brand">
@@ -14,8 +14,8 @@
         <summary><svg class="menu-summary-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 7h7l2 2h9v11H3zM3 7V4h7l2 3"/></svg><span>File</span><svg class="menu-chevron" viewBox="0 0 16 16" aria-hidden="true"><path d="m4 6 4 4 4-4"/></svg></summary>
         <div class="project-menu-panel" aria-label="File actions"><div class="menu-section-label">Your projects</div>
           <button id="newProject" title="Clear the workspace"><span class="menu-item-icon" aria-hidden="true">＋</span><span>New Project</span></button>
-          <button id="menuSave" title="Save named project in this browser"><span class="menu-item-icon" aria-hidden="true">▣</span><span>Save Project</span></button>
-          <button id="loadNamed" title="Load a project saved in this browser"><span class="menu-item-icon" aria-hidden="true">▱</span><span>Load Project</span></button>
+          <button id="menuSave" title="Save private account project"><span class="menu-item-icon" aria-hidden="true">▣</span><span>Save Project</span></button>
+          <button id="loadNamed" title="Load private account project"><span class="menu-item-icon" aria-hidden="true">▱</span><span>Load Project</span></button>
           <hr>
           <button id="menuUpload" title="Upload a CodyNick project"><span class="menu-item-icon" aria-hidden="true">↥</span><span>Upload Project</span></button>
           <button id="saveProject" title="Download the current CodyNick project"><span class="menu-item-icon" aria-hidden="true">↧</span><span>Download Project</span></button>
@@ -32,12 +32,14 @@
         </div>
       </details>
       <input id="importFile" type="file" accept=".codynick,.json" />
+      <button id="headerExamples">Examples</button>
       <button id="toggleSpaces">Hide Spaces</button>
       <div class="connection-group">
         <button id="connect" title="Connect to your CodyJoy Pro USB connection">Connect</button>
         <button id="blockRunBtn" class="run-btn" aria-label="Run program" aria-pressed="false" title="Run this browser program">Run</button>
         <div class="connection-status" role="status" aria-live="polite"><span id="status">Disconnected</span><span id="device">Waiting for USB</span></div>
       </div>
+      <div class="account-controls" aria-label="CodyNick account"><button id="accountSignIn">Sign in</button><button id="accountSignOut" hidden>Sign out</button><span id="accountName" class="account-name">Guest</span></div>
     </nav>
   </header>
 
@@ -80,7 +82,7 @@
   <div class="about-tags"><span>Version <strong id="aboutVersion"></strong></span><span>Released <time id="aboutDate"></time></span></div>
   <p class="about-intro">Build with blocks. Bring your gadgets to life.</p>
   <p>Connect CodyJoy Pro hardware, explore simulated gadgets, and turn readings into live dashboards.</p>
-  <p class="about-note">Programs run while this browser stays open. Projects and dashboard layouts are saved locally in your browser.</p>
+  <p class="about-note">Programs run while this browser stays open. Sign in to save private projects. Guest drafts stay in this browser; Download keeps a portable copy.</p>
   <div class="design-actions"><button id="closeAbout">Close</button></div>
 </dialog>
 <dialog id="examplesDialog" class="design-dialog" aria-labelledby="examplesTitle">
@@ -92,7 +94,7 @@
 </dialog>
 <dialog id="designDialog" class="design-dialog" aria-labelledby="designDialogTitle">
   <h2 id="designDialogTitle">Load Design</h2>
-  <label for="designList">Saved on this device</label>
+  <label for="designList">Private projects in your account</label>
   <select id="designList" size="8" ></select>
   <p id="designListStatus" role="status">Saved in this browser</p>
   <div class="design-actions"><button id="closeDesignDialog">Cancel</button><button id="loadNamedConfirm">Load</button></div>
