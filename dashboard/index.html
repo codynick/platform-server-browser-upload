@@ -1369,7 +1369,12 @@ function attachEvents() {
     });
 }
 
-let renderedState=null;
+let renderedState=null,renderedStructure=null;
+// Keep live widget nodes (and their current gauge animation state) when only
+// readings/history change. Rebuild only for additions, removal or configuration.
+function cardStructure(cards){
+    return JSON.stringify(cards.map(({value,history,samples,...configuration})=>configuration));
+}
 function pollState() {
     localFetch('cards.php?action=state', { cache: 'no-store' })
         .then(response => response.json())
@@ -1378,10 +1383,19 @@ function pollState() {
                 throw new Error(data.error || 'Invalid API response');
             }
 
-            // Because title/color/description/type may also change, the entire dashboard is AJAX-rendered.
             const signature=JSON.stringify(data.cards);
+            const structure=cardStructure(data.cards);
             if(window.CodyDashboardLayoutUI?.busy)return;
-            if(signature!==renderedState){renderAllCards(data.cards);renderedState=signature;}
+            if(signature!==renderedState){
+                if(structure!==renderedStructure){
+                    renderAllCards(data.cards);
+                    renderedStructure=structure;
+                }else{
+                    latestCards=data.cards;
+                    data.cards.forEach(updateCardValues);
+                }
+                renderedState=signature;
+            }
         })
         .catch(error => {
             if (!firstLoadComplete) {

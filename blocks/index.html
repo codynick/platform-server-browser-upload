@@ -1,4 +1,4 @@
-<!doctype html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>CodyNick Block IDE</title><link rel="icon" href="/assets/favicon.ico"><link rel="stylesheet" href="editor.css"><link rel="stylesheet" href="/assets/tool-navigation.css"><link rel="stylesheet" href="stage.css"><link rel="stylesheet" href="webserial.css"><script src="vendor/blockly/blockly.min.js" defer></script><script src="ch340-usb.js" defer></script><script src="linux-help.js" defer></script><script src="firmware.js" defer></script><script src="serial.js" defer></script><script src="live-scheduler.js" defer></script><script src="hardware.js" defer></script><script src="runtime.js" defer></script><script src="block-specs.js" defer></script><script src="live-store.js" defer></script><script src="live-router.js" defer></script><script src="dashboard-blocks.js" defer></script><script src="blocks.js" defer></script><script src="version.js" defer></script><script src="project-menu.js" defer></script><style>body{visibility:hidden}</style><script src="/blocks/accounts.js?v=20261027-header5" defer></script><link rel="stylesheet" href="/blocks/accounts.css?v=20261027-header5"></head><body>
+<!doctype html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>CodyNick Block IDE</title><link rel="icon" href="/assets/favicon.ico"><link rel="stylesheet" href="editor.css"><link rel="stylesheet" href="/assets/tool-navigation.css"><link rel="stylesheet" href="stage.css"><link rel="stylesheet" href="webserial.css"><script src="vendor/blockly/blockly.min.js" defer></script><script src="ch340-usb.js" defer></script><script src="linux-help.js" defer></script><script src="firmware.js" defer></script><script src="serial.js" defer></script><script src="live-scheduler.js" defer></script><script src="hardware.js" defer></script><script src="runtime.js" defer></script><script src="block-specs.js" defer></script><script src="live-store.js" defer></script><script src="live-router.js" defer></script><script src="dashboard-blocks.js" defer></script><script src="blocks.js" defer></script><script src="version.js" defer></script><script src="project-menu.js" defer></script><link rel="stylesheet" href="python-pilot.css"><script src="python-bridge.js" defer></script><script src="python-pilot-config.js" defer></script><script src="python-color.js" defer></script><script src="python-pilot.js" defer></script><style>body{visibility:hidden}</style><script src="/blocks/accounts.js?v=20261027-header5" defer></script><link rel="stylesheet" href="/blocks/accounts.css?v=20261027-header5"></head><body>
 <div class="app">
   <header class="topbar">
     <div class="brand">
@@ -44,7 +44,11 @@
 
   <main id="liveMain" class="main stage-layout">
     <section class="workspace-shell">
-      <div class="design-bar"><label for="designName">Design</label><input id="designName" type="text" maxlength="120" placeholder="Untitled" autocomplete="off"><button id="saveNamed" title="Save named design in this browser">Save</button>
+      <div class="design-bar"><label for="designName">Design</label><input id="designName" type="text" maxlength="120" placeholder="Untitled" autocomplete="off"><button id="pythonInfo" type="button" title="Example information" aria-label="Example information" aria-expanded="false" aria-controls="pythonHelpBubble" hidden>ⓘ</button><button id="saveNamed" title="Save named design in this browser">Save</button>
+        <nav id="pythonTabs" class="python-mode-tabs" role="tablist" aria-label="Coding language" hidden>
+          <button id="blocksEditorTab" role="tab" aria-selected="true" aria-controls="toolboxWorkspace">Blocks</button>
+          <button id="pythonEditorTab" role="tab" aria-selected="false" aria-controls="pythonPanel">Python · Pilot</button>
+        </nav>
       </div>
       <div class="panel-head" title="Programs run in this browser while connected; Stop leaves hardware outputs unchanged.">
         <nav class="toolbox-modes" style="flex-wrap:wrap" role="tablist" aria-label="Block categories" aria-orientation="horizontal">
@@ -55,6 +59,13 @@
         <span id="workspaceStatus" class="status" role="status">Live mode · Ready to edit.</span>
       </div>
       <div class="workspace-coding">
+        <section id="pythonPanel" role="tabpanel" aria-labelledby="pythonEditorTab" hidden>
+          <input id="pythonFile" type="file" accept=".py,text/x-python" hidden>
+          <div class="python-codewrap"><pre id="pythonLineNumbers" aria-hidden="true">1</pre><div class="python-edit-surface"><pre id="pythonColors" aria-hidden="true"></pre><textarea id="pythonSource" aria-label="Python source code" spellcheck="false" autocapitalize="off" autocomplete="off" autocorrect="off" wrap="off"># Open Examples to get started.
+print("Hello, CodyNick!")
+</textarea></div></div>
+          <div class="python-console-head"><strong>Python Console</strong><button id="pythonClearOutput" type="button">Clear</button></div><pre id="pythonOutput" role="log" aria-label="Python program output"></pre><div id="pythonStatusBar" role="status" aria-live="polite">Python pilot · Ready.</div>
+        </section>
         <div id="toolboxWorkspace" role="tabpanel" aria-labelledby="generalToolboxTab"><div id="blocklyDiv"></div></div>
       </div>
     </section>
@@ -76,6 +87,11 @@
 </div>
 
 <div id="toast" class="toast"></div>
+<div id="pythonHelpBubble" class="python-help-bubble" popover="auto" role="note" aria-label="Python example information">
+ <strong>Example information</strong>
+ <p id="pythonExampleHelp">Open Examples to begin. Gadget operations and wait() use await. Ctrl+Enter runs or stops.</p>
+ <p class="python-help-files">Use File → Open Python File or Download Python File. Account Save/Load is not available for Python in this pilot.</p>
+</div>
 <dialog id="firmwareProgressDialog" class="design-dialog" aria-labelledby="firmwareProgressTitle">
  <h2 id="firmwareProgressTitle">CJP firmware installation</h2>
  <p id="firmwareProgressStatus" role="status" aria-live="polite">Preparing firmware…</p>

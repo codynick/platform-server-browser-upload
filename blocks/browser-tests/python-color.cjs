@@ -1,0 +1,28 @@
+const assert=require('assert/strict'),fs=require('fs'),path=require('path');
+const root=path.resolve(__dirname,'../..');
+const artifacts=process.env.PILOT_ARTIFACTS||path.resolve('test-output/python-pilot');fs.mkdirSync(artifacts,{recursive:true});
+const highlight=require(path.join(root,'blocks/python-color.js'));
+const sample='# A comment\nasync def read():\n    value = 12.5\n    text = "hello"\n    return True\n';
+for(const name of ['comment','keyword','definition','number','string','literal'])assert(highlight(sample).includes('py-'+name));
+assert(highlight('print(range(10))').includes('py-builtin'));assert(highlight('"""one\ntwo"""').includes('py-string'));
+assert(!highlight('"<img src=x onerror=alert(1)>"').includes('<img'));assert(highlight('# "not a string"').includes('py-comment'));
+assert(highlight('r"\\n"').includes('py-string'));assert(highlight('await wait(0.5)').includes('py-keyword'));
+console.log('PASS: Python tokens, multiline/raw strings, comments and HTML escaping');
+const {chromium}=require('playwright');let browser;
+(async()=>{
+ browser=await chromium.launch({...(process.env.CHROME_PATH?{executablePath:process.env.CHROME_PATH}:{}),headless:true});const page=await browser.newPage({viewport:{width:1400,height:950}});const errors=[];page.on('pageerror',e=>errors.push(e.message));page.on('dialog',d=>d.accept());
+ await page.goto((process.env.PILOT_URL||'http://127.0.0.1:8767/blocks/'));await page.locator('#pythonEditorTab').click();
+ await page.locator('#pythonSource').fill(sample);await page.waitForFunction(()=>document.querySelectorAll('#pythonColors span').length>4);
+ assert.equal(await page.locator('#pythonColors').textContent(),sample+' ');assert.equal(await page.locator('#pythonSource').inputValue(),sample);
+ assert.equal(await page.locator('#pythonColors .py-keyword').first().evaluate(e=>getComputedStyle(e).color),'rgb(124, 46, 165)');
+ await page.locator('#pythonSource').fill(('print("'+('long '.repeat(80))+'")\n').repeat(70));
+ await page.locator('#pythonSource').evaluate(e=>{e.scrollTop=200;e.scrollLeft=170;e.dispatchEvent(new Event('scroll'));});
+ const positions=await page.evaluate(()=>{const t=document.querySelector('#pythonSource'),c=document.querySelector('#pythonColors'),n=document.querySelector('#pythonLineNumbers');return [t.scrollTop,c.scrollTop,n.scrollTop,t.scrollLeft,c.scrollLeft]});assert.equal(positions[0],positions[1]);assert.equal(positions[0],positions[2]);assert.equal(positions[3],positions[4]);
+ await page.locator('#pythonSource').fill('print("Coloring preserves execution")');await page.locator('#blockRunBtn').click();await page.waitForFunction(()=>!window.CodyPythonPilot.running,null,{timeout:180000});assert((await page.locator('#pythonOutput').textContent()).includes('Coloring preserves execution'));
+ await page.locator('#headerExamples').click();await page.selectOption('#example','sim-dashboard');await page.locator('#loadExample').click();
+ await page.screenshot({path:path.join(artifacts,'python-colored-desktop.png'),fullPage:true});
+ await page.setViewportSize({width:412,height:915});
+ assert(await page.evaluate(()=>getComputedStyle(document.querySelector('#pythonColors')).font===getComputedStyle(document.querySelector('#pythonSource')).font));
+ assert(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth));await page.screenshot({path:path.join(artifacts,'python-colored-mobile.png'),fullPage:true});
+ assert.equal(errors.length,0,errors.join('\n'));console.log('PASS: colored editor, exact source preservation, scroll alignment, real Python execution and mobile font alignment');
+})().catch(e=>{console.error(e);process.exitCode=1;}).finally(async()=>{await browser?.close();});

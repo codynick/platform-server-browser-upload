@@ -46,7 +46,7 @@ else
   git clone --branch main --single-branch https://github.com/codynick/platform-server-browser-upload.git "$repo"
  fi
 fi
-for required in VERSION install.sh cas/update.sh cas/patch_frontend.py cas/backend/app.py cas/frontend/accounts.js cas/frontend/accounts.css blocks/index.html; do
+for required in VERSION install.sh cas/update.sh cas/patch_frontend.py cas/backend/app.py cas/frontend/accounts.js cas/frontend/accounts.css blocks/index.html blocks/python-pilot.css blocks/python-pilot.js blocks/python-pilot-config.js blocks/python-color.js blocks/python-bridge.js blocks/python-worker.mjs blocks/codynick.py blocks/python-examples.json; do
  [[ -f $repo/$required ]] || { echo "Incomplete source package: $required" >&2; exit 1; }
 done
 

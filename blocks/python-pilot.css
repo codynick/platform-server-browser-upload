@@ -1,0 +1,51 @@
+[hidden]{display:none!important}
+.python-mode-tabs{display:flex;gap:6px;margin-left:auto}
+.python-mode-tabs button[aria-selected="true"]{background:#087d91;color:#fff;border-color:#087d91}
+#pythonPanel{display:flex;flex-direction:column;min-height:0;min-width:0;background:#fff}
+.python-filebar{display:flex;flex-wrap:wrap;gap:8px;padding:8px 12px;border-bottom:1px solid #d0d7de;font-size:12px;align-items:center}
+.python-filebar span{flex:1;min-width:180px;color:#425766}
+#pythonExampleHelp{font-size:13px;margin:0;padding:8px 12px;color:#314956;background:#edf7fa}
+.python-codewrap{display:flex;flex:1;min-height:190px;overflow:hidden;border-bottom:1px solid #d0d7de}
+#pythonLineNumbers{margin:0;padding:12px 8px;background:#f4f7fa;color:#687c8b;user-select:none;text-align:right;overflow:hidden;font:14px/1.6 Consolas,monospace;min-width:45px}
+#pythonSource{resize:none;flex:1;min-width:0;border:0;border-radius:0;margin:0;padding:12px;font:14px/1.6 Consolas,monospace;white-space:pre;tab-size:4;color:#142f40;background:#fff;outline-offset:-2px;overflow:auto}
+#pythonSource.python-error{box-shadow:inset 3px 0 #c43d42}
+.python-console-head{display:flex;justify-content:space-between;align-items:center;padding:6px 12px;background:#f4f7fa;font-size:13px}
+#pythonOutput{height:125px;min-height:75px;overflow:auto;margin:0;padding:10px 12px;background:#142630;color:#edf6fc;white-space:pre-wrap;overflow-wrap:anywhere;font:13px/1.5 Consolas,monospace}
+@media(max-width:550px){.python-mode-tabs{margin-left:0}#pythonSource{font-size:13px}.python-filebar span{flex-basis:100%}}
+
+.python-active .workspace-shell{min-width:0;grid-template-columns:minmax(0,1fr)}
+.python-active .panel-head{height:auto;min-height:42px;padding-top:8px;padding-bottom:8px}
+.python-active #workspaceStatus{white-space:normal;overflow-wrap:anywhere;min-width:0}
+.python-filebar span{overflow-wrap:anywhere;white-space:normal;min-width:0}
+@media(max-width:980px){
+ .python-active #liveMain.stage-layout{grid-template-rows:minmax(760px,auto) max-content}
+ .python-active #liveMain.stage-collapsed{grid-template-rows:minmax(760px,1fr)}
+}
+
+/* One native textarea handles typing, selection, IME and accessibility. The
+   noninteractive layer underneath supplies colors with identical text metrics. */
+.python-edit-surface{position:relative;flex:1;min-width:0;min-height:0;background:#fff;overflow:hidden}
+#pythonColors,#pythonSource{position:absolute;inset:0;width:100%;height:100%;margin:0;padding:12px;border:0;border-radius:0;font:14px/1.6 Consolas,monospace;letter-spacing:normal;tab-size:4;white-space:pre;text-align:left;box-sizing:border-box}
+#pythonColors{overflow:hidden;pointer-events:none;color:#142f40;background:#fff}
+#pythonSource{background:transparent;color:transparent;-webkit-text-fill-color:transparent;caret-color:#142f40;overflow:auto}
+#pythonSource::selection{background:rgba(75,145,230,.28);color:transparent}
+#pythonColors .py-keyword{color:#7c2ea5}
+#pythonColors .py-builtin,#pythonColors .py-definition{color:#075ca8}
+#pythonColors .py-string{color:#17643b}
+#pythonColors .py-comment{color:#637449}
+#pythonColors .py-number{color:#a34b08}
+#pythonColors .py-literal{color:#8c3076}
+#pythonColors .py-operator{color:#68439a}
+@media(max-width:550px){#pythonColors,#pythonSource,#pythonLineNumbers{font-size:13px}}
+@media(forced-colors:active){#pythonColors{display:none}#pythonSource{color:CanvasText;-webkit-text-fill-color:CanvasText;caret-color:CanvasText}#pythonSource::selection{background:Highlight;color:HighlightText}}
+
+/* Keep Python's working area tall: no category/status row or inline file/help bar. */
+.python-active .workspace-shell{grid-template-rows:auto minmax(0,1fr)}
+.python-active .workspace-shell>.panel-head{display:none}
+#pythonInfo{flex:0 0 auto;width:32px;height:32px;padding:0;border:1px solid #a9bdc8;border-radius:50%;color:#087d91;background:#fff;font-size:21px;line-height:1;cursor:pointer}
+#pythonInfo[aria-expanded="true"]{background:#e6f4f7}
+.python-help-bubble{position:fixed;inset:auto;margin:0;width:min(380px,calc(100vw - 32px));padding:14px;border:1px solid #aec3ce;border-radius:10px;background:#fff;color:#243e4c;box-shadow:0 8px 28px #14263033;font:14px/1.5 Arial,sans-serif;overflow-wrap:anywhere}
+.python-help-bubble #pythonExampleHelp{margin:8px 0;padding:0;background:none;font-size:14px;color:inherit}
+.python-help-files{margin:10px 0 0;padding-top:10px;border-top:1px solid #dce6eb;font-size:12px;color:#526875}
+#pythonStatusBar{flex:0 0 auto;min-height:30px;padding:6px 12px;border-top:1px solid #cbd9e2;background:#edf4f8;color:#385665;font:12px/1.4 Arial,sans-serif;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;white-space:normal;overflow-wrap:anywhere}
+.python-console-head,#pythonOutput{flex-shrink:0}

@@ -1,23 +1,19 @@
-CodyNick Portal 3.11.5 (Not Mature)
+CodyNick Portal 3.12.0 — CUMULATIVE GITHUB UPGRADE
 
-INSTALL OR UPGRADE
-
-Run this command in an interactive terminal on your Debian/Ubuntu VPS:
+Run this one command on your Debian/Ubuntu VPS:
 
 wget -4 -O /tmp/codynick-browser-setup.sh "https://raw.githubusercontent.com/codynick/platform-server-browser-upload/main/setup.sh?$(date +%s)" && sudo bash /tmp/codynick-browser-setup.sh
 
-First installation asks for the website domain and CAS settings. Upgrades reuse
-the saved domain and existing CAS configuration and preserve private projects.
-DNS must point to the VPS; inbound ports 80 and 443 must be open.
-The repository checkout is /root/platform-server-browser-upload.
-This does not require deleting or changing an older repository checkout.
+It installs/updates the complete release from codynick/platform-server-browser-upload
+on main, reusing the saved domain and existing CAS settings/private projects.
+Includes all firmware, browser Python, dashboard and interface updates through pilot.6.
+Close old editor/dashboard tabs, reopen /blocks/ and press Ctrl+F5 after upgrading.
 
-After setup succeeds, close old CodyNick tabs, open your site's /blocks/ path,
-and press Ctrl+F5. Connect the CJP to the computer/phone running the browser.
-The editor checks bundled CodyPi 1.19.6 and asks before installing if needed.
-Keep USB connected during installation and verification.
+The installer prints website and CAS backup paths and their rollback commands.
+Use those printed commands for rolling back a GitHub setup/upgrade.
+For a manual ZIP update, the previous update-local.sh workflow remains available.
+Its convenience rollback script applies to the most recent manual ZIP update.
 
-See README.md for CAS registration and configuration, and
-blocks/firmware/README.md for firmware releases and physical acceptance checks.
-Physical desktop and Android CJP upload testing remains required before release
-is considered mature.
+Python account Save/Load remains unavailable. Physical Python CJP/Android
+validation is pending. The browser needs Internet for uncached Pyodide downloads.
+See README.md for revision history and PYTHON_PILOT.md for Python testing.
