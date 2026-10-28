@@ -37,30 +37,64 @@
   const image=parseHex(new TextDecoder().decode(bytes));progress(100);return image;
  }
  class Programmer {
-  constructor(port,progress){this.port=port;this.progress=progress;this.bytes=[];this.error=null;}
+  constructor(port,progress,log=()=>{}){this.port=port;this.progress=progress;this.log=log;this.bytes=[];this.error=null;this.stage='starting uploader';}
   async start(){this.reader=this.port.readable.getReader();this.writer=this.port.writable.getWriter();this.pump=(async()=>{try{while(true){const r=await this.reader.read();if(r.done)break;this.bytes.push(...r.value);}}catch(e){this.error=e;}finally{this.error ||= Error('USB connection ended.');}})();}
   async exact(n,timeout=1400){const until=Date.now()+timeout;while(this.bytes.length<n){if(this.error)throw this.error;if(Date.now()>until)throw Error('CJP bootloader timed out. Check the port and USB cable, then retry.');await sleep(5);}return this.bytes.splice(0,n);}
-  async command(bytes,n=0){await this.writer.write(Uint8Array.from([...bytes,0x20]));const reply=await this.exact(n+2);if(reply[0]!==0x14||reply[n+1]!==0x10)throw Error('Unexpected Uno bootloader response.');return reply.slice(1,-1);}
-  async reset(){await this.port.setSignals({dataTerminalReady:false,requestToSend:false});await sleep(100);this.bytes=[];await this.port.setSignals({dataTerminalReady:true,requestToSend:true});await sleep(60);}
+  async command(bytes,n=0){await this.writer.write(Uint8Array.from([...bytes,0x20]));const reply=await this.exact(n+2);if(reply[0]!==0x14||reply[n+1]!==0x10)throw Error('Unexpected Uno bootloader response: '+reply.map(v=>v.toString(16).padStart(2,'0')).join(' '));return reply.slice(1,-1);}
+  async reset(){
+   await this.port.setSignals({dataTerminalReady:false,requestToSend:false});await sleep(250);
+   this.bytes=[];await this.port.setSignals({dataTerminalReady:true,requestToSend:true});await sleep(100);
+  }
+  async synchronize(){
+   this.stage='connecting to Uno bootloader';
+   for(let reset=0;reset<3;reset++){
+    this.progress('Connecting to Uno bootloader (attempt '+(reset+1)+' of 3)');
+    this.log('BOOT reset '+(reset+1));await this.reset();
+    // Probe repeatedly inside one boot window. A single early packet can be
+    // lost during startup; waiting a full command timeout then resetting repeats it.
+    for(let probe=0;probe<8;probe++){
+     this.log('BOOT sync '+(reset+1)+'.'+(probe+1));
+     await this.writer.write(Uint8Array.of(0x30,0x20));
+     const until=Date.now()+120;let previous=-1;
+     while(Date.now()<until){
+      if(this.error)throw this.error;
+      while(this.bytes.length){
+       const byte=this.bytes.shift();
+       if(previous===0x14&&byte===0x10){
+        this.log('BOOT synchronized');
+        // Drain duplicate synchronization replies before issuing binary commands.
+        await sleep(40);this.bytes=[];return;
+       }
+       previous=byte;
+      }
+      await sleep(5);
+     }
+    }
+   }
+   throw Error('No Uno bootloader reply after 3 reset attempts. No firmware was written. On mobile, disconnect/reconnect USB and retry; if it repeats, open Console and share the BOOT messages.');
+  }
   async upload(image){
    await this.start();
    try{
-    let synced=false;
-    for(let attempt=0;attempt<3&&!synced;attempt++){await this.reset();try{await this.command([0x30]);synced=true;}catch(e){if(this.error||attempt===2)throw e;}}
+    await this.synchronize();
+    this.stage='checking Uno signature';
     const signature=await this.command([0x75],3);
     if(signature.join(',')!=='30,149,15')throw Error('Selected device is not an ATmega328P Uno. Nothing was written.');
+    this.log('BOOT signature '+signature.map(v=>v.toString(16)).join(' '));
     await this.command([0x50]);
     for(let at=0;at<image.length;at+=128){
+     this.stage='writing firmware page '+(at/128+1);
      const word=at/2,page=image.slice(at,at+128);
      await this.command([0x55,word&255,word>>8]);
      await this.command([0x64,0,128,0x46,...page]);
      await this.command([0x55,word&255,word>>8]);
+     this.stage='verifying firmware page '+(at/128+1);
      const read=await this.command([0x74,0,128,0x46],128);
      if(read.some((v,i)=>v!==page[i]))throw Error('Firmware verification failed. Reconnect and retry installation.');
      this.progress('Installing and verifying firmware',Math.round((at+128)/image.length*100));
     }
     await this.command([0x51]);
-   }finally{this.writer.releaseLock();try{await this.reader.cancel();}catch{}await this.pump;this.reader.releaseLock();}
+   }catch(e){this.log('BOOT failure at '+this.stage+': '+e.message);throw Error(this.stage+': '+e.message);}finally{this.writer.releaseLock();try{await this.reader.cancel();}catch{}await this.pump;this.reader.releaseLock();}
   }
  }
  const api={compare,parseHex,release,download,Programmer};

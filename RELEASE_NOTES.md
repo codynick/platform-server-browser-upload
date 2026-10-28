@@ -1,3 +1,10 @@
+## 3.11.4 — Android bootloader synchronization
+
+- Retry STK500 synchronization within each reset window instead of one early probe.
+- Match CH340 driver control-line values using the complete 16-bit complement.
+- Log synchronization attempts and failing upload stage; freeze progress on error.
+- Physical Android acceptance remains required; this addresses identified handshake weaknesses, not a confirmed device diagnosis.
+
 ## 3.11.3 — firmware download integrity and visible progress
 
 - Preserve exact HEX bytes in Git and normalize new releases before hashing.

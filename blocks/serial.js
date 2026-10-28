@@ -31,7 +31,7 @@ function firmwareFinished(message,failed=false){
  if(!firmwareActive)return;firmwareActive=false;
  $('firmwareProgressStatus').textContent=message;
  $('firmwareProgressHint').textContent=failed?'Close this message, check the USB connection, and click Connect to retry.':'Firmware verified. Your CJP is ready.';
- if(!failed)$('firmwareProgressBar').value=100;
+ $('firmwareProgressBar').value=failed?Number($('firmwareProgressBar').value)||0:100;
  $('firmwareProgressClose').hidden=false;
 }
 $('firmwareProgressClose').onclick=()=>{if(!firmwareActive)$('firmwareProgressDialog').close?.();};
@@ -74,7 +74,7 @@ $('connect').onclick=async()=>{
    ready=false;await stopReader();await p.close();
    await p.open({baudRate:115200});
    const preventLeave=event=>{event.preventDefault();event.returnValue='';};window.addEventListener('beforeunload',preventLeave);
-   try{await new window.CjpFirmware.Programmer(p,(text,percent)=>firmwareProgress(text,percent)).upload(image);}finally{window.removeEventListener('beforeunload',preventLeave);}
+   try{await new window.CjpFirmware.Programmer(p,(text,percent)=>firmwareProgress(text,percent),log).upload(image);}finally{window.removeEventListener('beforeunload',preventLeave);}
    await p.close();await p.open({baudRate:115200});
    firmwareProgress('Restarting CJP and confirming firmware version');identity=await identify(p);
    if(firmwareVersion(identity)!==release.version)throw Error('Upload completed, but the expected firmware version was not confirmed. Reconnect to retry.');

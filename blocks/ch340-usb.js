@@ -61,17 +61,17 @@ class Ch340UsbPort {
       await this.controlRead(0x95,0x0706);
       await this.out(0xa1,0x501f,0xd90a);
       await this.baud(9600);
-      await this.out(0xa4,0xff); // DTR/RTS deasserted
+      await this.out(0xa4,0xffff); // DTR/RTS deasserted
       await this.controlRead(0x95,0x0706);
       await this.baud(baudRate);
       await this.out(0x9a,0x2518,0xc3);
       await this.out(0x9a,0x2727,0); // no hardware flow control
-      await this.out(0xa4,0x9f); // assert DTR/RTS; the Uno may reset
+      await this.out(0xa4,0xff9f); // assert DTR/RTS; the Uno may reset
       this.stopped=false;
     }catch(e){try{await this.close();}catch{}throw e;}
   }
   async setSignals({dataTerminalReady=false,requestToSend=false}){
-    await this.out(0xa4,(~((dataTerminalReady?0x20:0)|(requestToSend?0x40:0)))&0xff);
+    await this.out(0xa4,(~((dataTerminalReady?0x20:0)|(requestToSend?0x40:0)))&0xffff);
   }
   async read(){
     while(!this.stopped){

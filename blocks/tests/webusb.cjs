@@ -12,7 +12,9 @@ class Device {
 }
 (async()=>{
  const d=new Device(),p=new Port(d);await p.open({baudRate:115200});assert.equal(p.inEndpoint,2);assert.equal(p.outEndpoint,3);assert.equal(d.claimed,0);
- assert(d.commands.some(([k,s])=>s.request===0x9a&&s.value===0x1312&&s.index===0xcc83));assert(d.commands.some(([k,s])=>s.request===0x9a&&s.value===0x2518&&s.index===0xc3));assert(d.commands.some(([k,s])=>s.request===0xa4&&s.value===0x9f));
+ assert(d.commands.some(([k,s])=>s.request===0x9a&&s.value===0x1312&&s.index===0xcc83));assert(d.commands.some(([k,s])=>s.request===0x9a&&s.value===0x2518&&s.index===0xc3));assert(d.commands.some(([k,s])=>s.request===0xa4&&s.value===0xff9f));
+ await p.setSignals({dataTerminalReady:false,requestToSend:false});assert.equal(d.commands.at(-1)[1].value,0xffff);
+ await p.setSignals({dataTerminalReady:true,requestToSend:true});assert.equal(d.commands.at(-1)[1].value,0xff9f);
  const bytes=new TextEncoder().encode('CN@@RGB@@00#FF0000__');await p.writable.getWriter().write(bytes);assert.deepEqual(d.out,[...bytes]);
  d.inResult={status:'ok',data:new DataView(new TextEncoder().encode('CN@@CJP-Neo|1.19.6\0\0\n').buffer)};const reader=p.readable.getReader();const r=await reader.read();assert.equal(new TextDecoder().decode(r.value),'CN@@CJP-Neo|1.19.6\0\0\n');
  d.inResult=null;const pending=reader.read();await reader.cancel();assert.equal((await pending).done,true);await p.close();assert(!d.opened);
