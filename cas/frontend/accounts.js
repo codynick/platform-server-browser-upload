@@ -46,7 +46,7 @@
    user=data.user;csrf=data.csrf;checked=true;
    if(reloading)return;
    document.body.style.visibility='visible';
-   
+
    label.textContent=user?(user.name||user.user_id):'';sign.hidden=!!user;out.hidden=!user;
   }catch(e){label.textContent='';sign.disabled=true;out.disabled=true;sign.title='Account service unavailable. Reload to retry.';csrf=null;}finally{checking=false;if(refreshPending){refreshPending=false;void check();}}
  }
