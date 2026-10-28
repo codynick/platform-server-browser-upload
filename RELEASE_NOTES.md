@@ -1,3 +1,11 @@
+## 3.11.5 — program error alerts and revision history
+
+- Show a browser alert as well as status/Console output when a program fails to start or ends with an error, including missing sensors and hardware disconnection.
+- Restore program controls and stop live updates before displaying a runtime error alert.
+- Keep normal completion and the user's Stop action free of error alerts.
+- Include documented revision history at the end of README.md; require updates for every release.
+- User confirmed successful desktop firmware upload after 3.11.3 and mobile upload after 3.11.4.
+
 ## 3.11.4 — Android bootloader synchronization
 
 - Retry STK500 synchronization within each reset window instead of one early probe.

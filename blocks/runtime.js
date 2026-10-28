@@ -1,7 +1,7 @@
 'use strict';
 class BlockRuntime {
  constructor(hardware,specs,report=()=>{}){this.hw=hardware;this.specs=new Map(specs.map(s=>[s.type,s]));this.report=report;this.vars=new Map();this.controller=null;this.sources=new Set();this.variableSources=new Map();}
- stop(){this.controller?.abort(new Error('Stopped'));}
+ stop(reason='Stopped'){this.controller?.abort(new Error(reason));}
  async tick(){this.signal.throwIfAborted();await this.hw.wait(0,this.signal);}
  field(b,n){return b.getFieldValue(n);}
  async input(b,n,fallback=0){const v=b.getInputTargetBlock(n);return v?this.value(v):fallback;}
