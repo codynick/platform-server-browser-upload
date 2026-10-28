@@ -3,7 +3,7 @@ from pathlib import Path
 import hashlib,json,re,sys
 if len(sys.argv)!=3 or not re.fullmatch(r"\d+\.\d+\.\d+",sys.argv[2]):
     raise SystemExit("Usage: python update.py PATH_TO_HEX VERSION")
-data=Path(sys.argv[1]).read_bytes()
+data=Path(sys.argv[1]).read_bytes().replace(b'\r\n',b'\n')
 sha=hashlib.sha256(data).hexdigest()
 folder=Path(__file__).resolve().parent
 name=f"CodyPi.{sha}.hex"

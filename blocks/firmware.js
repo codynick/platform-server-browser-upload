@@ -25,11 +25,16 @@
   if(m.board!=='arduino-uno'||!/^\d+\.\d+\.\d+$/.test(m.version)||!/^CodyPi\.[a-f0-9]{64}\.hex$/.test(m.file)||!/^[a-f0-9]{64}$/.test(m.sha256))throw Error('Invalid firmware manifest.');
   return m;
  }
- async function download(m){
+ async function download(m,progress=()=>{}){
+  progress(0);
   const res=await fetch('firmware/'+m.file,{cache:'no-store'});if(!res.ok)throw Error('Cannot download firmware.');
-  const bytes=await res.arrayBuffer();const hash=Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256',bytes)),b=>b.toString(16).padStart(2,'0')).join('');
+  const chunks=[];let received=0;const total=Number(res.headers?.get('Content-Length'))||0;
+  if(res.body?.getReader){const reader=res.body.getReader();try{while(true){const {value,done}=await reader.read();if(done)break;chunks.push(value);received+=value.length;progress(total?Math.min(99,received/total*100):null);}}finally{reader.releaseLock();}}
+  else{const bytes=new Uint8Array(await res.arrayBuffer());chunks.push(bytes);received=bytes.length;}
+  const bytes=new Uint8Array(received);let offset=0;for(const chunk of chunks){bytes.set(chunk,offset);offset+=chunk.length;}
+  const hash=Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256',bytes)),b=>b.toString(16).padStart(2,'0')).join('');
   if(hash!==m.sha256)throw Error('Firmware download checksum failed. Reconnect to retry.');
-  return parseHex(new TextDecoder().decode(bytes));
+  const image=parseHex(new TextDecoder().decode(bytes));progress(100);return image;
  }
  class Programmer {
   constructor(port,progress){this.port=port;this.progress=progress;this.bytes=[];this.error=null;}
@@ -52,7 +57,7 @@
      await this.command([0x55,word&255,word>>8]);
      const read=await this.command([0x74,0,128,0x46],128);
      if(read.some((v,i)=>v!==page[i]))throw Error('Firmware verification failed. Reconnect and retry installation.');
-     this.progress('Installing and verifying firmware: '+Math.round((at+128)/image.length*100)+'%. Keep USB connected.');
+     this.progress('Installing and verifying firmware',Math.round((at+128)/image.length*100));
     }
     await this.command([0x51]);
    }finally{this.writer.releaseLock();try{await this.reader.cancel();}catch{}await this.pump;this.reader.releaseLock();}

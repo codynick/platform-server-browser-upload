@@ -76,6 +76,13 @@
 </div>
 
 <div id="toast" class="toast"></div>
+<dialog id="firmwareProgressDialog" class="design-dialog" aria-labelledby="firmwareProgressTitle">
+ <h2 id="firmwareProgressTitle">CJP firmware installation</h2>
+ <p id="firmwareProgressStatus" role="status" aria-live="polite">Preparing firmware…</p>
+ <progress id="firmwareProgressBar" max="100" style="width:100%;height:24px" aria-label="Firmware progress"></progress>
+ <p id="firmwareProgressHint">Keep the CJP connected. Please leave this tab open.</p>
+ <div class="design-actions"><button id="firmwareProgressClose" type="button" hidden>Close</button></div>
+</dialog>
 <dialog id="aboutDialog" class="design-dialog about-dialog" aria-labelledby="aboutTitle">
   <div class="about-heading"><div class="about-logo"><img src="/assets/codynick-logo.png" alt="CodyNick — Bridging Ideation to Creation" draggable="false"></div><div><p class="about-eyebrow">CREATE · CONNECT · EXPLORE</p><h2 id="aboutTitle">CodyNick Platform</h2></div></div>
   <div class="about-tags"><span>Version <strong id="aboutVersion"></strong></span><span>Released <time id="aboutDate"></time></span></div>

@@ -18,6 +18,24 @@ const delay=ms=>new Promise(r=>setTimeout(r,ms));
 async function send(text){if(!port)throw Error('Device disconnected.');if(text.length>20)throw Error('Command exceeds 20 bytes.');const frame=text.padEnd(20,'_');const writer=port.writable.getWriter();try{await writer.write(encoder.encode(frame));log('TX '+frame);}finally{writer.releaseLock();}}
 async function readLoop(p,token){const decoder=new TextDecoder();const r=p.readable.getReader();reader=r;try{while(true){const {value,done}=await r.read();if(done)break;rx+=decoder.decode(value,{stream:true});let n;while((n=rx.indexOf('\n'))>=0){const line=rx.slice(0,n).replace(/\0/g,'').replace(/\r$/,'');rx=rx.slice(n+1);log('RX '+line);window.dispatchEvent(new CustomEvent('cjp-line',{detail:line}));if(/^CN@@CJP-Neo\|[^_]+/.test(line)&&identityResolve){identityResolve(line);identityResolve=null;}}if(rx.length>2048)rx=rx.slice(-256);}}catch(e){if(token===session)log('Serial read: '+e.message);}finally{r.releaseLock();if(reader===r)reader=null;if(token===session&&port===p){ready=false;window.dispatchEvent(new Event('cjp-disconnected'));controls();notice('Serial connection ended. Disconnect and reconnect the CJP.');$('status').textContent='Connection ended';}}}
 async function disconnect(){window.dispatchEvent(new Event('cjp-disconnected'));session++;ready=false;identityResolve=null;const p=port;port=null;if(reader){try{await reader.cancel();}catch{}}if(readTask){try{await readTask;}catch{}}if(p){try{await p.close();}catch(e){log('Close: '+e.message);}}readTask=null;rx='';$('status').textContent='Disconnected';$('device').textContent='Waiting for a USB connection';controls();}
+let firmwareActive=false;
+function firmwareProgress(text,percent=null){
+ const dialog=$('firmwareProgressDialog'),bar=$('firmwareProgressBar');
+ firmwareActive=true;$('firmwareProgressClose').hidden=true;
+ if(!dialog.open)dialog.showModal?.();
+ if(percent===null)bar.removeAttribute?.('value');else bar.value=percent;
+ $('firmwareProgressStatus').textContent=text+(percent===null?'':' — '+Math.round(percent)+'%');
+ $('status').textContent=text;
+}
+function firmwareFinished(message,failed=false){
+ if(!firmwareActive)return;firmwareActive=false;
+ $('firmwareProgressStatus').textContent=message;
+ $('firmwareProgressHint').textContent=failed?'Close this message, check the USB connection, and click Connect to retry.':'Firmware verified. Your CJP is ready.';
+ if(!failed)$('firmwareProgressBar').value=100;
+ $('firmwareProgressClose').hidden=false;
+}
+$('firmwareProgressClose').onclick=()=>{if(!firmwareActive)$('firmwareProgressDialog').close?.();};
+$('firmwareProgressDialog').addEventListener?.('cancel',event=>{if(firmwareActive)event.preventDefault();});
 async function identify(p){
  const token=++session;rx='';readTask=readLoop(p,token);await delay(2200);
  if(port!==p)throw Error('Device disconnected during startup.');
@@ -50,19 +68,21 @@ $('connect').onclick=async()=>{
   if(!installed||window.CjpFirmware.compare(installed,release.version)<0){
    const message=installed?'CJP firmware '+installed+' is installed. Update to '+release.version+'?':'The selected device did not report a CJP firmware version. Install CodyPi '+release.version+'? Confirm that you selected your CJP Arduino Uno.';
    if(!window.confirm(message+'\n\nThis replaces the program on the selected board. Keep USB connected until verification finishes.'))throw Error('Firmware installation declined. Hardware is unavailable; simulation remains available.');
-   notice('Downloading firmware…');const image=await window.CjpFirmware.download(release);
+   firmwareProgress('Downloading firmware');$('firmwareProgressHint').textContent='Keep the CJP connected. Please leave this tab open.';
+   const image=await window.CjpFirmware.download(release,percent=>firmwareProgress('Downloading firmware',percent));
+   firmwareProgress('Starting Uno bootloader');
    ready=false;await stopReader();await p.close();
    await p.open({baudRate:115200});
    const preventLeave=event=>{event.preventDefault();event.returnValue='';};window.addEventListener('beforeunload',preventLeave);
-   try{await new window.CjpFirmware.Programmer(p,text=>{notice(text);$('status').textContent=text;}).upload(image);}finally{window.removeEventListener('beforeunload',preventLeave);}
+   try{await new window.CjpFirmware.Programmer(p,(text,percent)=>firmwareProgress(text,percent)).upload(image);}finally{window.removeEventListener('beforeunload',preventLeave);}
    await p.close();await p.open({baudRate:115200});
-   notice('Checking installed firmware…');identity=await identify(p);
+   firmwareProgress('Restarting CJP and confirming firmware version');identity=await identify(p);
    if(firmwareVersion(identity)!==release.version)throw Error('Upload completed, but the expected firmware version was not confirmed. Reconnect to retry.');
   }else if(window.CjpFirmware.compare(installed,release.version)>0){
    throw Error('CJP firmware '+installed+' is newer than this platform release ('+release.version+'). Update the platform before using hardware. No downgrade was performed.');
   }
-  ready=true;$('status').textContent='Connected';$('device').textContent=identity.replace('CN@@','')+' · '+(p.transportName||'Web Serial');notice('CJP firmware '+release.version+' is ready.');log('Device firmware confirmed.');
- }catch(e){await disconnect();log('Connection error: '+e.name+': '+e.message);notice(connectionError(e)+' Click Connect to retry.');}finally{busy=false;controls();}
+  ready=true;$('status').textContent='Connected';$('device').textContent=identity.replace('CN@@','')+' · '+(p.transportName||'Web Serial');notice('CJP firmware '+release.version+' is ready.');log('Device firmware confirmed.');firmwareFinished('CodyPi '+release.version+' installed and verified.');
+ }catch(e){firmwareFinished(e.message,true);await disconnect();log('Connection error: '+e.name+': '+e.message);notice(connectionError(e)+' Click Connect to retry.');}finally{busy=false;controls();}
 };
 $('clearLog').onclick=()=>{$('log').textContent='';};
 if(!window.isSecureContext)notice('HTTPS is required. Open https://'+window.location.host+'/blocks/.');else if(!supported())notice('USB connectivity is unavailable. Open the site directly in Chrome.');

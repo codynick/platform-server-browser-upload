@@ -1,3 +1,9 @@
+## 3.11.3 — firmware download integrity and visible progress
+
+- Preserve exact HEX bytes in Git and normalize new releases before hashing.
+- Correct the deployed firmware checksum mismatch caused by Git line endings.
+- Show persistent download, upload/read-back, restart, completion and failure progress.
+
 ## 3.11.2 — CJP firmware installation
 
 - Check the deployed CodyPi firmware version on connection; bundle release 1.19.6.

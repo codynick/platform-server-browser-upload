@@ -16,7 +16,7 @@ function mock({signature=[30,149,15],corrupt=false,unplug=false}={}){
  }})}};
 }
 (async()=>{
- let port=mock(),progress=[];await new F.Programmer(port,s=>progress.push(s)).upload(image);assert.equal(port.writes,image.length/128);assert(progress.at(-1).includes('100%'));
+ let port=mock(),progress=[];await new F.Programmer(port,(s,n)=>progress.push(n)).upload(image);assert.equal(port.writes,image.length/128);assert.equal(progress.at(-1),100);
  port=mock({signature:[0,0,0]});await assert.rejects(()=>new F.Programmer(port,()=>{}).upload(image),/not an ATmega/);assert.equal(port.writes,0);
  await assert.rejects(()=>new F.Programmer(mock({corrupt:true}),()=>{}).upload(image),/verification failed/);
  await assert.rejects(()=>new F.Programmer(mock({unplug:true}),()=>{}).upload(image),/unplugged/);

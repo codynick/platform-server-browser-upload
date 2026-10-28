@@ -10,7 +10,7 @@ mode='cancel';await els.connect.onclick();assert.equal(els.connect.textContent,'
 mode='ok';await els.connect.onclick();ctx.CJP.fault();assert(!els.connect.classList.contains('connected'));assert.equal(els.connect.textContent,'Disconnect');await els.connect.onclick();assert.equal(els.connect.textContent,'Connect');
 await els.connect.onclick();listeners.disconnect({port});await new Promise(r=>setTimeout(r,5));assert.equal(els.connect.textContent,'Connect');assert(!els.connect.classList.contains('connected'));
 latest='1.19.7';await els.connect.onclick();assert(!ctx.CJP.connected);assert.equal(uploads,0);assert(els.notice.textContent.includes('declined'));
-accept=true;await els.connect.onclick();assert(ctx.CJP.connected);assert.equal(uploads,1);await els.connect.onclick();
+accept=true;await els.connect.onclick();assert(ctx.CJP.connected);assert.equal(uploads,1);assert.equal(els.firmwareProgressClose.hidden,false);assert.equal(els.firmwareProgressBar.value,100);assert(els.firmwareProgressStatus.textContent.includes('installed and verified'));await els.connect.onclick();
 latest='1.19.6';await els.connect.onclick();assert(!ctx.CJP.connected);assert.equal(uploads,1);assert(els.notice.textContent.includes('newer'));
 reported='unknown';latest='1.19.7';await els.connect.onclick();assert(ctx.CJP.connected);assert.equal(uploads,2);await els.connect.onclick();
 console.log('PASS: firmware update acceptance, decline, newer version, unidentified firmware;  single button connects/disconnects, success styling, cancellation, fault cleanup, USB unplug');
