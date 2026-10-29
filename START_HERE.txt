@@ -1,24 +1,23 @@
-CodyNick Portal 3.18.0 — CUMULATIVE RELEASE
+CodyNick Portal 3.19.0 — NUMBERED ZONE EXAMPLES
 
 ONE COMMAND (fresh install or upgrade on Debian/Ubuntu VPS):
 
 wget -4 -O /tmp/codynick-browser-setup.sh "https://raw.githubusercontent.com/codynick/platform-server-browser-upload/main/setup.sh?$(date +%s)" && sudo bash /tmp/codynick-browser-setup.sh
 
-This downloads the GitHub main release, reuses the saved domain/CAS settings,
-backs up the website and updates the existing account service. No new backend
-schema or firmware image is introduced. Existing private records are retained;
-older project formats are not converted. Close old tabs and hard-refresh /blocks/.
+The installer reuses saved domain/CAS settings, backs up the website and updates
+the existing account service. No firmware/backend/schema change is introduced.
+Close old tabs, reopen /blocks/ and hard-refresh after installation.
+Use the exact rollback paths printed by setup.sh for the website/account service.
 
-Includes browser Python, sprites/eleven looks/Open Stage, dashboard buttons,
-toggles/sliders/LEDs, complete .codynick project ZIPs and twelve paired examples.
-Examples load both programs and all initial dashboard/simulation/sprite setup,
-preserve the selected editor and leave execution stopped. Widgets appear before
-Run. Keep the originating editor open when using Open Stage.
+The first fifteen Examples choices cover every combination of HW, Sim, Dash and
+Sprite. Each complete .codynick archive contains both programs and panel settings.
+The twelve existing examples remain available after the numbered collection.
+See blocks/examples/ZONE_EXAMPLES.md for hardware requirements and expected results.
+Start with 2, 3, 4, 8, 9, 10 and 14 (no CJP); then connect a CJP for the others.
 
-MANUAL ZIP: upload codynick-platform-upgrade-3.18.0.zip to /root/, then run:
-sudo unzip -o /root/codynick-platform-upgrade-3.18.0.zip -d /root/ && sudo bash /root/codynick-platform-upgrade-3.18.0/update-local.sh
+MANUAL ZIP: upload codynick-platform-upgrade-3.19.0.zip to /root/, then run:
+sudo unzip -o /root/codynick-platform-upgrade-3.19.0.zip -d /root/ && sudo bash /root/codynick-platform-upgrade-3.19.0/update-local.sh
 Manual website rollback: sudo bash /root/codynick-python-rollback.sh
-For setup.sh upgrades use the exact rollback paths printed by the installer.
 
-See README.md and VALIDATION.md. Physical CJP/Android and production deployment
-of this revision are not claimed as tested.
+Automated checks use mocked hardware responses. Physical CJP/Android and Linux
+production deployment of this revision are not claimed as tested.

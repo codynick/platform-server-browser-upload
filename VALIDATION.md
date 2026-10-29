@@ -1,24 +1,24 @@
-# Validation for 3.18.0
+# Validation for 3.19.0
 
-This cumulative release promotes the locally verified 3.17.0-preview.1 source,
-including the complete-example, dashboard-input and sprite-stage previews.
+The fifteen numbered archives are built from one shared program description for
+Blocks and Python. Each ZIP has the seven defined payload files plus a SHA-256
+manifest. The builder compiles the Python syntax and is repeatable.
 
-Browser evidence: all twelve archived examples load from both editors, restoring
-both programs and clean dashboard/simulation/sprite configuration while stopped.
-The paired dashboard examples execute in Blocks and real Pyodide, including
-hold/tap/toggle/slider/LED and sprite control. Separate stage tabs mirror pose,
-appearance/size/speech and forward keyboard/pointer/touch input. Hidden embedded
-panels, Stop, input lease expiry, editor isolation, account-reset detachment and
-mobile layout are covered by the retained browser regressions.
+Browser regression: blocks/browser-tests/zone-examples.cjs executes all fifteen
+in real Blockly and browser Pyodide (thirty runs), exercises changes on both sides
+of thresholds, dashboard inputs/outputs, joystick and stage reactions, initial
+configuration, editor selection, zone isolation and Stop. A mocked CJP transport
+supplies readings/joystick inputs and records real-output commands. No physical
+board is claimed. The actual simulator/router/dashboard/stage implementations
+remain active. Additional existing archive/load and Node checks are retained.
 
-Release checks include the full Node suite, syntax checks, browser smoke tests,
-ZIP CRC/SHA checks and corrupt-payload rejection, exact Linux required filenames,
-firmware hash preservation and shell syntax. Scripts under blocks/browser-tests
-require Playwright and accept CHROME_PATH/PILOT_URL. The local preview is provided
-by tools/python-preview.cjs.
+The cumulative package is checked for CRC, SHA-256 of every payload, exact firmware
+hash and shell syntax. Local installer checksum preflight accepts the package and
+rejects a deliberately corrupt copy. The firmware and backend are unchanged.
+Linux service/deployment and physical CJP/Android tests remain manual. Publishing this release does not itself deploy it to the server.
 
-Windows does not execute the full Linux service/deployment fixture. Physical
-CJP/Android and production deployment of this revision are not claimed. No server
-database/schema or firmware image change is part of this release. Older project
-formats are rejected, not migrated. Browser suspension can still pause a Live
-program; keep the original editor open when using the separate stage.
+Example 12 uses a documented near-edge margin abs(x)>=190 with distance mapped to
+[-200,200], so its warning remains reachable at every sprite size. Other edge
+examples use the sprite's actual boundary. Sprite size clamps to 10-300 percent.
+Green dashboard warning LEDs mean True; red means False. RGB warning outputs use
+red for warning, green for normal. Stop leaves hardware outputs unchanged.

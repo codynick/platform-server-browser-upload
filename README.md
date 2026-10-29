@@ -1,9 +1,14 @@
-# CodyNick Portal 3.18.0
+# CodyNick Portal 3.19.0
 
 CodyNick is a browser-based programming environment with Blocks and Python editors
 for real CodyNick gadgets, simulated gadgets, live dashboards and a sprite stage.
 
 Repository: [codynick/platform-server-browser-upload](https://github.com/codynick/platform-server-browser-upload)
+
+The first fifteen Examples choices cover HW / Sim / Dash / Sprite individually
+and every combination. Each loads both programs and complete panel setup while
+stopped. See [the project table](blocks/examples/ZONE_EXAMPLES.md). The twelve
+existing examples remain available after them.
 
 ## One command for installation and upgrades
 
@@ -29,7 +34,7 @@ tabs, reopen /blocks/ and hard-refresh after the upgrade.
 - One sprite with eleven appearances, motion/sensing/speech, and Open Stage in a
   separate tab. Keep the originating editor open to run the program.
 - Complete .codynick ZIP projects and account snapshots with both programs and
-  scene configuration; all twelve examples restore both editors and initial state.
+  scene configuration; all twenty-seven examples restore both editors and initial state.
 
 See [SPRITES.md](SPRITES.md), [DASHBOARD_WIDGETS.md](DASHBOARD_WIDGETS.md),
 [APPEARANCES.md](APPEARANCES.md), [PROJECT_FORMAT.md](PROJECT_FORMAT.md) and
@@ -232,6 +237,20 @@ Keep this history current in every revision, with the newest revision first.
 Entries below describe the documented changes; earlier test limitations apply to
 their original releases. Desktop and mobile firmware uploads have since been
 confirmed by the user, as recorded in 3.11.5.
+
+### 3.19.0 — numbered zone examples
+
+- Publish fifteen complete numbered examples covering each of Hardware, Simulation, Dashboard and Sprite, every pair, every triple and all four together.
+- Include matching Blocks/Python code, Design names, help, clean simulation scenes, dashboard widgets/layout and sprite setup in each `.codynick` archive. Put these examples first and retain the twelve existing choices.
+- Add a shared-program example builder and thirty browser execution checks with mocked CJP responses; confirm all twenty-seven examples restore correctly from both editors. Physical CJP/Android and Linux deployment checks remain manual.
+- Promote the tested local preview, update versioned assets and release documentation, and retain the existing GitHub upgrade and local ZIP rollback paths. No firmware/backend/schema changes are included.
+
+### 3.19.0-preview.1 — numbered zone examples (local update only)
+
+- Add fifteen complete `.codynick` projects covering four individual zones, six pairs, four triples and all four together. Titles use number, target zones and project title; new examples use “simulated” terminology.
+- Every new archive contains matching Blocks/Python programs, Design names, instructions, clean simulation/dashboard/sprite configuration and saved dashboard layout. Put the numbered examples first in both editors and retain the twelve existing choices.
+- Include a reproducible shared-program builder, usage table and browser regressions for all thirty program runs. Hardware interactions are mocked in automated tests; physical CJP/sensor and Linux deployment validation remain manual.
+- Supply separate project files and a cumulative checked ZIP with the existing local update/rollback scripts. GitHub remains unchanged; no firmware/backend/schema change is included.
 
 ### 3.18.0 — cumulative browser platform release
 

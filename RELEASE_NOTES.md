@@ -1,3 +1,17 @@
+## 3.19.0 — numbered zone examples
+
+- Publish fifteen complete numbered examples covering each of Hardware, Simulation, Dashboard and Sprite, every pair, every triple and all four together.
+- Include matching Blocks/Python code, Design names, help, clean simulation scenes, dashboard widgets/layout and sprite setup in each `.codynick` archive. Put these examples first and retain the twelve existing choices.
+- Add a shared-program example builder and thirty browser execution checks with mocked CJP responses; confirm all twenty-seven examples restore correctly from both editors. Physical CJP/Android and Linux deployment checks remain manual.
+- Promote the tested local preview, update versioned assets and release documentation, and retain the existing GitHub upgrade and local ZIP rollback paths. No firmware/backend/schema changes are included.
+
+## 3.19.0-preview.1 — numbered zone examples (local update only)
+
+- Add fifteen complete `.codynick` projects covering four individual zones, six pairs, four triples and all four together. Titles use number, target zones and project title; new examples use “simulated” terminology.
+- Every new archive contains matching Blocks/Python programs, Design names, instructions, clean simulation/dashboard/sprite configuration and saved dashboard layout. Put the numbered examples first in both editors and retain the twelve existing choices.
+- Include a reproducible shared-program builder, usage table and browser regressions for all thirty program runs. Hardware interactions are mocked in automated tests; physical CJP/sensor and Linux deployment validation remain manual.
+- Supply separate project files and a cumulative checked ZIP with the existing local update/rollback scripts. GitHub remains unchanged; no firmware/backend/schema change is included.
+
 ## 3.18.0 — cumulative browser platform release
 
 - Preserve the supplied HEX file's exact bytes in Git so the packaged firmware checksum remains valid; AVR program content/version is unchanged.

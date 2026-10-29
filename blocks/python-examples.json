@@ -1,4 +1,141 @@
 {
+  "zone-01": {
+    "title": "1. HW - Real Sensor and Light",
+    "help": "Requires: CJP and temperature sensor. Try warming the real temperature sensor. Above 30 C, RGB LED 0 turns red; otherwise green. Choose Blocks or Python, then Run. Press Stop to finish. Hardware outputs keep their last state after Stop.",
+    "simulation": [],
+    "stage": false,
+    "dashboard": false,
+    "archive": "examples/zone-01.codynick"
+  },
+  "zone-02": {
+    "title": "2. Sim - Simulated Sensor and Light",
+    "help": "No CJP required. Open Simulation and change temperature across 30 C. Simulated RGB LED 0 turns red above 30 C and green otherwise. Choose Blocks or Python, then Run. Press Stop to finish.",
+    "simulation": [
+      "temperature"
+    ],
+    "stage": false,
+    "dashboard": false,
+    "archive": "examples/zone-02.codynick"
+  },
+  "zone-03": {
+    "title": "3. Dash - Dashboard Control Desk",
+    "help": "No CJP required. Open Dashboard. Hold or tap Hold; Held follows the press and Taps counts clicks. Power controls Enabled; Level controls Reading. Choose Blocks or Python, then Run. Press Stop to finish.",
+    "simulation": [],
+    "stage": false,
+    "dashboard": true,
+    "archive": "examples/zone-03.codynick"
+  },
+  "zone-04": {
+    "title": "4. Sprite - Move the Bee",
+    "help": "No CJP required. Open Sprites or Open Stage, then focus the stage. Arrows move and bounce the Bee; hold Space to hide it, release to show it. Press the stage to enlarge it. Choose Blocks or Python, then Run. Press Stop to finish.",
+    "simulation": [],
+    "stage": true,
+    "dashboard": false,
+    "archive": "examples/zone-04.codynick"
+  },
+  "zone-05": {
+    "title": "5. HW + Sim - Real Meets Simulated",
+    "help": "Requires: CJP, temperature sensor and standalone seven-segment display. Open Simulation. Real temperature appears on the simulated seven-segment display. Change simulated distance: the real standalone display follows. Choose Blocks or Python, then Run. Press Stop to finish. Hardware outputs keep their last state after Stop.",
+    "simulation": [
+      "ultrasonic",
+      "seven"
+    ],
+    "stage": false,
+    "dashboard": false,
+    "archive": "examples/zone-05.codynick"
+  },
+  "zone-06": {
+    "title": "6. HW + Dash - Hardware Control Desk",
+    "help": "Requires: CJP and temperature sensor. Open Dashboard. Temperature and History show the real sensor. Enable Light and adjust Level: RGB LED 0 turns red above the selected temperature threshold, green below it; disabling Light turns it off. Choose Blocks or Python, then Run. Press Stop to finish. Hardware outputs keep their last state after Stop.",
+    "simulation": [],
+    "stage": false,
+    "dashboard": true,
+    "archive": "examples/zone-06.codynick"
+  },
+  "zone-07": {
+    "title": "7. HW + Sprite - Joystick Pilot",
+    "help": "Requires: CJP (built-in joystick). Move the real CJP joystick: the sprite follows. At the stage edge, real RGB LED 0 turns red; otherwise green. Choose Blocks or Python, then Run. Press Stop to finish. Hardware outputs keep their last state after Stop.",
+    "simulation": [],
+    "stage": true,
+    "dashboard": false,
+    "archive": "examples/zone-07.codynick"
+  },
+  "zone-08": {
+    "title": "8. Sim + Dash - Virtual Instrument Panel",
+    "help": "No CJP required. Change temperature in Simulation: Dashboard follows. Toggle Light in Dashboard: simulated RGB LED 0 turns green when enabled, off when disabled. Choose Blocks or Python, then Run. Press Stop to finish.",
+    "simulation": [
+      "temperature"
+    ],
+    "stage": false,
+    "dashboard": true,
+    "archive": "examples/zone-08.codynick"
+  },
+  "zone-09": {
+    "title": "9. Sim + Sprite - Temperature Balloon",
+    "help": "No CJP required. Change simulated temperature: Ball size and speech change (size clamps safely to 10-300%). Arrows move it. At the stage edge simulated RGB LED 0 turns red; otherwise green. Choose Blocks or Python, then Run. Press Stop to finish.",
+    "simulation": [
+      "temperature"
+    ],
+    "stage": true,
+    "dashboard": false,
+    "archive": "examples/zone-09.codynick"
+  },
+  "zone-10": {
+    "title": "10. Dash + Sprite - Sprite Control Desk",
+    "help": "No CJP required. Open Dashboard and Open Stage side by side. Hold Move to advance and bounce the Bee; Visible hides/shows it; Size resizes it; Position reports x. Choose Blocks or Python, then Run. Press Stop to finish.",
+    "simulation": [],
+    "stage": true,
+    "dashboard": true,
+    "archive": "examples/zone-10.codynick"
+  },
+  "zone-11": {
+    "title": "11. HW + Sim + Dash - Compare Real and Simulated",
+    "help": "Requires: CJP and temperature sensor. Change simulated temperature and warm the real sensor. Compare gauges and histories. Threshold independently makes each matching real/simulated RGB LED 0 red above it and green otherwise. Choose Blocks or Python, then Run. Press Stop to finish. Hardware outputs keep their last state after Stop.",
+    "simulation": [
+      "temperature"
+    ],
+    "stage": false,
+    "dashboard": true,
+    "archive": "examples/zone-11.codynick"
+  },
+  "zone-12": {
+    "title": "12. HW + Sim + Sprite - Two Worlds, One Sprite",
+    "help": "Requires: CJP and temperature sensor. Real temperature changes sprite size. Simulated distance maps 2-400 cm onto x=-200 to 200. Near either edge (abs(x)>=190), both RGB LEDs 0 turn red; otherwise green. Choose Blocks or Python, then Run. Press Stop to finish. Hardware outputs keep their last state after Stop.",
+    "simulation": [
+      "ultrasonic"
+    ],
+    "stage": true,
+    "dashboard": false,
+    "archive": "examples/zone-12.codynick"
+  },
+  "zone-13": {
+    "title": "13. HW + Dash + Sprite - Joystick Mission Control",
+    "help": "Requires: CJP (built-in joystick). Open Dashboard and Open Stage. Move the real joystick; Speed controls each movement step. X/Y show position and Edge lights green at a boundary. Choose Blocks or Python, then Run. Press Stop to finish. Hardware outputs keep their last state after Stop.",
+    "simulation": [],
+    "stage": true,
+    "dashboard": true,
+    "archive": "examples/zone-13.codynick"
+  },
+  "zone-14": {
+    "title": "14. Sim + Dash + Sprite - Virtual Weather Station",
+    "help": "No CJP required. Change simulated temperature and Dashboard Threshold. Above the threshold, the sprite becomes a Cactus and says Hot; otherwise it becomes an Apple and says Comfortable. Dashboard shows reading, history and warning. Choose Blocks or Python, then Run. Press Stop to finish.",
+    "simulation": [
+      "temperature"
+    ],
+    "stage": true,
+    "dashboard": true,
+    "archive": "examples/zone-14.codynick"
+  },
+  "zone-15": {
+    "title": "15. HW + Sim + Dash + Sprite - Smart Greenhouse",
+    "help": "Requires: CJP and temperature sensor. Warm the real sensor or change simulated soil moisture. Set Max temperature and Min moisture in Dashboard. Too hot OR too dry makes both RGB LEDs 0 red, Warning green, and the Cactus large with Check greenhouse speech. Otherwise both RGB LEDs are green and it says Healthy. Choose Blocks or Python, then Run. Press Stop to finish. Hardware outputs keep their last state after Stop.",
+    "simulation": [
+      "soil"
+    ],
+    "stage": true,
+    "dashboard": true,
+    "archive": "examples/zone-15.codynick"
+  },
   "hello": {
     "title": "Hello Python (no gadgets)",
     "help": "No CJP required. Prints text and a calculation.",
