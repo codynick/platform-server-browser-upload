@@ -6,7 +6,7 @@ const DashboardBlocks = (() => {
   const choice = (name, values) => ({type:'field_dropdown',name,options:values.map(value=>[value,value])});
   const specs = [
     {type:'dash_clear',message0:'clear dashboard'},
-    {type:'dash_create',message0:'create widget %1 type %2 title %3',args0:[name,choice('TYPE',['info','gauge','graph']),{type:'field_input',name:'TITLE',text:'Temperature'}]},
+    {type:'dash_create',message0:'create widget %1 type %2 title %3',args0:[name,choice('TYPE',['info','gauge','graph','button','switch','slider','led']),{type:'field_input',name:'TITLE',text:'Temperature'}]},
     {type:'dash_set',message0:'set widget %1 to %2',args0:[name,{type:'input_value',name:'VALUE'}]},
     {type:'dash_append',message0:'add %1 to graph %2',args0:[{type:'input_value',name:'VALUE',check:'Number'},name]},
     {type:'dash_history',message0:'graph %1 history %2 samples',args0:[name,number('COUNT',20,1,1000)]},
@@ -18,19 +18,29 @@ const DashboardBlocks = (() => {
     specs.push({type:'dash_create_'+kind,message0:`create ${label} %1 title %2`,args0:[name,{type:'field_input',name:'TITLE',text:kind==='graph'?'History':'Temperature'}]});
     if(kind!=='graph') specs.push({type:'dash_'+kind+'_set',message0:`set ${label} %1 to %2`,args0:[name,{type:'input_value',name:'VALUE',...(kind==='gauge'?{check:'Number'}:{})}]});
   }
+  for(const [type,label,kind] of [['button','momentary button','button'],['toggle','toggle button','switch'],['slider','slider','slider'],['led','LED indicator','led']]){
+    const args=[{...name,text:type},{type:'field_input',name:'TITLE',text:label}];let message=`create ${label} %1 title %2`;
+    if(type==='slider'){args.push(number('MIN',0),number('MAX',100),number('STEP',1,.000001),number('INITIAL',50));message+=' minimum %3 maximum %4 step %5 initial %6';}
+    if(['toggle','led'].includes(type)){args.push(choice('INITIAL',['FALSE','TRUE']));message+=' initial %3';}
+    specs.push({type:'dash_create_'+(type==='toggle'?'switch':type),message0:message,args0:args});
+  }
+  for(const [suffix,label,output] of [['button_pressed','button held?', 'Boolean'],['button_clicked','button clicked? (consume tap)','Boolean'],['toggle_value','toggle state','Boolean'],['slider_value','slider value','Number']])specs.push({type:'dash_'+suffix,message0:label+' %1',args0:[name],output});
+  for(const [kind,label] of [['toggle','toggle'],['slider','slider'],['led','LED']])specs.push({type:'dash_'+kind+'_set',message0:'set '+label+' %1 to %2',args0:[name,{type:'input_value',name:'VALUE',check:kind==='slider'?'Number':'Boolean'}]});
   const folders = [
+    ['Inputs','#d17b12',['dash_create_button','dash_button_pressed','dash_button_clicked','dash_create_switch','dash_toggle_value','dash_toggle_set','dash_create_slider','dash_slider_value','dash_slider_set']],
+    ['LED','#29854a',['dash_create_led','dash_led_set']],
     ['Setup','#546e7a',['dash_clear','dash_appearance','dash_font']],
     ['Info','#147d92',['dash_create_info','dash_info_set']],
     ['Gauge','#29854a',['dash_create_gauge','dash_gauge_set','dash_range']],
     ['Graph','#a0528c',['dash_create_graph','dash_append','dash_history']]
   ];
   function definitions() {
-    Blockly.defineBlocksWithJsonArray(specs.map(spec=>({...spec,previousStatement:null,nextStatement:null,colour:folders.find(folder=>folder[2].includes(spec.type))?.[1]||colour,
+    Blockly.defineBlocksWithJsonArray(specs.map(spec=>({...spec,...(spec.output?{output:spec.output}:{previousStatement:null,nextStatement:null}),colour:folders.find(folder=>folder[2].includes(spec.type))?.[1]||colour,
       tooltip:'Creates or updates a widget on your own dashboard. Create the named widget before updating it.'})));
   }
   function categories() {
     return folders.map(([name,colour,types])=>({kind:'category',name,colour,contents:types.map(type=>({kind:'block',type,
-      ...(['dash_info_set','dash_gauge_set','dash_append'].includes(type)?{inputs:{VALUE:{shadow:{type:'math_number',fields:{NUM:25}}}}}:{})}))}));
+      ...(['dash_led_set','dash_toggle_set'].includes(type)?{inputs:{VALUE:{shadow:{type:'logic_boolean',fields:{BOOL:'FALSE'}}}}}:{}),...(['dash_info_set','dash_gauge_set','dash_append','dash_slider_set'].includes(type)?{inputs:{VALUE:{shadow:{type:'math_number',fields:{NUM:25}}}}}:{})}))}));
   }
   function category() {
     return {kind:'category',name:'Dashboard',colour,contents:specs.map(spec=>({kind:'block',type:spec.type,

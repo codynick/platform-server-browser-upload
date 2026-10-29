@@ -1,0 +1,30 @@
+/* Original CSS artwork: a raised red cap inside a brushed metal bezel. */
+.card[data-card-type="button"] .card-body { gap:8px; }
+.card .dash-button {
+ position:relative; width:min(112px,100%); height:auto; aspect-ratio:1;
+ flex:0 0 auto; max-width:112px; padding:0; border-radius:50%;
+ border:1px solid #adb3ba; font-size:0; color:transparent;
+ background:conic-gradient(from 25deg,#f8fafc,#9da4ad 16%,#eceff2 28%,#fff 43%,#a0a7af 60%,#e5e8ed 76%,#f8fafc);
+ box-shadow:0 4px 7px #17212b40,inset 0 1px 2px #fff,inset 0 -2px 3px #555b65;
+ cursor:pointer; filter:none; outline:none; transform:none;
+ -webkit-tap-highlight-color:transparent;
+}
+.card .dash-button::after {
+ content:""; position:absolute; inset:12%; border-radius:50%;
+ border:2px solid #5f0a0a;
+ background:radial-gradient(ellipse at 35% 22%,#ff7168 0%,#f32924 20%,#d60708 62%,#a70003 100%);
+ box-shadow:0 5px 2px #640000,inset 0 3px 3px #ffaaaaa6,inset 0 -4px 4px #7800009c;
+ transition:transform 80ms ease,box-shadow 80ms ease,background 80ms ease;
+ pointer-events:none;
+}
+.card .dash-button.input-held,.card .dash-button[aria-pressed="true"],.card .dash-button:active {
+ filter:none; outline:none; transform:none;
+}
+.card .dash-button.input-held::after,.card .dash-button[aria-pressed="true"]::after,.card .dash-button:active::after {
+ transform:translateY(3px) scale(.97);
+ background:radial-gradient(ellipse at 40% 30%,#e82c27,#b60005 68%,#850003);
+ box-shadow:0 1px 1px #640000,inset 0 4px 7px #590000a8,inset 0 -1px 2px #fa524b;
+}
+.card .dash-button:focus-visible { outline:3px solid #0f6cbd; outline-offset:4px; }
+.push-button-state { font:600 12px Arial,sans-serif; color:#475569; }
+@media (prefers-reduced-motion:reduce) {.card .dash-button::after{transition:none;}}

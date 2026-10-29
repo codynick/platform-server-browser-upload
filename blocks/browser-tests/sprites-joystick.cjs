@@ -1,0 +1,9 @@
+const {chromium}=require('playwright'),assert=require('assert/strict');let browser;
+(async()=>{
+ browser=await chromium.launch({...(process.env.CHROME_PATH?{executablePath:process.env.CHROME_PATH}:{}),headless:true});const page=await browser.newPage();page.on('dialog',d=>d.accept());await page.goto((process.env.PILOT_URL||'http://127.0.0.1:8770/blocks/'));await page.waitForFunction(()=>!!window.CodyPythonPilot);
+ await page.evaluate(()=>{window.joystickFrames=[];Object.defineProperty(window.CJP,'connected',{get:()=>true,configurable:true});Object.assign(window.CJP,{controls(){},log(){},fault(){},preview(){},raw:async()=>{},send:async frame=>{joystickFrames.push(frame);if(frame.startsWith('CN@@JOY@@05'))setTimeout(()=>dispatchEvent(new CustomEvent('cjp-line',{detail:'CN@@JOY@@05R_______'})),5);}});});
+ const load=async()=>{await page.locator('#headerExamples').click();await page.selectOption('#example','stage-joystick');await page.locator('#loadExample').click();await page.waitForFunction(()=>!document.getElementById('examplesDialog').open);};
+ await load();await page.locator('#blockRunBtn').click();await page.waitForFunction(()=>CodySpriteStage.model.snapshot().x>=10);await page.locator('#blockRunBtn').click();await page.waitForFunction(()=>!blockProgramRunning);assert((await page.evaluate(()=>joystickFrames)).some(s=>s.startsWith('CN@@JOY@@05')));
+ await page.locator('#pythonEditorTab').click();await load();await page.locator('#blockRunBtn').click();await page.waitForFunction(()=>CodySpriteStage.model.snapshot().x>=10,null,{timeout:180000});await page.locator('#blockRunBtn').click();await page.waitForFunction(()=>!CodyPythonPilot.running);
+ console.log('PASS: Blocks and Python CJP joystick examples drive the sprite through simulated serial replies (physical hardware not used)');
+})().catch(e=>{console.error(e);process.exitCode=1;}).finally(async()=>{await browser?.close();});

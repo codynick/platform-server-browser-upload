@@ -1,3 +1,71 @@
+## 3.18.0 — cumulative browser platform release
+
+- Preserve the supplied HEX file's exact bytes in Git so the packaged firmware checksum remains valid; AVR program content/version is unchanged.
+
+- Publish all local previews since 3.12.0: the browser-native sprite stage, eleven appearances, Blocks/Python stage APIs and keyboard/pointer/touch controls.
+- Add Open Stage, a separate tab linked to its originating editor, with live pose/appearance/speech and forwarded inputs; preserve editor isolation and invalidate held input on Stop/reset/disconnection.
+- Add momentary buttons, persistent toggles, stepped numeric sliders and red/green boolean LED outputs, including the round metallic push-button appearance and paired no-hardware examples.
+- Replace .codynick JSON with complete ZIP project archives containing both programs, names, editor and dashboard/simulation/sprite state. Account Save/Load stores the same logical snapshot; momentary input is restored released.
+- Convert all twelve supplied examples to complete archived projects. Load both programs and the full initial scene from either editor, preserve the chosen language and leave execution stopped. Validate before replacement and block Run while loading.
+- Rename the Python tab, retain syntax colouring/compact layout and .py import/export, and version shared editor/stage assets together.
+- Provide the normal GitHub one-command upgrade and a checked cumulative ZIP. Retain older revision history. No backend schema migration or firmware change is required; old project formats are not converted.
+- Software browser/Node and package checks are recorded in VALIDATION.md. Physical hardware/Android and production deployment of this revision are not claimed.
+
+## 3.17.0-preview.1 — Open Stage in a separate tab (local update only)
+
+- Add Open Stage beside Open Simulator/Open Dashboard, opening a responsive standalone stage linked to its originating editor.
+- Reuse the existing sprite renderer/assets and mirror current pose, appearance, size, backdrop, visibility and speech for both Blocks and Python programs; forward focused keyboard, pointer and touch inputs to the editor.
+- Keep controls working when the embedded stage is hidden; release input on focus loss/cancellation/close and expire abandoned holds. Stop, Run and project resets invalidate stale input messages.
+- Isolate editor sessions with separate channels, detach and clear stage views on account reset, and show connection/program status. The program continues to run in the original editor, which must remain open.
+- Version editor/stage script and stylesheet URLs so updated shared rendering code loads consistently after an upgrade.
+- Supply a cumulative checked ZIP with the previous complete-example and dashboard improvements. GitHub and the original checkout remain unchanged; physical CJP/Android and VPS deployment are unvalidated.
+
+## 3.16.0-preview.1 — complete archived examples (local update only)
+
+- Convert all 12 supplied examples to full .codynick ZIP projects containing both Blocks and Python source, matching Design names, dashboard configuration/layout, a clean simulation scene and sprite setup.
+- Use one complete-project loading path for Examples in both editors, preserving the selected language and leaving execution stopped.
+- Confirm replacement of both programs and all scene configuration; verify archive integrity and validate state before applying. Cancelled/invalid loads preserve the current project.
+- Populate dashboard controls/indicators/readings and saved layouts immediately before Run; remove unrelated widgets and gadgets from prior projects. Restore momentary inputs released and use example initial toggle/slider/LED values.
+- Make the shared chooser metadata point to authoritative archive files rather than loading separate Python-only source. Add Hello to Blocks and align mixed-temperature colour logic and sensor/dashboard counterparts.
+- Include all earlier local features and original round push-button artwork in a cumulative checked ZIP. GitHub/original checkout are unchanged. Physical hardware/Android and VPS deployment remain unvalidated.
+
+## 3.15.1-preview.1 — round dashboard push button (local update only)
+
+- Replace the rectangular momentary button with original CSS artwork: a raised red circular cap and metallic rim, inspired by the supplied visual reference.
+- Add a depressed appearance while held and a visible Pressed/Released label; retain an accessible button name, keyboard focus ring and reduced-motion support.
+- Allocate enough card height for the round control, title and state label. Preserve momentary/tap behaviour and both examples in Blocks/Python.
+- Supply a cumulative checked local ZIP; GitHub and the original checkout remain unchanged. Physical hardware/Android and VPS deployment of this revision are unvalidated.
+
+## 3.15.0-preview.1 — dashboard inputs and boolean LED indicators (local update only)
+
+- Add momentary buttons, persistent toggle buttons, numeric sliders and boolean LED outputs; green means True and red means False.
+- Add Dashboard Inputs/LED Blocks categories and browser Python creation/read/write APIs; input reads use await in Python while output writes retain the existing ordered notification API.
+- Support held-state reads plus queued/consumable button taps, pointer/touch and keyboard input, slider range/step/initial values and direct numeric entry.
+- Release momentary inputs on focus loss, touch cancellation, hidden pages, Stop and project restore; owner isolation and a short heartbeat lease prevent stuck presses. LEDs reject user-input writes.
+- Share inputs/outputs with embedded and separate dashboards in the same browser. Save toggle/slider/LED values in .codynick/account snapshots; exclude held buttons, input ownership and queued taps.
+- Add two no-hardware examples in both languages: Dashboard buttons/slider/LEDs with tap counting, and dashboard control of a sprite.
+- Deliver a cumulative checked local server ZIP, with existing website rollback. GitHub and the original checkout remain unchanged. Browser/Node software checks pass; physical CJP/Android and VPS deployment of this revision remain pending.
+
+## 3.14.0-preview.1 — complete projects and sprite appearances (local update only)
+
+- Rename the Python tab to Python.
+- Add Ball, Bee, Bird, Dog, Athlete, Cactus, Apple, Apartment, Bike and Diamond alongside Rocket; select appearances in the stage or change them with Blocks/Python.
+- Add original local SVG assets and an extendable catalogue, documented in APPEARANCES.md.
+- Replace .codynick JSON with a ZIP container holding both programs, independent Design names, editor selection, Python console/cursor, simulation gadget positions/readings/outputs, dashboard widgets/history/layout, simulator camera and sprite starting/current state.
+- Unify File New/Upload/Download and private account Save/Load across both editors; retain separate Import/Export Python .py items. Reopening restores state with programs stopped; connections, held inputs, pending sounds and Python runtime memory are excluded.
+- Validate ZIP size, directory, streamed expansion, CRC and SHA-256 before applying; reject old project formats and malformed state. Convert supplied project examples to the new ZIP format.
+- Include the previous local sprite preview and all published browser Python improvements. No GitHub push or original-checkout change. Browser software checks pass; physical CJP/Android and production deployment of this revision remain unvalidated.
+
+## 3.13.0-preview.1 — browser-native sprite stage (local update only)
+
+- Add a Sprites space with one rocket, 480×360 coordinates, three backdrops, motion, glides, edge bouncing, speech, size and visibility controls.
+- Add Motion, Looks and Sensing blocks plus an awaited codynick.stage Python API using the existing worker bridge.
+- Support focused keyboard input, pointer sensing and touch direction buttons; release input on blur, hidden views and Stop.
+- Save Block starting settings with project files/account designs; Python examples configure the stage in their source. Runtime motion does not overwrite saved settings.
+- Include keyboard, simulated-temperature and real-CJP-joystick examples in both languages; retain shared simulation/dashboard functionality.
+- Supply a standalone server ZIP with integrity checks and website rollback. The original Git checkout and GitHub are unchanged; no older sprite compatibility is included.
+- Desktop and emulated-touch software validation is performed locally. Physical Python CJP/Android acceptance remains pending.
+
 ## 3.12.0 — cumulative platform upgrade
 
 - Combine all firmware, Python pilot, dashboard and interface updates through 3.12.0-pilot.6 in one complete manual upgrade package.

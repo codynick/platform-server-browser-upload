@@ -3,7 +3,7 @@
     "title": "Hello Python (no gadgets)",
     "help": "No CJP required. Prints text and a calculation.",
     "simulation": [],
-    "source": "# No hardware needed.\nprint(\"Hello, CodyNick!\")\ntemperature = 20 + 5\nprint(\"The answer is\", temperature)\n"
+    "archive": "examples/hello.codynick"
   },
   "sim-dashboard": {
     "title": "Pretend sensor → dashboard and LED",
@@ -11,13 +11,13 @@
     "simulation": [
       "temperature"
     ],
-    "source": "from codynick import simulation, dashboard, wait\n\ndashboard.clear()\ndashboard.gauge(\"Temperature\", minimum=0, maximum=50)\ndashboard.graph(\"Temperature history\")\n\nwhile True:\n    temperature = await simulation.temperature.read()\n    dashboard.show(\"Temperature\", temperature)\n    dashboard.append(\"Temperature history\", temperature)\n    await simulation.led.set_color(\"green\")\n    await wait(0.5)\n"
+    "archive": "examples/sim-dashboard.codynick"
   },
   "mixed": {
     "title": "Real temperature → dashboard and pretend LED",
     "help": "Connect a CJP with a real temperature sensor. Open Dashboard for readings. The LED in Simulation becomes red above 30°C and blue otherwise.",
     "simulation": [],
-    "source": "from codynick import hardware, simulation, dashboard, wait\n\ndashboard.clear()\ndashboard.gauge(\"Temperature\", minimum=0, maximum=50)\ndashboard.graph(\"Temperature history\")\n\nwhile True:\n    temperature = await hardware.temperature.read()\n    dashboard.show(\"Temperature\", temperature)\n    dashboard.append(\"Temperature history\", temperature)\n    color = \"red\" if temperature > 30 else \"blue\"\n    await simulation.led.set_color(color)\n    await wait(0.5)\n"
+    "archive": "examples/mixed.codynick"
   },
   "cross-displays": {
     "title": "Real and pretend readings → opposite displays",
@@ -26,24 +26,61 @@
       "ultrasonic",
       "seven"
     ],
-    "source": "from codynick import hardware, simulation, wait\n\nwhile True:\n    temperature = await hardware.temperature.read()\n    await simulation.seven_segment.show(round(temperature, 1))\n    distance = await simulation.ultrasonic.read()\n    await hardware.seven_segment.show(round(distance, 1))\n    await wait(0.5)\n"
+    "archive": "examples/Real-temperature-Sim-distance.codynick"
   },
   "blink": {
     "title": "Blink a real CJP light",
     "help": "Connect a CJP. Its RGB LED 0 blinks red. Press Stop to finish; Stop leaves the last hardware output unchanged.",
     "simulation": [],
-    "source": "from codynick import hardware, wait\n\nwhile True:\n    await hardware.led.set_color(\"red\", index=0)\n    await wait(0.5)\n    await hardware.led.clear()\n    await wait(0.5)\n"
+    "archive": "examples/blink.codynick"
   },
   "temperature": {
     "title": "Real temperature → display and dashboard",
     "help": "Connect a CJP, temperature sensor, and standalone seven-segment display. Open Dashboard to see the reading there too.",
     "simulation": [],
-    "source": "from codynick import hardware, dashboard, wait\n\nwhile True:\n    temperature = await hardware.temperature.read()\n    await hardware.seven_segment.show(round(temperature, 1))\n    dashboard.show(\"Temperature\", temperature)\n    await wait(1)\n"
+    "archive": "examples/temperature.codynick"
   },
   "joystick": {
     "title": "CJP joystick click → real light",
     "help": "Connect a CJP. Press the joystick button to light RGB LED 0 green; release to turn it off.",
     "simulation": [],
-    "source": "from codynick import hardware, wait\n\nwhile True:\n    clicked = await hardware.joystick.clicked()\n    await hardware.led.set_color(\"green\" if clicked else \"off\")\n    await wait(0.1)\n"
+    "archive": "examples/joystick.codynick"
+  },
+  "stage-keyboard": {
+    "title": "Sprites: arrow-key movement",
+    "help": "No CJP needed. Run, then click/tap the stage. Hold arrow keys or the on-screen buttons. Stop ends the program.",
+    "simulation": [],
+    "stage": true,
+    "archive": "examples/stage-keyboard.codynick"
+  },
+  "stage-temperature": {
+    "title": "Sprites: simulated temperature",
+    "help": "No CJP needed. Adds a simulated temperature sensor. Run, then switch to Simulation to change its slider; return to Sprites to see size and speech change. Dashboard shows the same reading.",
+    "simulation": [
+      "temperature"
+    ],
+    "stage": true,
+    "archive": "examples/stage-temperature.codynick"
+  },
+  "stage-joystick": {
+    "title": "Sprites: real CJP joystick",
+    "help": "Connect a CJP first. Its joystick moves the sprite. No extra sensor needed. Stop or unplugging the CJP stops the program.",
+    "simulation": [],
+    "stage": true,
+    "archive": "examples/stage-joystick.codynick"
+  },
+  "dashboard-controls": {
+    "title": "Dashboard: buttons, slider and LEDs",
+    "help": "No CJP needed. Run and open Dashboard. Hold/tap the button, toggle Power and change Level. Green means True, red means False. Quick taps increment Tap count.",
+    "dashboard": true,
+    "stage": false,
+    "archive": "examples/dashboard-controls.codynick"
+  },
+  "dashboard-sprite": {
+    "title": "Dashboard: control a sprite",
+    "help": "No CJP needed. Run, open Dashboard in a separate tab/window, then choose Sprites in the editor. Hold Move, toggle visibility and change Size. Returning focus to the editor releases Move.",
+    "dashboard": true,
+    "stage": true,
+    "archive": "examples/dashboard-sprite.codynick"
   }
 }

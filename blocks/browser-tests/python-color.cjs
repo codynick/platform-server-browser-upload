@@ -19,7 +19,7 @@ const {chromium}=require('playwright');let browser;
  await page.locator('#pythonSource').evaluate(e=>{e.scrollTop=200;e.scrollLeft=170;e.dispatchEvent(new Event('scroll'));});
  const positions=await page.evaluate(()=>{const t=document.querySelector('#pythonSource'),c=document.querySelector('#pythonColors'),n=document.querySelector('#pythonLineNumbers');return [t.scrollTop,c.scrollTop,n.scrollTop,t.scrollLeft,c.scrollLeft]});assert.equal(positions[0],positions[1]);assert.equal(positions[0],positions[2]);assert.equal(positions[3],positions[4]);
  await page.locator('#pythonSource').fill('print("Coloring preserves execution")');await page.locator('#blockRunBtn').click();await page.waitForFunction(()=>!window.CodyPythonPilot.running,null,{timeout:180000});assert((await page.locator('#pythonOutput').textContent()).includes('Coloring preserves execution'));
- await page.locator('#headerExamples').click();await page.selectOption('#example','sim-dashboard');await page.locator('#loadExample').click();
+ await page.locator('#headerExamples').click();await page.selectOption('#example','sim-dashboard');await page.locator('#loadExample').click();await page.waitForFunction(()=>!document.getElementById('examplesDialog').open);
  await page.screenshot({path:path.join(artifacts,'python-colored-desktop.png'),fullPage:true});
  await page.setViewportSize({width:412,height:915});
  assert(await page.evaluate(()=>getComputedStyle(document.querySelector('#pythonColors')).font===getComputedStyle(document.querySelector('#pythonSource')).font));

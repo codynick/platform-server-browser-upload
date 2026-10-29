@@ -1,18 +1,12 @@
-# Browser Python in the cumulative upgrade — 3.12.0
+# Browser Python — 3.18.0
 
-Upload codynick-platform-upgrade-3.12.0.zip to /root/ on the existing VPS.
-For a manual ZIP update, extract it and run update-local.sh. Alternatively use
-the GitHub upgrade command in README.md to install the cumulative release directly.
-
-```bash
-sudo unzip -o /root/codynick-platform-upgrade-3.12.0.zip -d /root/ && sudo bash /root/codynick-platform-upgrade-3.12.0/update-local.sh
-```
+Install or upgrade from GitHub using the command in START_HERE.txt or README.md.
 
 The script reuses the saved website domain. If it cannot find one, it asks for it.
 An explicit domain override is supported:
 
 ```bash
-sudo env CODYNICK_DOMAIN=ide.codynick.com bash /root/codynick-platform-upgrade-3.12.0/update-local.sh
+sudo env CODYNICK_DOMAIN=ide.codynick.com bash /root/codynick-platform-upgrade-3.18.0/update-local.sh
 ```
 
 The update uses only extracted package files. Python 3 must already be present
@@ -39,9 +33,9 @@ editor; Python appears beside it. Select Python and open Examples.
 5. Connect a CJP and run Blink, then a real temperature example with its listed gadgets.
 6. Switch back to Blocks and confirm existing projects still run.
 
-Python Open/Download .py works in this pilot. Account Save/Load is Blocks-only
-and disabled while Python is selected. Autocomplete, Blocks-to-
-Python generation and full project-level Python saving are deferred.
+Both editors share File New/Upload/Download Project and account Save/Load.
+See PROJECT_FORMAT.md. File also offers separate Python .py import/export.
+Autocomplete and Blocks-to-Python generation remain deferred.
 
 ## Rollback
 
@@ -74,4 +68,12 @@ Coloring validation: token/HTML escaping checks, exact source preservation, nati
 
 Dashboard update validation: successive nonzero readings preserve gauge/info/graph nodes without intermediate zero/blank text; range changes and removal still render. Cross-tab storage/focus and dashboard layout tests pass. Browser regression: `node dashboard/tests/live-updates.cjs` (Playwright required).
 
-Python status appears below Console. Click the info icon beside Design for the example description and pilot file-saving notes. Use File → Open Python File / Download Python File / New Python Program; Blocks file actions return when Blocks is selected.
+Python status appears below Console. Click the info icon beside Design for the example description and project-saving notes. File Project actions save both editors; Python .py import/export remains available separately.
+
+Dashboard input and LED APIs/examples: see DASHBOARD_WIDGETS.md.
+
+Examples now restore both source programs and their complete scene configuration.
+They preserve the selected editor and do not start execution.
+
+Open Stage opens a linked standalone sprite view. Python continues in the original
+editor; keep it open and use Run/Stop there. See SPRITES.md.

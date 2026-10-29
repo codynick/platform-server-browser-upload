@@ -295,8 +295,8 @@ function generatePython() {
 }
 
 function viewPython() {
-  const mixed=workspace.getAllBlocks(false).some(b=>b.getFieldValue('TARGET')==='SIMULATION'||b.type.startsWith('dash_'));
-  const code = mixed?'# This Live program uses browser simulation/dashboard targets.\n# A single Python hardware script cannot represent its routing.\n# Run the blocks using the Live runtime.':updatePythonPreview(true);
+  const mixed=workspace.getAllBlocks(false).some(b=>b.getFieldValue('TARGET')==='SIMULATION'||b.type.startsWith('dash_')||b.type.startsWith('stage_'));
+  const code = mixed?'# This Live program uses browser sprites/simulation/dashboard targets.\n# A single Python hardware script cannot represent its routing.\n# Run the blocks using the Live runtime.':updatePythonPreview(true);
   document.getElementById('pythonPreview').textContent = code;
   document.getElementById('pythonModal').classList.add('open');
 }

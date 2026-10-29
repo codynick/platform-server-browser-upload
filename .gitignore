@@ -2,3 +2,6 @@
 __pycache__/
 *.py[cod]
 .venv/
+node_modules/
+test-output/
+.pytest_cache/

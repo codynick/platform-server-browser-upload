@@ -48,5 +48,5 @@
  window.addEventListener('blur',()=>finish(true));
  window.addEventListener('resize',()=>{finish(true);apply();redraw();});
  window.addEventListener('storage',e=>{if(e.key===L.key||e.key===null){finish(true);saved=L.read(localStorage);apply();redraw();}});
- window.CodyDashboardLayoutUI={apply,get busy(){return !!gesture;}};apply();redraw();
+ window.CodyDashboardLayoutUI={apply,reload(){finish(true);saved=L.read(localStorage);apply();redraw();},get busy(){return !!gesture;}};apply();redraw();
 })();

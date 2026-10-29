@@ -7,8 +7,8 @@
  function read(storage){try{const value=JSON.parse(storage.getItem(key)||'{}');const out={};for(const [id,v] of Object.entries(value||{}).slice(0,1000))if(v&&typeof v==='object')Object.defineProperty(out,id,{value:clean(v),enumerable:true,writable:true,configurable:true});return out;}catch{return {};}}
  function save(storage,changes){const value={...read(storage)};for(const [id,v] of Object.entries(changes))Object.defineProperty(value,id,{value:clean(v),enumerable:true,writable:true,configurable:true});storage.setItem(key,JSON.stringify(value));return value;}
  function columns(width){return width<600?2:width<1000?6:12;}
- function defaults(card){const graph=card.type==='graph',gauge=card.type==='gauge';return {x:0,y:0,w:graph?6:gauge?4:2,h:graph||gauge?2:1};}
- function minimum(card,cols){return {w:Math.min(cols,card.type==='graph'?3:card.type==='gauge'?2:1),h:['graph','gauge'].includes(card.type)?2:1};}
+ function defaults(card){const graph=card.type==='graph',gauge=card.type==='gauge';return {x:0,y:0,w:graph?6:gauge?4:2,h:['graph','gauge','switch','slider','led','button'].includes(card.type)?2:1};}
+ function minimum(card,cols){return {w:Math.min(cols,card.type==='graph'?3:card.type==='gauge'?2:1),h:['graph','gauge','switch','slider','led','button'].includes(card.type)?2:1};}
  function preferred(card,saved){if(Object.hasOwn(saved,card.id))return clean(saved[card.id]);const d=defaults(card);if(Number(card.column_span)>1)d.w=Math.min(12,Number(card.column_span)*3);if(Number(card.height_multiplier)>1)d.h=Math.min(6,Number(card.height_multiplier)*2);return clean(d);}
  const overlap=(a,b)=>a.x<b.x+b.w&&a.x+a.w>b.x&&a.y<b.y+b.h&&a.y+a.h>b.y;
  function arrange(cards,saved,cols,priority){cols=integer(cols,1,12,12);const result={},placed=[];

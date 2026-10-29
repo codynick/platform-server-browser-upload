@@ -1,5 +1,29 @@
-# Real temperature + simulated distance
+# Complete example projects
 
-Connect a CJP running CodyPi, with a real temperature sensor and standalone seven-segment display attached to their usual gadget connections. Select this example in the editor, or upload the .codynick file through File → Upload Project.
+Every Examples item is a .codynick ZIP containing both Blocks and Python source,
+Design names, dashboard/widgets/layout, a clean simulation scene and sprite setup.
+Loading from either editor preserves the selected language and leaves execution
+stopped. Both programs and all scene configuration are replaced after confirmation.
+Widgets appear before Run; momentary buttons restore released. Run executes setup
+again and may reset widgets. The catalogue is ../python-examples.json; its archive
+field selects the file. Code and initial state live in the archive itself.
 
-The saved simulation scene includes an ultrasonic sensor (initially 50 cm) and a standalone seven-segment display. Run the program, then change simulated distance in the simulation space. Real temperature appears on the simulated display; simulated distance appears on the physical display. Each sensor also has its own dashboard info card and 120-sample history graph, updated every loop with a 0.5-second wait. Display values are rounded to one decimal place; dashboard values keep the original readings. Stop before changing projects.
+| Example | Hardware required |
+| --- | --- |
+| Hello Python | None |
+| Pretend sensor → dashboard and LED | None |
+| Real temperature → dashboard and pretend LED | CJP and temperature sensor |
+| Real and pretend readings → opposite displays | CJP, temperature sensor and standalone seven-segment display |
+| Blink a real CJP light | CJP |
+| Real temperature → display and dashboard | CJP, temperature sensor and standalone seven-segment display |
+| CJP joystick click → real light | CJP |
+| Sprites: arrow-key movement | None |
+| Sprites: simulated temperature | None |
+| Sprites: real CJP joystick | CJP |
+| Dashboard: buttons, slider and LEDs | None |
+| Dashboard: control a sprite | None |
+
+Use Open Dashboard and Open Stage to view/control separate panels while keeping
+the original editor open. Hardware examples require the expected CJP firmware and
+the gadgets named in their help. Older JSON project files are not converted.
+File → Download Project saves both programs and the current scene as a new archive.

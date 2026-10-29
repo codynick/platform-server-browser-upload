@@ -17,7 +17,7 @@ let activeBrowser;
  assert((await page.locator('#pythonOutput').textContent()).includes('Hello real browser Python!'));assert((await page.locator('#pythonOutput').textContent()).includes('25'));
  console.log('PASS: real Pyodide module worker, stdout and ordinary arithmetic');
  // Prepared simulation example uses the same live store as the embedded dashboard.
- await page.locator('#headerExamples').click();await page.selectOption('#example','sim-dashboard');await page.locator('#loadExample').click();await page.locator('#blockRunBtn').click();
+ await page.locator('#headerExamples').click();await page.selectOption('#example','sim-dashboard');await page.locator('#loadExample').click();await page.waitForFunction(()=>!document.getElementById('examplesDialog').open);await page.locator('#blockRunBtn').click();
  await page.waitForFunction(()=>window.CodyLiveStore.read().widgets.Temperature?.value===21.1,null,{timeout:180000});
  await page.evaluate(()=>CodyLiveStore.update(s=>{s.scene.temperature=34.5;}));
  await page.waitForFunction(()=>window.CodyLiveStore.read().widgets.Temperature?.value===34.5);

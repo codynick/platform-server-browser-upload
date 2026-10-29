@@ -55,5 +55,5 @@ rollback=$(mktemp /root/codynick-python-rollback-XXXXXXXX)
 printf '#!/usr/bin/env bash\nset -euo pipefail\nexec bash %q\n' "$backup/rollback.sh" > "$rollback"
 install -m 700 -- "$rollback" /root/codynick-python-rollback.sh
 rm -f -- "$rollback"
-printf '\nPython pilot installation complete.\nOpen: https://%s/blocks/\nClose old editor tabs, reopen, and press Ctrl+F5. Select Python, then Examples.\nRollback this update: sudo bash /root/codynick-python-rollback.sh\nBackup: %s\n' "$domain" "$backup"
+printf '\nCodyNick platform upgrade complete.\nOpen: https://%s/blocks/\nClose old tabs, reopen, and press Ctrl+F5.\nRollback this update: sudo bash /root/codynick-python-rollback.sh\nBackup: %s\n' "$domain" "$backup"
 echo 'CAS configuration, account backend, private projects, and CJP firmware were not changed by this installer.'

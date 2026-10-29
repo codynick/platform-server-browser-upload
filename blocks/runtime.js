@@ -10,7 +10,7 @@ class BlockRuntime {
  executable(workspace){const result=[];const visit=b=>{for(;b;b=b.getNextBlock()){if(!b.isEnabled())continue;result.push(b);for(const input of b.inputList||[]){const child=input.connection?.targetBlock();if(child)visit(child);}}};for(const root of workspace.getTopBlocks(true))if(root.isEnabled()&&['cn_event_start','cn_event_loop'].includes(root.type)){result.push(root);visit(root.getInputTargetBlock('DO'));}return result;}
  preflight(workspace){for(const b of this.executable(workspace)){if(!this.specs.has(b.type))continue;try{this.hw.check?.(b.type,{device:this.field(b,'device')},this.field(b,'TARGET')||'HARDWARE');}catch(e){throw Error(b.type+' ['+b.id+']: '+e.message);}}}
  variable(b){return this.field(b,'VAR');}
- async value(b){await this.tick();if(!b||!b.isEnabled())return 0;const f=n=>this.field(b,n),v=(n,d)=>this.input(b,n,d);if(this.specs.has(b.type))return this.gadget(b);switch(b.type){
+ async value(b){await this.tick();if(!b||!b.isEnabled())return 0;const f=n=>this.field(b,n),v=(n,d)=>this.input(b,n,d);if(b.type.startsWith('stage_')){this.sources.add('Sprites');return window.CodySpriteBlocks.execute(b,this);}if(this.specs.has(b.type))return this.gadget(b);if(['dash_button_pressed','dash_button_clicked','dash_toggle_value','dash_slider_value'].includes(b.type)){this.sources.add('Dashboard');return this.hw.store.dashboard(b.type,{NAME:f('NAME')});}switch(b.type){
  case 'math_number':return Number(f('NUM'));
  case 'text':return f('TEXT');
  case 'logic_boolean':return f('BOOL')==='TRUE';
@@ -27,7 +27,7 @@ class BlockRuntime {
  case 'cn_timer_value':return (performance.now()-this.timer)/1000;
  default:throw Error('Unsupported value block: '+b.type);
  }throw Error('Invalid block '+b.type);}
- async chain(b){for(;b;b=b.getNextBlock()){await this.tick();if(!b.isEnabled())continue;this.report('block',b.id);if(this.specs.has(b.type)){await this.gadget(b);continue;}if(b.type.startsWith('dash_')){this.sources.clear();const a={};for(const f of ['NAME','TYPE','TITLE','COUNT','MIN','MAX','COLOR','WIDTH','HEIGHT','FONT','SIZE','HORIZONTAL','VERTICAL'])a[f]=this.field(b,f);if(b.getInput('VALUE'))a.VALUE=await this.input(b,'VALUE');a.SOURCE=[...this.sources].join(' + ')||'Program';this.hw.store.dashboard(b.type,a);continue;}const v=(n,d)=>this.input(b,n,d),body=n=>this.chain(b.getInputTargetBlock(n));switch(b.type){
+ async chain(b){for(;b;b=b.getNextBlock()){await this.tick();if(!b.isEnabled())continue;this.report('block',b.id);if(b.type.startsWith('stage_')){await window.CodySpriteBlocks.execute(b,this);continue;}if(this.specs.has(b.type)){await this.gadget(b);continue;}if(b.type.startsWith('dash_')){this.sources.clear();const a={};for(const f of ['NAME','TYPE','TITLE','COUNT','MIN','MAX','STEP','INITIAL','COLOR','WIDTH','HEIGHT','FONT','SIZE','HORIZONTAL','VERTICAL'])a[f]=this.field(b,f);if(b.getInput('VALUE'))a.VALUE=await this.input(b,'VALUE');a.SOURCE=[...this.sources].join(' + ')||'Program';this.hw.store.dashboard(b.type,a);continue;}const v=(n,d)=>this.input(b,n,d),body=n=>this.chain(b.getInputTargetBlock(n));switch(b.type){
  case 'cn_event_start':case 'cn_event_loop':await body('DO');break;
  case 'cn_wait':{const seconds=Number(await v('SECONDS',1));if(!Number.isFinite(seconds)||seconds<0||seconds>86400)throw Error('Wait must be between 0 and 86400 seconds');await this.hw.wait(seconds*1000,this.signal);break;}
  case 'cn_timer_reset':this.timer=performance.now();break;
@@ -44,3 +44,5 @@ class BlockRuntime {
 }
 BlockRuntime.types=['cn_event_start','cn_event_loop','cn_wait','cn_forever','cn_timer_value','cn_timer_reset','math_number','text','logic_boolean','logic_null','logic_negate','logic_operation','logic_compare','math_arithmetic','math_single','math_round','math_random_int','variables_get','math_change','text_join','variables_set','text_print','controls_if','controls_repeat_ext','controls_whileUntil','controls_flow_statements','dash_clear','dash_create','dash_create_info','dash_create_gauge','dash_create_graph','dash_set','dash_info_set','dash_gauge_set','dash_append','dash_history','dash_range','dash_appearance','dash_font'];
 if(typeof module!=='undefined')module.exports=BlockRuntime;else window.BlockRuntime=BlockRuntime;
+
+BlockRuntime.types.push('dash_create_button','dash_create_switch','dash_create_slider','dash_create_led','dash_button_pressed','dash_button_clicked','dash_toggle_value','dash_slider_value','dash_toggle_set','dash_slider_set','dash_led_set');

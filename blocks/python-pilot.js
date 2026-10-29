@@ -6,7 +6,7 @@
  const $=id=>document.getElementById(id),source=$('pythonSource'),output=$('pythonOutput');
  const fileButtons=['saveNamed','menuSave','loadNamed','menuUpload','saveProject','newProject','importFile'];
  const api={selected:false,running:false,worker:null,dirty:false,controller:null,bridge:null,token:null};
- const blockOptions=$('example').innerHTML,blockLoad=$('loadExample').onclick;
+ const blockOptions=$('example').innerHTML;
  const blockFiles={};
  for(const id of ['menuUpload','saveProject','newProject']){const button=$(id);blockFiles[id]={handler:button.onclick,label:button.querySelector('span:last-child').textContent,title:button.title};}
  const bubble=$('pythonHelpBubble');
@@ -33,10 +33,10 @@
   document.body.classList.toggle('python-active',api.selected);
   $('blocksEditorTab').setAttribute('aria-selected',String(!api.selected));$('pythonEditorTab').setAttribute('aria-selected',String(api.selected));
   $('toolboxWorkspace').hidden=api.selected;$('pythonPanel').hidden=!api.selected;
-  for(const id of ['generalToolboxTab','hardwareToolboxTab','dashboardToolboxTab'])$(id).hidden=api.selected;
-  for(const id of fileButtons)$(id).disabled=window.blockProgramRunning||(api.selected&&['saveNamed','menuSave','loadNamed','importFile'].includes(id));
-  $('pythonInfo').hidden=!api.selected;$('saveNamed').hidden=api.selected;
-  for(const [id,label] of Object.entries({menuUpload:'Open Python File…',saveProject:'Download Python File',newProject:'New Python Program'})){
+  for(const id of ['generalToolboxTab','hardwareToolboxTab','dashboardToolboxTab','spritesToolboxTab'])$(id).hidden=api.selected;
+  for(const id of fileButtons)$(id).disabled=id==='saveProject'?false:!!window.blockProgramRunning;
+  $('pythonInfo').hidden=!api.selected;$('saveNamed').hidden=false;$('importPythonSource').hidden=!api.selected;$('exportPythonSource').hidden=!api.selected;$('importPythonSource').disabled=api.running;
+  for(const [id,label] of Object.entries({menuUpload:'Upload Project',saveProject:'Download Project',newProject:'New Project'})){
    $(id).querySelector('span:last-child').textContent=api.selected?label:blockFiles[id].label;
    $(id).title=api.selected?label:blockFiles[id].title;
   }
@@ -50,8 +50,8 @@
   closeInfo();api.selected=python;controls();
   if(python){
    try{examples=await examplesReady;$('example').replaceChildren(...Object.entries(examples).map(([id,e])=>{const o=document.createElement('option');o.value=id;o.textContent=e.title;return o;}));}catch(e){status(e.message);}
-   $('examplesTitle').textContent='Python Examples';exampleNote.textContent='Loads Python code and adds any required simulated gadgets. Blocks stay unchanged. Download edited Python first to keep a copy.';status('Python pilot · Ready. Use await for gadget operations and waits.');source.focus();
-  }else{$('example').innerHTML=blockOptions;$('examplesTitle').textContent='Example Projects';exampleNote.textContent=blockNote;window.Blockly.svgResize(window.codyWorkspace);status('Live mode · Ready to edit.');}
+   $('examplesTitle').textContent='Complete Examples';exampleNote.textContent='Loads both programs and complete dashboard, simulation and sprite setup. Download your current project first to keep a copy.';status('Python · Ready. Use await for gadget operations and waits.');source.focus();
+  }else{$('example').innerHTML=blockOptions;$('examplesTitle').textContent='Complete Examples';exampleNote.textContent=blockNote;window.Blockly.svgResize(window.codyWorkspace);status('Live mode · Ready to edit.');}
  }
  function highlightError(text){
   const matches=[...text.matchAll(/File "program\.py", line (\d+)/g)];
@@ -61,7 +61,7 @@
  async function finish(message,error=false){
   if(finishing)return finishing;if(!api.running)return;
   finishing=(async()=>{
-   api.worker?.terminate();api.worker=null;workerGeneration++;api.controller.abort(Error('Stopped'));
+   api.worker?.terminate();api.worker=null;workerGeneration++;api.controller.abort(Error('Stopped'));window.CodySpriteStage?.release();
    status('Stopping Python… Waiting for any active hardware reply.');
    // Preserve serial exclusivity until an outstanding sensor request settles.
    await api.bridge.router.hardware.tail.catch(()=>{});
@@ -128,19 +128,16 @@
   $('pythonExampleHelp').textContent='Write Python code or open Examples. Gadget operations and wait() use await.';
   closeInfo();lines();status('New Python program · Ready.');source.focus();
  };
- $('loadExample').onclick=async event=>{
-  if(!api.selected)return blockLoad(event);
-  const example=examples[$('example').value];if(!example)return;
-  if(api.dirty&&!confirm('Replace your Python code with this example? Download it first to keep a copy.'))return;
-  try{
-   const scene=window.CodyLiveStore.read().scene;
-   for(const [i,kind] of (example.simulation||[]).entries())scene.gadgets[kind]??={x:440+(i%2)*220,y:100+Math.floor(i/2)*200};
-   if(example.simulation?.length)window.CodyLiveStore.simCommand({action:'scene',scene});
-   source.value=example.source;$('designName').value=example.title;api.dirty=false;$('pythonExampleHelp').textContent=example.help;closeInfo();lines();$('examplesDialog').close();status('Loaded '+example.title+'.');source.focus();
-  }catch(e){status(e.message);}
- };
  window.addEventListener('cjp-disconnected',()=>{if(api.running&&api.bridge.hardwareUsed)void finish('CJP disconnected. Reconnect it before running again.',true);});
  window.addEventListener('beforeunload',event=>{if(api.dirty||api.running){event.preventDefault();event.returnValue='';}});
+ api.exportPythonSource=downloadPython;
+ api.markProjectSaved=()=>{api.dirty=false;};
+ api.exportProjectState=()=>({source:source.value,names:{blocks:api.selected?blockDesignName:$('designName').value,python:api.selected?$('designName').value:pythonDesignName},language:api.selected?'python':'blocks',help:$('pythonExampleHelp').textContent,console:output.textContent,cursorStart:source.selectionStart,cursorEnd:source.selectionEnd,scrollTop:source.scrollTop,scrollLeft:source.scrollLeft});
+ api.restoreProjectState=async data=>{
+  blockDesignName=data.names.blocks;pythonDesignName=data.names.python;source.value=data.source;api.dirty=false;lines();
+  $('designName').value=api.selected?pythonDesignName:blockDesignName;await select(data.language==='python');
+  $('pythonExampleHelp').textContent=data.help;output.textContent=data.console;source.setSelectionRange(Math.min(source.value.length,data.cursorStart),Math.min(source.value.length,data.cursorEnd));source.scrollTop=data.scrollTop;source.scrollLeft=data.scrollLeft;syncColors();
+ };
  const blockStatus=window.CodyAccountEditor.status;window.CodyAccountEditor.status=text=>api.selected?status(text):blockStatus(text);
  const reset=window.CodyAccountEditor.reset;window.CodyAccountEditor.reset=()=>{
   if(api.running)void finish('Python stopped because the account changed.');

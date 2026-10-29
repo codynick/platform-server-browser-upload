@@ -33,3 +33,7 @@ SOFTWARE.
 
 Blockly and uploaded project attribution remains as described in README.md and
 vendor/blockly/LICENSE.
+
+# Project ZIP support
+
+JSZip (bundled as vendor/jszip.min.js) is used under its MIT license. See vendor/JSZIP-LICENSE.md. Sprite SVG artwork in sprites/appearances is original artwork for this project.

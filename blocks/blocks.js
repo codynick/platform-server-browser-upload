@@ -105,6 +105,7 @@ function defineEventBlocks() {
 
 B.defineBlocksWithJsonArray(specs.map(buildDynamicBlockJson));
 DashboardBlocks.definitions();
+window.CodySpriteBlocks?.definitions();
 defineEventBlocks();
 B.defineBlocksWithJsonArray([
 {type:'cn_wait',message0:'wait %1 seconds',args0:[{type:'input_value',name:'SECONDS',check:'Number'}],previousStatement:null,nextStatement:null,colour:'#ffab19'},
@@ -214,7 +215,7 @@ function buildToolbox() {
       }
   ];
   return {kind: 'categoryToolbox', contents: toolboxMode === 'general' ? general
-    : toolboxMode==='dashboard'?DashboardBlocks.categories():Array.from(dynamicCategories.values())};
+    : toolboxMode==='dashboard'?DashboardBlocks.categories():toolboxMode==='sprites'?(window.CodySpriteBlocks?.categories()||[]):Array.from(dynamicCategories.values())};
 }
 
 const CodyNickTheme = Blockly.Theme.defineTheme('codynickScratchLike', {
@@ -249,17 +250,25 @@ for(const type of new Set([...specs.map(spec=>spec.type),...BlockRuntime.types])
 const workspace=B.inject('blocklyDiv',{toolbox:buildToolbox(),media:'/blocks/vendor/blockly/media/',renderer:'zelos',theme:CodyNickTheme,trashcan:true,move:{scrollbars:true,drag:true,wheel:false},grid:{spacing:32,length:3,colour:'#dbeafe',snap:true},zoom:{controls:true,wheel:true,startScale:.72,maxScale:2.2,minScale:.35,scaleSpeed:1.12}});
 const runtime=new BlockRuntime(new LiveRouter(new CjpHardware(window.CJP),window.CodyLiveStore),specs,(kind,id)=>workspace.highlightBlock(id));
 window.codyWorkspace=workspace;
-for(const mode of ['general','hardware','dashboard'])$(mode+'ToolboxTab').onclick=()=>{toolboxMode=mode;workspace.updateToolbox(buildToolbox());for(const name of ['general','hardware','dashboard'])$(name+'ToolboxTab').setAttribute('aria-selected',String(name===mode));$('toolboxWorkspace').setAttribute('aria-labelledby',mode+'ToolboxTab');B.svgResize(workspace);};
+for(const mode of ['general','hardware','dashboard','sprites'])$(mode+'ToolboxTab').onclick=()=>{toolboxMode=mode;workspace.updateToolbox(buildToolbox());for(const name of ['general','hardware','dashboard','sprites'])$(name+'ToolboxTab').setAttribute('aria-selected',String(name===mode));$('toolboxWorkspace').setAttribute('aria-labelledby',mode+'ToolboxTab');B.svgResize(workspace);};
 $('toggleConsole').onclick=()=>{$('consoleModal').classList.add('open');};
 $('closeConsole').onclick=()=>{$('consoleModal').classList.remove('open');};
 $('toggleSpaces').onclick=()=>{const main=$('liveMain');const hide=!main.classList.contains('stage-collapsed');main.classList.toggle('stage-collapsed',hide);$('toggleSpaces').textContent=hide?'Show Spaces':'Hide Spaces';B.svgResize(workspace);};
-for(const name of ['simulator','dashboard'])$('show-'+name).onclick=()=>{for(const other of ['simulator','dashboard']){$(other+'Frame').hidden=other!==name;$('show-'+other).setAttribute('aria-pressed',String(other===name));}};
-$('show-simulator').setAttribute('aria-pressed','true');$('show-dashboard').setAttribute('aria-pressed','false');
+function showSpace(name){for(const other of ['simulator','dashboard','sprites']){
+ const target=$(other==='sprites'?'spriteStagePanel':other+'Frame');target.hidden=other!==name;$('show-'+other).setAttribute('aria-pressed',String(other===name));
+}window.CodySpriteStage?.changedSpace();}
+window.CodySpaces={show:showSpace};
+for(const name of ['simulator','dashboard','sprites'])$('show-'+name).onclick=()=>showSpace(name);
+showSpace('simulator');
 $('consoleModal').onclick=e=>{if(e.target===$('consoleModal'))$('consoleModal').classList.remove('open');};
 window.addEventListener('keydown',e=>{if(e.key==='Escape')$('consoleModal').classList.remove('open');});
 let saving=null,loading=false;
 const key='codynick-webserial-blocks-v2';
 B.serialization.registry.register('codynick_live_scene',{priority:5,save:ws=>ws===workspace?{scene:CodyLiveStore.read().scene}:undefined,load:(data,ws)=>{if(ws===workspace&&data?.scene)CodyLiveStore.simCommand({action:'scene',scene:data.scene});},clear:()=>{}});
+if(window.CodySpriteStage)B.serialization.registry.register('codynick_sprite_stage',{priority:4,
+ save:ws=>ws===workspace?window.CodySpriteStage.getSettings():undefined,
+ load:(data,ws)=>{if(ws===workspace)window.CodySpriteStage.setSettings(data);},
+ clear:ws=>{if(ws===workspace)window.CodySpriteStage.clear();}});
 function status(s){$('workspaceStatus').textContent=s;}
 window.addEventListener('resize',()=>B.svgResize(workspace));
 function save(){/* Account work stays in memory until explicit server Save. */}
@@ -278,23 +287,23 @@ return {codynick_live_scene:{scene:{...CodyLiveStore.read().scene,gadgets:{...Co
 function replaceWith(data){if(workspace.getAllBlocks(false).length&&!confirm('Replace the current workspace? Download it first if you want to keep a copy.'))return false;load(data);return true;}
 $('loadExample').onclick=async()=>{try{
 const name=$('example').value,title=$('example').selectedOptions?.[0]?.textContent||name;let loaded=false;
-if(name==='cross-displays'){const response=await fetch('examples/Real-temperature-Sim-distance.codynick',{cache:'no-cache'});if(!response.ok)throw Error('Could not load example');loaded=replaceWith((await response.json()).workspace);}else if(name)loaded=replaceWith(example(name));
+if((name.startsWith('stage-')||name.startsWith('dashboard-'))){const response=await fetch('examples/'+name+'.codynick',{cache:'no-cache'});if(!response.ok)throw Error('Could not load sprite example');const project=await window.CodyProjectArchive.decode(await response.arrayBuffer());loaded=replaceWith({...project.workspace,codynick_live_scene:{scene:project.state.live.scene},codynick_sprite_stage:project.state.sprite.settings});if(loaded)showSpace(name.startsWith('dashboard-')?'dashboard':'sprites');}else if(name==='cross-displays'){const response=await fetch('examples/Real-temperature-Sim-distance.codynick',{cache:'no-cache'});if(!response.ok)throw Error('Could not load example');const project=await window.CodyProjectArchive.decode(await response.arrayBuffer());loaded=replaceWith({...project.workspace,codynick_live_scene:{scene:project.state.live.scene},codynick_sprite_stage:project.state.sprite.settings});}else if(name)loaded=replaceWith(example(name));
 if(loaded){$('designName').value=title;$('examplesDialog').close();}
 }catch(e){status(e.message);}finally{$('example').value='';}};
 $('newProject').onclick=()=>{try{replaceWith({blocks:{languageVersion:0,blocks:[{type:'cn_event_start',x:60,y:50}]}});}catch(e){status(e.message);}};
 $('saveProject').onclick=()=>{const project={format:'codynick-webserial',version:2,workspace:B.serialization.workspaces.save(workspace)};const url=URL.createObjectURL(new Blob([JSON.stringify(project,null,2)],{type:'application/json'}));const a=document.createElement('a');a.href=url;a.download='CodyNick-project.codynick';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);};
 $('importFile').onchange=async()=>{try{const f=$('importFile').files[0];if(!f)return;if(f.size>2*1024*1024)throw Error('Project must be smaller than 2 MB');const data=JSON.parse(await f.text());replaceWith(data.workspace??data);status('Project loaded.');}catch(e){status('Upload failed: '+e.message);}finally{$('importFile').value='';}};
-function lock(on){window.blockProgramRunning=on;window.CJP.controls();const button=$('blockRunBtn');button.disabled=false;button.textContent=on?'Stop':'Run';button.classList[on?'remove':'add']('run-btn');button.classList[on?'add':'remove']('stop-btn');button.title=on?'Stop this browser program':'Run this browser program';button.setAttribute('aria-label',on?'Stop program':'Run program');button.setAttribute('aria-pressed',String(on));for(const id of ['example','menuExamples','loadExample','importFile','menuUpload','newProject','loadNamed','loadNamedConfirm'])$(id).disabled=on;/* runtime uses a snapshot so edits cannot change a running program */}
+function lock(on){window.blockProgramRunning=on;window.CodySpriteStage?.setRunning(on);window.CJP.controls();const button=$('blockRunBtn');button.disabled=false;button.textContent=on?'Stop':'Run';button.classList[on?'remove':'add']('run-btn');button.classList[on?'add':'remove']('stop-btn');button.title=on?'Stop this browser program':'Run this browser program';button.setAttribute('aria-label',on?'Stop program':'Run program');button.setAttribute('aria-pressed',String(on));for(const id of ['example','menuExamples','loadExample','importFile','menuUpload','newProject','loadNamed','loadNamedConfirm'])$(id).disabled=on;/* runtime uses a snapshot so edits cannot change a running program */}
 $('saveNamed').onclick=()=>{try{const name=($('designName').value||'Untitled').trim();const saved=JSON.parse(localStorage.getItem('codynick-named-designs')||'{}');if(Object.hasOwn(saved,name)&&!confirm('Replace the saved design “'+name+'”?'))return;Object.defineProperty(saved,name,{value:B.serialization.workspaces.save(workspace),enumerable:true,configurable:true,writable:true});localStorage.setItem('codynick-named-designs',JSON.stringify(saved));status('Saved “'+name+'” in this browser.');}catch(e){status('Save failed: '+e.message);}};
 $('loadNamed').onclick=()=>{try{const saved=JSON.parse(localStorage.getItem('codynick-named-designs')||'{}');$('designList').replaceChildren();for(const name of Object.keys(saved).sort()){const option=document.createElement('option');option.textContent=name;option.value=name;$('designList').append(option);}if(!Object.keys(saved).length){status('No named designs saved in this browser yet.');return;}$('designDialog').showModal();}catch(e){status('Load failed: '+e.message);}};
 $('loadNamedConfirm').onclick=()=>{try{const name=$('designList').value;if(!name)return;const saved=JSON.parse(localStorage.getItem('codynick-named-designs')||'{}');replaceWith(saved[name]);$('designName').value=name;$('designDialog').close();}catch(e){status('Load failed: '+e.message);}};
 $('closeDesignDialog').onclick=()=>$('designDialog').close();
 window.CodyBlockExecution={lock};
-$('blockRunBtn').onclick=async()=>{if(window.CodyPythonPilot?.selected)return window.CodyPythonPilot.runOrStop();if(window.blockProgramRunning){runtime.stop();$('blockRunBtn').disabled=true;status('Stopping… Waiting for any active hardware reply.');return;}if(window.CJP.occupied){status('Wait for the serial connection operation to finish.');return;}let snapshot;try{snapshot=new B.Workspace();B.serialization.workspaces.load(B.serialization.workspaces.save(workspace),snapshot);}catch(e){snapshot?.dispose();status(e.message);window.alert('Program could not start: '+e.message);return;}lock(true);status('Running in this browser…');const token=Date.now()+'-'+Math.random();let heartbeat,programFailure=null;try{runtime.preflight(snapshot);runtime.activeNeedsHardware=runtime.executable(snapshot).some(b=>specs.some(s=>s.type===b.type&&s.type!=='cn_log')&&(b.getFieldValue('TARGET')||'HARDWARE')==='HARDWARE');CodyLiveStore.start(token);heartbeat=window.CodyScheduler?window.CodyScheduler.every(()=>CodyLiveStore.heartbeat(token),800):(()=>{const timer=setInterval(()=>CodyLiveStore.heartbeat(token),800);return ()=>clearInterval(timer);})();await runtime.run(snapshot);status('Program finished.');}catch(e){const message=e?.message||String(e||'Break/continue used outside a loop');if(message!=='Stopped')programFailure='Program ended: '+message;status(programFailure||'Program stopped.');window.CJP.log('PROGRAM '+message);}finally{heartbeat?.();CodyLiveStore.stop(token);snapshot.dispose();lock(false);if(programFailure)window.alert(programFailure);}};
+$('blockRunBtn').onclick=async()=>{if(window.CodyPythonPilot?.selected)return window.CodyPythonPilot.runOrStop();if(window.blockProgramRunning){runtime.stop();$('blockRunBtn').disabled=true;status('Stopping… Waiting for any active hardware reply.');return;}if(window.CJP.occupied){status('Wait for the serial connection operation to finish.');return;}let snapshot;try{snapshot=new B.Workspace();B.serialization.workspaces.load(B.serialization.workspaces.save(workspace),snapshot);}catch(e){snapshot?.dispose();status(e.message);window.alert('Program could not start: '+e.message);return;}lock(true);status('Running in this browser…');const token=Date.now()+'-'+Math.random();let heartbeat,programFailure=null;try{runtime.preflight(snapshot);runtime.activeNeedsHardware=runtime.executable(snapshot).some(b=>specs.some(s=>s.type===b.type&&s.type!=='cn_log')&&(b.getFieldValue('TARGET')||'HARDWARE')==='HARDWARE');CodyLiveStore.start(token);if(runtime.executable(snapshot).some(b=>b.type.startsWith('stage_')))window.CodySpriteStage?.beginRun();heartbeat=window.CodyScheduler?window.CodyScheduler.every(()=>CodyLiveStore.heartbeat(token),800):(()=>{const timer=setInterval(()=>CodyLiveStore.heartbeat(token),800);return ()=>clearInterval(timer);})();await runtime.run(snapshot);status('Program finished.');}catch(e){const message=e?.message||String(e||'Break/continue used outside a loop');if(message!=='Stopped')programFailure='Program ended: '+message;status(programFailure||'Program stopped.');window.CJP.log('PROGRAM '+message);}finally{heartbeat?.();CodyLiveStore.stop(token);snapshot.dispose();lock(false);if(programFailure)window.alert(programFailure);}};
 window.addEventListener('cjp-disconnected',()=>{if(window.blockProgramRunning&&runtime.activeNeedsHardware)runtime.stop('CJP disconnected. Reconnect the CJP before running the program again.');});
 window.CodyAccountEditor={
  project:()=>({format:'codynick-webserial',version:2,workspace:B.serialization.workspaces.save(workspace)}),
- load,status,reset:()=>{runtime.stop();workspace.clear();$('designName').value='';}
+ load,status,reset:()=>{runtime.stop();window.CodySpriteStage?.clear();workspace.clear();$('designName').value='';}
 };
 load(example('blink'));
 

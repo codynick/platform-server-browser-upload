@@ -24,8 +24,8 @@ els.example.value='mixed';els.loadExample.onclick();let count=state.widgets.hist
 // Mixed example uses actual serial sensor replies and simulation outputs together.
 ctx.CJP.connected=true;const mixed=els.blockRunBtn.onclick();setTimeout(()=>els.blockRunBtn.onclick(),350);await mixed;state=ctx.CodyLiveStore.read();assert.equal(state.widgets.temperature.value,27.4);assert.equal(state.widgets.temperature.description,'Source: Hardware');assert(sent.some(s=>s.startsWith('CN@@TEMP@@')));assert(!sent.some(s=>s.startsWith('CN@@RGB@@')));
 // Shipped cross-display project: real temp -> sim display, sim distance -> real display.
-const project=JSON.parse(fs.readFileSync(path.join(root,'examples/Real-temperature-Sim-distance.codynick'),'utf8'));
-B.serialization.workspaces.load(project.workspace,ws);
+const project=await require('../project-archive.js').decode(fs.readFileSync(path.join(root,'examples/Real-temperature-Sim-distance.codynick')));
+B.serialization.workspaces.load(project.workspace,ws);ctx.CodyLiveStore.restoreProject(project.state.live);
 sent.length=0;
 const cross=els.blockRunBtn.onclick();
 setTimeout(()=>{const scene=ctx.CodyLiveStore.read().scene;scene.distance=123.4;ctx.CodyLiveStore.simCommand({action:'scene',scene});},650);

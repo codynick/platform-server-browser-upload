@@ -60,12 +60,12 @@
    busy=true;
    try{
     const title=document.getElementById('designName').value.trim()||'Untitled';
-    const data={title,project:editor.project()};
+    const data={title,project:editor.project()};if(new TextEncoder().encode(JSON.stringify(data)).length>1900000)throw Error('This project is too large for account saving. Download .codynick instead.');
     // A changed title creates a new project; same title updates only the loaded/saved project.
     const existing=current&&current.title===title;
     if(existing)data.revision=current.revision;
     current=await api('/api/projects'+(existing?'/'+current.id:''),existing?'PUT':'POST',data);
-    say('Saved privately to your account.');
+    editor.saved?.();say('Saved privately to your account.');
    }catch(e){say(e.message);}finally{busy=false;}
   };
   document.getElementById('saveNamed').onclick=save;
@@ -84,7 +84,7 @@
     const id=document.getElementById('designList').value;if(!id)return;
     const p=await api('/api/projects/'+id);
     if(!confirm('Replace the workspace with “'+p.title+'”? Download unsaved work first.'))return;
-    editor.load(p.project.workspace);current={id:p.id,title:p.title,revision:p.revision};document.getElementById('designName').value=p.title;document.getElementById('designDialog').close();say('Private project loaded.');
+    await (editor.loadProject?editor.loadProject(p.project):editor.load(p.project.workspace));current={id:p.id,title:p.title,revision:p.revision};document.getElementById('designName').value=p.title;document.getElementById('designDialog').close();say('Private project loaded.');
    }catch(e){say(e.message);}
   };
   const del=document.createElement('button');del.textContent='Delete selected';document.querySelector('#designDialog .design-actions').prepend(del);

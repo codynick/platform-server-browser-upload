@@ -1,19 +1,24 @@
-CodyNick Portal 3.12.0 — CUMULATIVE GITHUB UPGRADE
+CodyNick Portal 3.18.0 — CUMULATIVE RELEASE
 
-Run this one command on your Debian/Ubuntu VPS:
+ONE COMMAND (fresh install or upgrade on Debian/Ubuntu VPS):
 
 wget -4 -O /tmp/codynick-browser-setup.sh "https://raw.githubusercontent.com/codynick/platform-server-browser-upload/main/setup.sh?$(date +%s)" && sudo bash /tmp/codynick-browser-setup.sh
 
-It installs/updates the complete release from codynick/platform-server-browser-upload
-on main, reusing the saved domain and existing CAS settings/private projects.
-Includes all firmware, browser Python, dashboard and interface updates through pilot.6.
-Close old editor/dashboard tabs, reopen /blocks/ and press Ctrl+F5 after upgrading.
+This downloads the GitHub main release, reuses the saved domain/CAS settings,
+backs up the website and updates the existing account service. No new backend
+schema or firmware image is introduced. Existing private records are retained;
+older project formats are not converted. Close old tabs and hard-refresh /blocks/.
 
-The installer prints website and CAS backup paths and their rollback commands.
-Use those printed commands for rolling back a GitHub setup/upgrade.
-For a manual ZIP update, the previous update-local.sh workflow remains available.
-Its convenience rollback script applies to the most recent manual ZIP update.
+Includes browser Python, sprites/eleven looks/Open Stage, dashboard buttons,
+toggles/sliders/LEDs, complete .codynick project ZIPs and twelve paired examples.
+Examples load both programs and all initial dashboard/simulation/sprite setup,
+preserve the selected editor and leave execution stopped. Widgets appear before
+Run. Keep the originating editor open when using Open Stage.
 
-Python account Save/Load remains unavailable. Physical Python CJP/Android
-validation is pending. The browser needs Internet for uncached Pyodide downloads.
-See README.md for revision history and PYTHON_PILOT.md for Python testing.
+MANUAL ZIP: upload codynick-platform-upgrade-3.18.0.zip to /root/, then run:
+sudo unzip -o /root/codynick-platform-upgrade-3.18.0.zip -d /root/ && sudo bash /root/codynick-platform-upgrade-3.18.0/update-local.sh
+Manual website rollback: sudo bash /root/codynick-python-rollback.sh
+For setup.sh upgrades use the exact rollback paths printed by the installer.
+
+See README.md and VALIDATION.md. Physical CJP/Android and production deployment
+of this revision are not claimed as tested.

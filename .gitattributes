@@ -1,3 +1,3 @@
 *.sh text eol=lf
 # Firmware hashes cover exact bytes; never normalize HEX line endings.
-*.hex -text
+*.hex -text -diff
