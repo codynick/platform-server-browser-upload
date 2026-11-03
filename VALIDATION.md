@@ -1,3 +1,10 @@
+# Validation for 3.20.4
+
+- Browser Demo regression executes real Blockly programs with a mocked CJP transport. Checks cross-wired temperature displays, all four LED bands including exact 18/25/30 boundaries on both sources, two separate dashboard histories, moisture on both displays, below-25% C3 alarm/silence at 25%, absence of real soil reads, and joystick motion in all four directions.
+- Native Python regression executes the published Python programs through the real codynick.py API and a mocked bridge: all temperature boundaries, independent source colors/displays/logs, moisture values 0/24.9/25/60/100, and all four joystick directions pass. This does not test browser Pyodide.
+- Editor/library regression restores all 32 projects in both coding modes (64 restores), checks the three exact Demo titles, Hardware inclusion, subscription/admin fields and landing links. All 32 archives pass ZIP/checksum checks and Python compilation. Demo category render inspected.
+- No firmware, account/backend, schema or installer change. Physical boards/sensors, real CAS, browser Pyodide runtime execution and production Linux deployment remain manual.
+
 # Validation for 3.20.3
 
 - Backend: 24 tests pass, including guest/default 60/10 admission, preserved saved runtime overrides, independent cooldown snapshots, early Stop, repeat Finish idempotence, expired limits, cooldown validation, omitted-field compatibility and legacy-run handling. Existing six-column access/run tables remain compatible with 3.20.2 SQL.

@@ -1,3 +1,11 @@
+## 3.20.4 — Demo project category
+
+- Add Demo as an inclusive category alongside Hardware and the existing topic categories. Keep the initial example unchanged.
+- Add paired Blocks/Python temperature crossover: real temperature to simulated seven-segment, simulated temperature to real seven-segment, four square LEDs (12–15) on each CJP colored by its own sensor at 18/25/30 C, and independent dashboard gauges/history logs.
+- Add simulated-soil-to-hardware demo using the existing pot/probe/can scene: both displays show moisture, CJP emits a short low C3 beep below 25%, and dashboard shows/logs moisture. No real soil sensor is read.
+- Reuse and rename the existing paired real-joystick sprite example as Move Sprite with HW Joystick; do not duplicate it. The library now has 32 projects.
+- Validate behavior with mocked hardware/services; physical devices and production Linux deployment remain manual. No account policy, firmware or database change.
+
 ## 3.20.3 — independent cooldown and body dragging
 
 - Default guest/free runs to 60 seconds with a separate 10-second cooldown after completion or early Stop. Preserve existing saved per-user runtime values. Add per-user Cooldown immediately after Maximum runtime in Admin; Unlimited/admin access ignores both settings.

@@ -428,7 +428,7 @@ body {
 .card .led-on{background:#22c55e!important;box-shadow:0 0 24px #22c55e80!important}.card .led-off{background:#ef4444!important;box-shadow:0 0 12px #ef444450}.dash-button.input-held,.dash-button[aria-pressed="true"]{filter:brightness(.75);outline:3px solid #0f766e}.slider-number{width:120px;max-width:95%;padding:6px;border:1px solid #cbd5e1;border-radius:6px}.dash-button,.dash-switch{touch-action:none;user-select:none}
 </style>
 <link rel="icon" type="image/x-icon" href="/assets/favicon.ico"><link rel="stylesheet" href="/assets/tool-navigation.css"><style>body{visibility:hidden}.card .led-on{background:#22c55e!important;box-shadow:0 0 24px #22c55e80!important}.card .led-off{background:#ef4444!important;box-shadow:0 0 12px #ef444450}.dash-button.input-held,.dash-button[aria-pressed="true"]{filter:brightness(.75);outline:3px solid #0f766e}.slider-number{width:120px;max-width:95%;padding:6px;border:1px solid #cbd5e1;border-radius:6px}.dash-button,.dash-switch{touch-action:none;user-select:none}
-</style><script src="/blocks/accounts.js?v=3.20.3" defer></script><link rel="stylesheet" href="push-button.css"></head>
+</style><script src="/blocks/accounts.js?v=3.20.4" defer></script><link rel="stylesheet" href="push-button.css"></head>
 <body>
 
 <header class="header tool-page-header">
@@ -447,7 +447,7 @@ body {
     </div>
 </main>
 
-<script src="layout.js"></script><script src="/blocks/live-store.js?v=3.20.3"></script><script src="inputs.js"></script><script>
+<script src="layout.js"></script><script src="/blocks/live-store.js?v=3.20.4"></script><script src="inputs.js"></script><script>
 const localFetch=async(url,options={})=>{try{if(url.includes("action=set"))window.CodyLiveStore.dashboardInput(options.body.get("id"),options.body.get("value"));return {json:async()=>({ok:true,cards:window.CodyLiveStore.cards()})};}catch(error){return {json:async()=>({ok:false,error:error.message})};}};
 const editorLink=document.getElementById('dashboardEditorLink');
 if(editorLink)editorLink.hidden=window.self!==window.top;

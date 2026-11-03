@@ -1,11 +1,11 @@
-# CodyNick Portal 3.20.3
+# CodyNick Portal 3.20.4
 
 CodyNick is a browser-based programming environment with Blocks and Python editors
 for real CodyNick gadgets, simulated gadgets, live dashboards and a sprite stage.
 
 Repository: [codynick/platform-server-browser-upload](https://github.com/codynick/platform-server-browser-upload)
 
-The searchable example library groups projects into General, Sensors, Hardware, Dashboards,
+The searchable example library groups projects into Demo, General, Sensors, Hardware, Dashboards,
 Sprites and Combined projects. A fresh editor loads the first catalog example;
 landing-page cards open their selected example. Every example is an editable
 personal copy containing both programs and complete panel setup, initially stopped.
@@ -39,7 +39,7 @@ tabs, reopen /blocks/ and hard-refresh after the upgrade.
 - One sprite with eleven appearances, motion/sensing/speech, and Open Stage in a
   separate tab. Keep the originating editor open to run the program.
 - Complete .codynick ZIP projects and account snapshots with both programs and
-  scene configuration; all thirty examples restore both editors and initial state.
+  scene configuration; all thirty-two examples restore both editors and initial state.
 
 See [SPRITES.md](SPRITES.md), [DASHBOARD_WIDGETS.md](DASHBOARD_WIDGETS.md),
 [APPEARANCES.md](APPEARANCES.md), [PROJECT_FORMAT.md](PROJECT_FORMAT.md) and
@@ -244,6 +244,14 @@ Keep this history current in every revision, with the newest revision first.
 Entries below describe the documented changes; earlier test limitations apply to
 their original releases. Desktop and mobile firmware uploads have since been
 confirmed by the user, as recorded in 3.11.5.
+
+### 3.20.4 — Demo project category
+
+- Add Demo as an inclusive category alongside Hardware and the existing topic categories. Keep the initial example unchanged.
+- Add paired Blocks/Python temperature crossover: real temperature to simulated seven-segment, simulated temperature to real seven-segment, four square LEDs (12–15) on each CJP colored by its own sensor at 18/25/30 C, and independent dashboard gauges/history logs.
+- Add simulated-soil-to-hardware demo using the existing pot/probe/can scene: both displays show moisture, CJP emits a short low C3 beep below 25%, and dashboard shows/logs moisture. No real soil sensor is read.
+- Reuse and rename the existing paired real-joystick sprite example as Move Sprite with HW Joystick; do not duplicate it. The library now has 32 projects.
+- Validate behavior with mocked hardware/services; physical devices and production Linux deployment remain manual. No account policy, firmware or database change.
 
 ### 3.20.3 — independent cooldown and body dragging
 

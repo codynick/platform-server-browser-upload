@@ -1,5 +1,6 @@
-CodyNick Portal 3.20.3
+CodyNick Portal 3.20.4
 
+Demo category: Temperature sensor: HW and SIM; Soil Moisture: SIM to HW; Move Sprite with HW Joystick.
 Unnumbered example titles, inclusive Hardware category and shared Blocks/Python project description info.
 Subscription dates, CAS email, searchable example library, editable copies and linked landing examples.
 Free and guest defaults: 60 seconds maximum runtime and 10 seconds cooldown. Existing saved per-user runtime values are preserved. Admin has separate Runtime and Cooldown fields.

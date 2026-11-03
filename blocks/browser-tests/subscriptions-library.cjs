@@ -40,7 +40,7 @@ const {chromium}=require('playwright'),assert=require('assert/strict'),fs=requir
   assert.match(await p.locator('#blockRunBtn').textContent(),/Wait/);
   await p.locator('#headerExamples').click();
   await p.locator('.example-categories button').filter({hasText:'Hardware'}).click();
-  assert.equal(await p.locator('.example-card').count(),14);
+  assert.equal(await p.locator('.example-card').count(),16);
   const hardware=await p.evaluate(async()=>{
    const catalog=await(await fetch('python-examples.json')).json();
    if(Object.values(catalog).some(e=>/^\d+\./.test(e.title)))throw Error('Numbered catalog title');
@@ -48,6 +48,8 @@ const {chromium}=require('playwright'),assert=require('assert/strict'),fs=requir
   });
   assert.deepEqual((await p.locator('.example-card strong').allTextContents()).sort(),hardware);
   if(process.env.REVIEW_SHOTS){fs.mkdirSync(process.env.REVIEW_SHOTS,{recursive:true});await p.screenshot({path:path.join(process.env.REVIEW_SHOTS,'hardware-library.png')});}
+  await p.locator('.example-categories button').filter({hasText:'Demo'}).click();
+  assert.deepEqual((await p.locator('.example-card strong').allTextContents()).sort(),['Temperature sensor: HW and SIM','Soil Moisture: SIM to HW','Move Sprite with HW Joystick'].sort());
   await p.locator('.example-categories button').filter({hasText:'Sensors'}).click();
   assert.equal(await p.locator('.example-card').count(),3);
   if(process.env.REVIEW_SHOTS){fs.mkdirSync(process.env.REVIEW_SHOTS,{recursive:true});await p.screenshot({path:path.join(process.env.REVIEW_SHOTS,'library.png')});}
@@ -76,8 +78,8 @@ const {chromium}=require('playwright'),assert=require('assert/strict'),fs=requir
      count++;
     }
    }return count;
-  });assert.equal(restored,60);
-  console.log('PASS all 30 examples restore both programs in both editor modes');
+  });assert.equal(restored,64);
+  console.log('PASS all 32 examples restore both programs in both editor modes');
   await p.goto(base+'/blocks/?python=0&example=zone-02');
   await p.waitForFunction(()=>document.getElementById('designName').value==='Sim - Simulated Sensor and Light');
   assert.equal(await p.evaluate(()=>!!window.CodyPythonPilot),false);

@@ -263,12 +263,14 @@
     "hardware": false
   },
   "stage-joystick": {
-    "title": "Sprites: real CJP joystick",
+    "title": "Move Sprite with HW Joystick",
     "help": "Connect a CJP first. Its joystick moves the sprite. No extra sensor needed. Stop or unplugging the CJP stops the program.",
     "simulation": [],
     "stage": true,
     "archive": "examples/stage-joystick.codynick",
-    "hardware": true
+    "hardware": true,
+    "demo": true,
+    "demoOrder": 3
   },
   "dashboard-controls": {
     "title": "Dashboard: buttons, slider and LEDs",
@@ -285,5 +287,33 @@
     "stage": true,
     "archive": "examples/dashboard-sprite.codynick",
     "hardware": false
+  },
+  "demo-temperature-hw-sim": {
+    "title": "Temperature sensor: HW and SIM",
+    "hardware": true,
+    "help": "Requires: CJP, real temperature sensor and standalone seven-segment display. The real temperature is shown on the simulated seven-segment; the simulated temperature is shown on the real standalone seven-segment. On each CJP, the four internal square LEDs (12–15) show its own temperature: blue below 18 C, green from 18 to below 25 C, yellow from 25 to below 30 C, red at 30 C and above. Warm the real sensor or change simulated temperature independently. Dashboard gauges show both readings and two history graphs log the latest 200 samples each. Choose Blocks or Python, then Run. Press Stop to finish. Hardware outputs keep their last state after Stop.",
+    "simulation": [
+      "temperature",
+      "seven"
+    ],
+    "stage": false,
+    "dashboard": true,
+    "archive": "examples/demo-temperature-hw-sim.codynick",
+    "demo": true,
+    "demoOrder": 1
+  },
+  "demo-soil-sim-hw": {
+    "title": "Soil Moisture: SIM to HW",
+    "hardware": true,
+    "help": "Requires: CJP and standalone seven-segment display; no real soil sensor. No real soil sensor is used. Insert both simulated probe tips into the soil pot and drag the watering can over it to change moisture. The real and simulated standalone seven-segment displays both show simulated moisture (%). Below 25%, the real CJP plays a short low C3 beep (about 131 Hz, 150 ms) each loop. At 25% and above there are no new beeps. Dashboard shows moisture and logs the latest 200 samples in a history graph. Choose Blocks or Python, then Run. Press Stop to finish. Hardware outputs keep their last state after Stop.",
+    "simulation": [
+      "soil",
+      "seven"
+    ],
+    "stage": false,
+    "dashboard": true,
+    "archive": "examples/demo-soil-sim-hw.codynick",
+    "demo": true,
+    "demoOrder": 2
   }
 }
