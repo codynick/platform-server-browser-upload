@@ -1,3 +1,11 @@
+## 3.20.1 — subscription dates and example library
+
+- Add UTC subscription start/end fields and a date-independent Unlimited override; preserve CAS email in admin list and account details.
+- Add searchable example categories and editable personal copies; load the first catalog example or the requested landing-page example automatically.
+- Apply per-run limits and the existing cooldown to every free/guest run, including examples; guests have 20 seconds per run and local project download.
+- Adopt the supplied interactive landing page with direct featured-example links. Published example archives remain unchanged.
+- Automated checks use mocked services/hardware. Physical device and Linux production deployment validation remain manual.
+
 ## 3.20.0 — cumulative sensor worlds, account access and first-admin setup
 
 - Publish the accepted local releases: water cups and extendable temperature probe; ultrasonic targets; soil pots, automatic watering can and moisture bar; three paired Sensor Test examples; Save As; read-only example code; per-user free runtime/cooldown; username menu; and the simple Unlimited checkbox admin panel. Admin accounts are unlimited automatically. Stopping preserves Hardware, Simulation and Dashboard outputs.

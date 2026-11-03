@@ -1,4 +1,9 @@
-CodyNick Portal 3.20.0
+CodyNick Portal 3.20.1
+
+Subscription dates, CAS email, searchable example library, editable copies and linked landing examples.
+Free and guest runs: maximum duration per run plus the existing equal-duration cooldown. Guests default to 20 seconds.
+Unlimited overrides saved subscription dates. Active dated subscriptions retain unrestricted runs.
+
 Run the standard setup/update command from an interactive terminal on the VPS:
 
 wget -4 -O /tmp/codynick-browser-setup.sh "https://raw.githubusercontent.com/codynick/platform-server-browser-upload/main/setup.sh?$(date +%s)" && sudo bash /tmp/codynick-browser-setup.sh
@@ -8,69 +13,4 @@ On a fresh installation it is reserved for matching CAS sign-in; no password or 
 For unattended setup: sudo env CODYNICK_ADMIN_ID='actual-id' bash /tmp/codynick-browser-setup.sh
 Close CodyNick tabs before updating. Reopen and Ctrl+F5 afterward. Keep the printed website/account rollback commands; private projects are retained.
 
-CodyNick 3.19.7 LOCAL ACCESS PATCH
-See INSTALL.txt in the patch ZIP. Requires 3.19.3 through 3.19.6 and the existing CAS account service.
-Do not run the full installation command for this local patch.
-
-CodyNick 3.19.6 LOCAL ACCESS PATCH
-See INSTALL.txt in the patch ZIP. Requires 3.19.3, 3.19.4 or 3.19.5 and the existing CAS account service.
-Do not run the full installation command for this local patch.
-
-CodyNick 3.19.5 LOCAL ACCESS PATCH
-See INSTALL.txt in the patch ZIP. Requires 3.19.3 or 3.19.4 and the existing CAS account service.
-Do not run the full installation command for this local patch.
-
-CodyNick 3.19.4 LOCAL ACCESS PATCH
-See INSTALL.txt in the patch ZIP. Requires installed soil patch 3.19.3 and existing CAS account service.
-Do not run the full installation command for this local patch.
-
-CodyNick 3.19.3 local soil patch. See INSTALL.txt in the patch archive.
-Supports installed 3.19.1 or 3.19.2; no full upgrade required.
-
-CodyNick 3.19.3-preview.3 — SOIL/WATERING LOCAL PREVIEW
-
-Use the isolated localhost preview. This is not a server upgrade package.
-Original platform, accounts and production server are unchanged.
-
-CodyNick Portal 3.19.2 — SENSOR TESTS LOCAL PATCH
-
-Upload codynick-sensor-tests-patch-3.19.2.zip to /root/, unzip, then run
-sudo bash codynick-sensor-tests-patch-3.19.2/upgrade.sh --check
-sudo bash codynick-sensor-tests-patch-3.19.2/upgrade.sh
-Requires the installed 3.19.1 water-assets patch. Keep the printed rollback command.
-See INSTALL.txt in the patch. No full platform upgrade or GitHub deployment.
-
-CodyNick Portal 3.19.1 — INTERACTIVE WATER ASSETS
-
-LOCAL UPGRADE: upload codynick-assets-upgrade-3.19.1-r2.zip to the server, extract,
-then run sudo bash codynick-assets-upgrade-3.19.1-r2/upgrade.sh
-For an explicit document root: sudo bash upgrade.sh --root /var/www/YOUR-DOMAIN
-Run --check first for a read-only compatibility/integrity check.
-The upgrade prints its exact backup and rollback command. No GitHub download,
-account/backend change, database migration or firmware update is performed.
-Close all CodyNick tabs before upgrading/rolling back; reopen and hard-refresh.
-See INSTALL.txt and VALIDATION.txt in the ZIP for instructions and test limits.
-
-CodyNick Portal 3.19.0 — NUMBERED ZONE EXAMPLES
-
-ONE COMMAND (fresh install or upgrade on Debian/Ubuntu VPS):
-
-wget -4 -O /tmp/codynick-browser-setup.sh "https://raw.githubusercontent.com/codynick/platform-server-browser-upload/main/setup.sh?$(date +%s)" && sudo bash /tmp/codynick-browser-setup.sh
-
-The installer reuses saved domain/CAS settings, backs up the website and updates
-the existing account service. No firmware/backend/schema change is introduced.
-Close old tabs, reopen /blocks/ and hard-refresh after installation.
-Use the exact rollback paths printed by setup.sh for the website/account service.
-
-The first fifteen Examples choices cover every combination of HW, Sim, Dash and
-Sprite. Each complete .codynick archive contains both programs and panel settings.
-The twelve existing examples remain available after the numbered collection.
-See blocks/examples/ZONE_EXAMPLES.md for hardware requirements and expected results.
-Start with 2, 3, 4, 8, 9, 10 and 14 (no CJP); then connect a CJP for the others.
-
-MANUAL ZIP: upload codynick-platform-upgrade-3.19.0.zip to /root/, then run:
-sudo unzip -o /root/codynick-platform-upgrade-3.19.0.zip -d /root/ && sudo bash /root/codynick-platform-upgrade-3.19.0/update-local.sh
-Manual website rollback: sudo bash /root/codynick-python-rollback.sh
-
-Automated checks use mocked hardware responses. Physical CJP/Android and Linux
-production deployment of this revision are not claimed as tested.
+Automated checks use mocked services and hardware. Production Linux deployment and physical-device checks remain manual.

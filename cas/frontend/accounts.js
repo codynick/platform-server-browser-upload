@@ -34,7 +34,7 @@
   const text=access?.unlimited?'Unlimited':access?.subscribed?'Subscribed':access?.plan?(access.ends&&access.ends<=now?'Expired':access.starts>now?'Scheduled':'Free'):'Free';
   const strong=document.createElement('strong');strong.textContent=text;strong.className=['Subscribed','Unlimited'].includes(text)?'subscription-active':'subscription-inactive';status.replaceChildren(strong);
   if(access?.plan&&access.role!=='admin'&&access.plan!=='Unlimited'){const plan=document.createElement('span');plan.textContent=access.plan;status.append(plan);}
-  if(access?.plan&&access.ends&&access.role!=='admin'){const end=document.createElement('span');end.textContent='Ends '+new Date(access.ends*1000).toLocaleDateString(undefined,{year:'numeric',month:'short',day:'numeric',timeZone:'UTC'})+' (UTC)';status.append(end);}
+  if(access?.plan&&access.ends&&access.role!=='admin'&&!access.unlimited){const end=document.createElement('span');end.textContent='Ends '+new Date(access.ends*1000).toLocaleDateString(undefined,{year:'numeric',month:'short',day:'numeric',timeZone:'UTC'})+' (UTC)';status.append(end);}
   if(text==='Scheduled'){const start=document.createElement('span');start.textContent='Starts '+new Date(access.starts*1000).toLocaleDateString(undefined,{year:'numeric',month:'short',day:'numeric',timeZone:'UTC'})+' (UTC)';status.append(start);}
  }
  const say=m=>editor?editor.status(m):console.info(m);
@@ -70,7 +70,7 @@
    if(previous!==marker)localStorage.setItem('codynick-active-account',marker);
    user=data.user;csrf=data.csrf;checked=true;window.CodyAccess?.setIdentity(user,data.access,csrf);
    if(reloading)return;
-   document.body.style.visibility='visible';showAccount(data.access);
+   document.body.style.visibility='visible';showAccount(data.access);window.dispatchEvent(new CustomEvent('codynick-account-ready'));
   }catch(e){sign.disabled=true;out.disabled=true;sign.title='Account service unavailable. Reload to retry.';csrf=null;}finally{checking=false;if(refreshPending){refreshPending=false;void check();}}
  }
  out.onclick=async()=>{closeMenu();if(busy||!confirm('Sign out? Unsaved changes will close.'))return;busy=true;try{const result=await api('/auth/logout','POST');accountChanged('__guest__',true);localStorage.setItem('codynick-active-account','__guest__');location.href=result.logout_url;}catch(e){say(e.message);}finally{busy=false;}};

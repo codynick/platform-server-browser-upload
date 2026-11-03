@@ -16,7 +16,7 @@ class Reply:
 class Tests(unittest.TestCase):
  def setUp(self):
   with m.database() as db:
-   for table in ['login_confirmations','users','sessions','projects','logins','account_access','access_audit','run_limits']:db.execute('DELETE FROM '+table)
+   for table in ['login_confirmations','users','sessions','projects','logins','account_access','account_overrides','access_audit','run_limits']:db.execute('DELETE FROM '+table)
   self.client=m.app.test_client()
  def user(self,client,uid):
   token='token-'+uid;csrf='csrf-'+uid
@@ -36,6 +36,61 @@ class Tests(unittest.TestCase):
   response=self.call('post','/auth/complete',data={'csrf':csrf},headers={'Origin':m.ORIGIN})
   self.assertEqual(response.status_code,303)
   me=self.call('get','/api/me').json;self.assertEqual(me['user']['user_id'],'id-123');self.assertEqual(me['access']['role'],'admin');self.assertTrue(me['access']['unlimited'])
+ def test_guest_and_example_runs_are_limited(self):
+  headers={'Origin':m.ORIGIN}
+  with patch.object(m.time,'time',return_value=1000):
+   run=self.call('post','/api/run/start',json={'example':'sensor-test-temperature'},headers=headers)
+   self.assertEqual(run.status_code,200)
+   self.assertEqual(run.json['deadline'],1020)
+   self.assertEqual(run.json['ready'],1040)
+   self.assertTrue(run.json['token'])
+   self.assertIn('HttpOnly',run.headers['Set-Cookie'])
+   self.assertEqual(self.call('post','/api/run/start',json={},headers=headers).status_code,429)
+  with patch.object(m.time,'time',return_value=1005):
+   finish=self.call('post','/api/run/finish',json={'token':run.json['token']},headers=headers)
+   self.assertEqual(finish.json['ready'],1025)
+  with patch.object(m.time,'time',return_value=1025):
+   self.assertEqual(self.call('post','/api/run/start',json={},headers=headers).status_code,200)
+  self.assertEqual(self.call('post','/api/run/start',json={},headers={'Origin':'https://other.test'}).status_code,403)
+
+ def test_free_account_example_has_configured_limit(self):
+  headers=self.user(self.client,'free')
+  with m.database() as db:db.execute("INSERT INTO account_access(user_id,seconds) VALUES('free',7)")
+  with patch.object(m.time,'time',return_value=1000):
+   run=self.call('post','/api/run/start',json={'example':'hello'},headers=headers)
+   self.assertEqual(run.json['deadline'],1007)
+   self.assertEqual(run.json['ready'],1014)
+
+ def test_admin_dates_override_and_email(self):
+  headers=self.user(self.client,'admin')
+  self.user(m.app.test_client(),'learner')
+  with m.database() as db:db.execute("INSERT INTO account_access(user_id,role) VALUES('admin','admin')")
+  payload=dict(role='user',seconds=9,plan='Subscription',starts=2000,ends=3000,unlimited=False)
+  def update():return self.call('put','/api/admin/users/learner',json=payload,headers=headers)
+  with patch.object(m.time,'time',return_value=1000):
+   self.assertFalse(update().json['access']['subscribed'])
+   payload['unlimited']=True
+   access=update().json['access'];self.assertTrue(access['unlimited']);self.assertEqual(access['starts'],2000);self.assertEqual(access['ends'],3000)
+   payload['unlimited']=False
+   self.assertFalse(update().json['access']['subscribed'])
+  with patch.object(m.time,'time',return_value=2500):self.assertTrue(m.access_for('learner')['subscribed'])
+  with patch.object(m.time,'time',return_value=3000):self.assertFalse(m.access_for('learner')['subscribed'])
+  rows=self.call('get','/api/admin/users?q=learner').json['users'];self.assertIn('email',rows[0])
+  payload['ends']=1000;self.assertEqual(update().status_code,400)
+  outsider=m.app.test_client();self.user(outsider,'outsider')
+  self.assertEqual(outsider.get('/api/admin/users',base_url=m.ORIGIN).status_code,403)
+
+ def test_legacy_unlimited_migration(self):
+  import sqlite3
+  with tempfile.TemporaryDirectory() as directory:
+   legacy=os.path.join(directory,'legacy.sqlite3')
+   with sqlite3.connect(legacy) as db:
+    db.executescript("CREATE TABLE account_access(user_id TEXT PRIMARY KEY,role TEXT DEFAULT 'user',seconds INTEGER DEFAULT 20,plan TEXT DEFAULT '',starts INTEGER,ends INTEGER);INSERT INTO account_access VALUES('legacy','user',20,'Unlimited',1,NULL);")
+   db.close()
+   with patch.object(m,'DB',legacy):
+    m.init_access();m.init_access()
+    self.assertTrue(m.access_for('legacy')['unlimited'])
+
  def test_guest_denied(self):
   self.assertIsNone(self.call('get','/api/me').json['user'])
   for method,path in [('get','/api/projects'),('post','/api/projects'),('get','/api/projects/known'),('delete','/api/projects/known')]:self.assertEqual(self.call(method,path).status_code,401)

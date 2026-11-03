@@ -22,7 +22,7 @@
 
  const exampleNote=document.querySelector('.examples-note'),blockNote=exampleNote.textContent;
  const status=text=>{const target=$(api.selected?'pythonStatusBar':'workspaceStatus');target.textContent=text;target.title=text;};
- const examplesReady=fetch('python-examples.json?v=3.20.0').then(r=>{if(!r.ok)throw Error('Cannot load Python examples');return r.json();});
+ const examplesReady=fetch('python-examples.json?v=3.20.1').then(r=>{if(!r.ok)throw Error('Cannot load Python examples');return r.json();});
  examplesReady.catch(e=>status(e.message));
  let examples={},heartbeat=null,finishing=null,started=false,workerGeneration=0;
  let blockDesignName=$('designName').value,pythonDesignName='';
@@ -84,7 +84,7 @@
   heartbeat=window.CodyScheduler.every(()=>window.CodyLiveStore.heartbeat(token),800);
   const generation=++workerGeneration;let activeRequests=0;
   try{
-   const worker=new Worker(new URL('python-worker.mjs?v=3.20.0',location.href),{type:'module'});api.worker=worker;
+   const worker=new Worker(new URL('python-worker.mjs?v=3.20.1',location.href),{type:'module'});api.worker=worker;
    worker.onerror=event=>{event.preventDefault();void finish('Python worker failed to load. Check the Internet connection and reload the local pilot.',true);};
    worker.onmessage=async event=>{
     if(generation!==workerGeneration||!api.running||finishing)return;

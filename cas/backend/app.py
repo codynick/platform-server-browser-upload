@@ -282,13 +282,19 @@ def init_access():
         CREATE TABLE IF NOT EXISTS access_audit(id INTEGER PRIMARY KEY,actor TEXT NOT NULL,target TEXT NOT NULL,at INTEGER NOT NULL,before_json TEXT NOT NULL,after_json TEXT NOT NULL);
         ''')
 
+    with database() as db:
+        db.execute('BEGIN IMMEDIATE')
+        db.execute('CREATE TABLE IF NOT EXISTS account_overrides(user_id TEXT PRIMARY KEY,unlimited_override INTEGER NOT NULL DEFAULT 0)')
+        db.execute("INSERT OR IGNORE INTO account_overrides SELECT user_id,1 FROM account_access WHERE plan='Unlimited'")
+
+
 def access_for(uid):
     with database() as db:
-        row=db.execute('SELECT * FROM account_access WHERE user_id=?',(uid,)).fetchone()
+        row=db.execute('SELECT a.*,coalesce(o.unlimited_override,0) AS unlimited_override FROM account_access a LEFT JOIN account_overrides o ON o.user_id=a.user_id WHERE a.user_id=?',(uid,)).fetchone()
         run=db.execute('SELECT ready FROM run_limits WHERE user_id=?',(uid,)).fetchone()
-    data=dict(row) if row else dict(user_id=uid,role='user',seconds=20,plan='',starts=None,ends=None)
+    data=dict(row) if row else dict(user_id=uid,role='user',seconds=20,plan='',starts=None,ends=None,unlimited_override=0)
     now=time.time()
-    data['unlimited']=data['role']=='admin' or (data['plan']=='Unlimited' and data['starts'] is not None and data['starts']<=now and data['ends'] is None)
+    data['unlimited']=data['role']=='admin' or bool(data.get('unlimited_override',0))
     data['subscribed']=data['unlimited'] or bool(data['plan'] and data['starts'] is not None and data['starts']<=now and (data['ends'] is None or now<data['ends']))
     data['ready']=run['ready'] if run and not data['subscribed'] else 0
     data['server_time']=now
@@ -310,55 +316,26 @@ def admin_users():
 @app.put('/api/admin/users/<path:uid>')
 def admin_update(uid):
     actor=admin_user(True);d=request.get_json()
-    if not isinstance(d,dict) or set(d)!=set(['role','seconds','plan','starts','ends']):abort(400)
+    if not isinstance(d,dict) or set(d)-{'role','seconds','plan','starts','ends','unlimited'} or not {'role','seconds','plan','starts','ends'}<=set(d):abort(400)
+    if 'unlimited' in d and type(d['unlimited']) is not bool:abort(400)
     if d['role'] not in ['admin','user'] or type(d['seconds']) is not int or not 1<=d['seconds']<=86400:abort(400)
     if not isinstance(d['plan'],str) or len(d['plan'])>80:abort(400)
     for k in ['starts','ends']:
         if d[k] is not None and (type(d[k]) is not int or not 0<=d[k]<=253402300799):abort(400)
     if d['plan'] and d['starts'] is None:abort(400)
-    if d['plan'].strip()=='Unlimited' and d['ends'] is not None:abort(400)
     if d['ends'] is not None and (d['starts'] is None or d['ends']<=d['starts']):abort(400)
     with database() as db:
         db.execute('BEGIN IMMEDIATE')
         if not db.execute('SELECT 1 FROM users WHERE id=?',(uid,)).fetchone():abort(404)
         before=db.execute('SELECT * FROM account_access WHERE user_id=?',(uid,)).fetchone()
         if before and before['role']=='admin' and d['role']!='admin' and db.execute("SELECT count(*) FROM account_access WHERE role='admin'").fetchone()[0]<=1:abort(409)
-        db.execute('INSERT INTO account_access VALUES(?,?,?,?,?,?) ON CONFLICT(user_id) DO UPDATE SET role=excluded.role,seconds=excluded.seconds,plan=excluded.plan,starts=excluded.starts,ends=excluded.ends',(uid,d['role'],d['seconds'],d['plan'].strip(),d['starts'],d['ends']))
+        db.execute('INSERT INTO account_access(user_id,role,seconds,plan,starts,ends) VALUES(?,?,?,?,?,?) ON CONFLICT(user_id) DO UPDATE SET role=excluded.role,seconds=excluded.seconds,plan=excluded.plan,starts=excluded.starts,ends=excluded.ends',(uid,d['role'],d['seconds'],d['plan'].strip(),d['starts'],d['ends']))
+        db.execute('INSERT INTO account_overrides VALUES(?,?) ON CONFLICT(user_id) DO UPDATE SET unlimited_override=excluded.unlimited_override',(uid,int(d.get('unlimited',d['plan'].strip()=='Unlimited'))))
         db.execute('INSERT INTO access_audit(actor,target,at,before_json,after_json) VALUES(?,?,?,?,?)',(actor['user_id'],uid,int(time.time()),json.dumps(dict(before) if before else {}),json.dumps(d)))
     return jsonify(access=access_for(uid))
 
-# Ignore workspace positioning and Blockly serialization display flags, not code.
-def code_key(value):
-    names={v['id']:v['name'] for v in value.get('variables',[]) if isinstance(v,dict) and 'id' in v and 'name' in v}
-    def clean(v):
-        if isinstance(v,dict):
-            ignored={'x','y','id','collapsed','inline','deletable','movable','editable'} if 'type' in v else set()
-            out={k:clean(x) for k,x in v.items() if k not in ignored and k not in ['codynick_live_scene','codynick_sprite_stage']}
-            if 'fields' in out:
-                for f,x in out['fields'].items():
-                    if isinstance(x,dict) and ('id' in x or 'name' in x):out['fields'][f]={'name':names.get(x['id'],'unknown:'+str(x['id'])) if 'id' in x else x['name']}
-            if out.get('fields',{}).get('TARGET')=='HARDWARE':out['fields'].pop('TARGET')
-            if out.get('fields')=={}:out.pop('fields')
-            return out
-        if isinstance(v,list):return [clean(x) for x in v]
-        return v
-    return json.dumps(clean({'blocks':value.get('blocks')}),sort_keys=True,separators=(',',':'),allow_nan=False)
-
-def example_matches(eid,project):
-    import zipfile
-    from pathlib import Path
-    if not isinstance(project,dict) or not isinstance(project.get('workspace'),dict) or not isinstance(project.get('python'),str):return False
-    if not isinstance(eid,str) or not __import__('re').fullmatch(r'[A-Za-z0-9-]+',eid):return False
-    root=Path(os.environ.get('WEBSITE_ROOT','/var/www/'+urlsplit(ORIGIN).hostname))
-    try:
-        catalog=json.loads((root/'blocks/python-examples.json').read_text())
-        archive=catalog[eid]['archive']
-        if not __import__('re').fullmatch(r'examples/[A-Za-z0-9-]+\.codynick',archive):return False
-        with zipfile.ZipFile(root/'blocks'/archive) as z:
-            workspace=json.loads(z.read('programs/blocks.json'))
-            python=z.read('programs/main.py').decode('utf-8')
-        return code_key(workspace)==code_key(project['workspace']) and python.replace('\r\n','\n')==project['python'].replace('\r\n','\n')
-    except (OSError,KeyError,TypeError,ValueError,zipfile.BadZipFile):return False
+def re_guest(value):
+    return bool(__import__('re').fullmatch(r'[A-Za-z0-9_-]{43}',value))
 
 @app.post('/api/run/start')
 def run_start():
@@ -368,33 +345,41 @@ def run_start():
     # Guest requests are same-origin; authenticated writes also require CSRF.
     if request.headers.get('Origin')!=ORIGIN:abort(403)
     if user:authenticated(True)
-    if d.get('example'):
-        if not example_matches(d['example'],d.get('project',{})):abort(403)
-        return jsonify(token=None,deadline=None,ready=0,server_time=time.time())
-    if not user:abort(401)
-    access=access_for(user['user_id']);now=time.time()
+    guest_cookie=request.cookies.get('__Host-codynick_guest','')
+    if not re_guest(guest_cookie):guest_cookie=secrets.token_urlsafe(32)
+    uid=user['user_id'] if user else 'guest:'+digest(guest_cookie)
+    access=access_for(uid) if user else {'seconds':20,'subscribed':False}
+    now=time.time()
     if access['subscribed']:return jsonify(token=None,deadline=None,ready=0,server_time=now)
     seconds=access['seconds'];token=secrets.token_urlsafe(32)
     with database() as db:
         db.execute('BEGIN IMMEDIATE')
-        previous=db.execute('SELECT ready FROM run_limits WHERE user_id=?',(user['user_id'],)).fetchone()
+        previous=db.execute('SELECT ready FROM run_limits WHERE user_id=?',(uid,)).fetchone()
         if previous and previous['ready']>now:return jsonify(error='Wait',ready=previous['ready'],server_time=now),429
-        db.execute('INSERT INTO run_limits VALUES(?,?,?,?,?,0) ON CONFLICT(user_id) DO UPDATE SET token=excluded.token,deadline=excluded.deadline,ready=excluded.ready,seconds=excluded.seconds,finished=0',(user['user_id'],digest(token),now+seconds,now+2*seconds,seconds))
-    return jsonify(token=token,deadline=now+seconds,ready=now+2*seconds,server_time=now)
+        db.execute('INSERT INTO run_limits VALUES(?,?,?,?,?,0) ON CONFLICT(user_id) DO UPDATE SET token=excluded.token,deadline=excluded.deadline,ready=excluded.ready,seconds=excluded.seconds,finished=0',(uid,digest(token),now+seconds,now+2*seconds,seconds))
+    response=jsonify(token=token,deadline=now+seconds,ready=now+2*seconds,server_time=now)
+    if not user:response.set_cookie('__Host-codynick_guest',guest_cookie,secure=True,httponly=True,samesite='Strict',path='/',max_age=86400*30)
+    return response
 
 @app.post('/api/run/finish')
 def run_finish():
-    user=authenticated(True);d=request.get_json()
+    if request.headers.get('Origin')!=ORIGIN:abort(403)
+    user=identity()
+    if user:authenticated(True)
+    cookie=request.cookies.get('__Host-codynick_guest','')
+    if not user and not re_guest(cookie):abort(401)
+    uid=user['user_id'] if user else 'guest:'+digest(cookie)
+    d=request.get_json()
     if not isinstance(d,dict) or not isinstance(d.get('token'),str):abort(400)
     now=time.time()
     with database() as db:
         db.execute('BEGIN IMMEDIATE')
-        row=db.execute('SELECT * FROM run_limits WHERE user_id=? AND token=?',(user['user_id'],digest(d['token']))).fetchone()
+        row=db.execute('SELECT * FROM run_limits WHERE user_id=? AND token=?',(uid,digest(d['token']))).fetchone()
         if not row:abort(409)
         ready=row['ready']
         if not row['finished']:
             ready=min(now,row['deadline'])+row['seconds']
-            db.execute('UPDATE run_limits SET ready=?,finished=1 WHERE user_id=?',(ready,user['user_id']))
+            db.execute('UPDATE run_limits SET ready=?,finished=1 WHERE user_id=?',(ready,uid))
     return jsonify(ready=ready,server_time=now)
 
 init_access()

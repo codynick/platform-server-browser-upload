@@ -1,14 +1,15 @@
-# CodyNick Portal 3.20.0
+# CodyNick Portal 3.20.1
 
 CodyNick is a browser-based programming environment with Blocks and Python editors
 for real CodyNick gadgets, simulated gadgets, live dashboards and a sprite stage.
 
 Repository: [codynick/platform-server-browser-upload](https://github.com/codynick/platform-server-browser-upload)
 
-The first fifteen Examples choices cover HW / Sim / Dash / Sprite individually
-and every combination. Each loads both programs and complete panel setup while
-stopped. See [the project table](blocks/examples/ZONE_EXAMPLES.md). The twelve
-existing examples remain available after them.
+The searchable example library groups projects into General, Sensors, Dashboards,
+Sprites and Combined projects. A fresh editor loads the first catalog example;
+landing-page cards open their selected example. Every example is an editable
+personal copy containing both programs and complete panel setup, initially stopped.
+See [the project table](blocks/examples/ZONE_EXAMPLES.md) for the fifteen zone examples.
 
 ## One command for installation and upgrades
 
@@ -136,7 +137,9 @@ service registry.
   tab, which must remain open.
 - Simulator and dashboard, including separate live-view tabs.
 - CAS login, private account projects, account Save/Load, and project deletion.
-- Guest use and portable `.codynick` file upload/download.
+- Guest editing and portable `.codynick` file upload/download; sign in for private account saving.
+- Every free/guest run has a maximum duration and equal-duration cooldown, including examples. Guests default to 20 seconds; admins can configure signed-in users.
+- Active dated subscriptions and Unlimited grants allow unrestricted runs. Admins can set UTC subscription dates; Unlimited overrides but preserves those dates.
 - Sign out clears the local workspace/account state and visits central CAS
   logout. Its return to the editor depends on the CAS redirect policy above.
 - Header: **Logo · File · Advanced · Examples · Show/Hide Spaces · Connect · Run ·
@@ -241,6 +244,14 @@ Keep this history current in every revision, with the newest revision first.
 Entries below describe the documented changes; earlier test limitations apply to
 their original releases. Desktop and mobile firmware uploads have since been
 confirmed by the user, as recorded in 3.11.5.
+
+### 3.20.1 — subscription dates and example library
+
+- Add UTC subscription start/end fields and a date-independent Unlimited override; preserve CAS email in admin list and account details.
+- Add searchable example categories and editable personal copies; load the first catalog example or the requested landing-page example automatically.
+- Apply per-run limits and the existing cooldown to every free/guest run, including examples; guests have 20 seconds per run and local project download.
+- Adopt the supplied interactive landing page with direct featured-example links. Published example archives remain unchanged.
+- Automated checks use mocked services/hardware. Physical device and Linux production deployment validation remain manual.
 
 ### 3.20.0 — cumulative sensor worlds, account access and first-admin setup
 

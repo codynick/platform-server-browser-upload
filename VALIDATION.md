@@ -1,3 +1,13 @@
+# Validation for 3.20.1
+
+- CAS/backend: 20 tests pass, including timed guest/example admission, configured free-user duration, cooldown, subscription dates/expiry, Unlimited override, CAS email, admin authorization and idempotent legacy Unlimited migration.
+- Browser: subscriptions-library.cjs passes with local static assets and mocked account/run APIs. Checks cover first-example startup, direct example links, guest editing, timed stop/cooldown, category search, all 30 examples restored in both editor modes (60 restores), email display and date preservation across Unlimited toggles. Desktop library/admin and mobile landing layouts were rendered and inspected. Network preview serving was unreliable on this Windows host; the deterministic browser fixture serves the same files directly.
+- Project archive and Blockly runtime suites pass. The 14 first-admin tests pass. Apache configuration/idempotence, embedded Python parsing and Git Bash syntax checks pass.
+- Linux setup fixtures could not run on this Windows host. The legacy cas/test_accounts.cjs mock lacks document.addEventListener and fails before account logic; the browser regression above covers the changed admin/account flows.
+- Physical hardware, real CAS sign-in and production Linux deployment remain manual. Browser execution remains subject to client-side enforcement; guest cooldown identity uses a secure HttpOnly cookie. Example archives and firmware are unchanged.
+
+Previous validation history follows.
+
 # Validation for 3.20.0
 
 - First-admin helper: 14 tests cover a fresh database, an existing pre-policy database, a configured/pending admin, blank input, EOF, unattended configuration, read-only selection, concurrent application, exact-ID handling, preserving private projects/settings, and the unprivileged apply path avoiding root-only config reads. An actual interactive terminal prompt was exercised locally, including capturing only the selected ID for the installer.
