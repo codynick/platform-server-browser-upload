@@ -1,8 +1,10 @@
-CodyNick Portal 3.20.2
+CodyNick Portal 3.20.3
 
 Unnumbered example titles, inclusive Hardware category and shared Blocks/Python project description info.
 Subscription dates, CAS email, searchable example library, editable copies and linked landing examples.
-Free and guest runs: maximum duration per run plus the existing equal-duration cooldown. Guests default to 20 seconds.
+Free and guest defaults: 60 seconds maximum runtime and 10 seconds cooldown. Existing saved per-user runtime values are preserved. Admin has separate Runtime and Cooldown fields.
+Target, pot and cup bodies are draggable; their visible headers are removed.
+Keep BOTH rollback commands printed by the installer. Restore backend first, then website. Private projects/database are retained.
 Unlimited overrides saved subscription dates. Active dated subscriptions retain unrestricted runs.
 
 Run the standard setup/update command from an interactive terminal on the VPS:

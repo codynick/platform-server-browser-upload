@@ -27,7 +27,7 @@
   },
   "sensor-test-ultrasonic": {
     "title": "Sensor Test: Ultrasonic",
-    "help": "Simulation only. Move the striped target by its title bar. Aim the ultrasonic marker with the angle control. The seven-segment shows cm; LED 0 is red for a valid echo below 20 cm, green for farther targets, and blue for no echo (0). Target gear changes its size; 1 stage unit = 1 cm. Range 2–400 cm, 30-degree cone. Choose Blocks or Python, then Run; Stop ends the test. No CJP, dashboard or sprite is required.",
+    "help": "Simulation only. Move the striped target from anywhere on its body. Aim the ultrasonic marker with the angle control. The seven-segment shows cm; LED 0 is red for a valid echo below 20 cm, green for farther targets, and blue for no echo (0). Target gear changes its size; 1 stage unit = 1 cm. Range 2–400 cm, 30-degree cone. Choose Blocks or Python, then Run; Stop ends the test. No CJP, dashboard or sprite is required.",
     "simulation": [
       "ultrasonic",
       "seven"

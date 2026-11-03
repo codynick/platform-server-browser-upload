@@ -1,3 +1,11 @@
+# Validation for 3.20.3
+
+- Backend: 24 tests pass, including guest/default 60/10 admission, preserved saved runtime overrides, independent cooldown snapshots, early Stop, repeat Finish idempotence, expired limits, cooldown validation, omitted-field compatibility and legacy-run handling. Existing six-column access/run tables remain compatible with 3.20.2 SQL.
+- Simulator browser regression passes for target/pot/hot/cold body dragging at multiple points, touch events, keyboard movement, settings/remove controls and independent probes. Drawing/sensing offsets match the prior geometry, temperature/soil contact still registers and overlapping the can still waters the pot. Target headers/footers and pot/cup headers are absent; moisture/temperature readouts remain. Desktop renders were inspected.
+- Editor/admin browser regression passes for independent runtime/cooldown fields, field order, saved values and Unlimited disabling/preservation; all thirty examples restore in both editors. Browser checks use local static files with mocked account/run services; touch uses Chrome touch events.
+- All thirty project archives pass ZIP/checksum checks and their Python programs compile. Project archive and Blockly runtime regressions pass, as do 14 first-admin tests and Apache patch/idempotence/shell syntax checks.
+- The committed 3.20.2 source archive was saved and checked. Cooldown storage is additive; private projects and old table layouts are retained. Server rollback uses the installer's actual backend backup first and website backup second. No production server update/rollback, real CAS or physical hardware test was performed.
+
 # Validation for 3.20.2
 
 - Browser regression passes for the inclusive Hardware category (all fourteen projects), unnumbered catalog/saved titles, and the shared description popover in Blocks, Python and Blocks-only mode. All thirty examples restore in both editors (sixty restores); existing subscription/admin checks still pass. Tests use local static assets and mocked services.

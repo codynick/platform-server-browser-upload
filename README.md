@@ -1,4 +1,4 @@
-# CodyNick Portal 3.20.2
+# CodyNick Portal 3.20.3
 
 CodyNick is a browser-based programming environment with Blocks and Python editors
 for real CodyNick gadgets, simulated gadgets, live dashboards and a sprite stage.
@@ -138,7 +138,7 @@ service registry.
 - Simulator and dashboard, including separate live-view tabs.
 - CAS login, private account projects, account Save/Load, and project deletion.
 - Guest editing and portable `.codynick` file upload/download; sign in for private account saving.
-- Every free/guest run has a maximum duration and equal-duration cooldown, including examples. Guests default to 20 seconds; admins can configure signed-in users.
+- Every free/guest run has a maximum duration and independent cooldown, including examples. Defaults are 60 seconds running and 10 seconds waiting; saved per-user runtime overrides are preserved. Admins can configure both values for signed-in users.
 - Active dated subscriptions and Unlimited grants allow unrestricted runs. Admins can set UTC subscription dates; Unlimited overrides but preserves those dates.
 - Sign out clears the local workspace/account state and visits central CAS
   logout. Its return to the editor depends on the CAS redirect policy above.
@@ -244,6 +244,14 @@ Keep this history current in every revision, with the newest revision first.
 Entries below describe the documented changes; earlier test limitations apply to
 their original releases. Desktop and mobile firmware uploads have since been
 confirmed by the user, as recorded in 3.11.5.
+
+### 3.20.3 — independent cooldown and body dragging
+
+- Default guest/free runs to 60 seconds with a separate 10-second cooldown after completion or early Stop. Preserve existing saved per-user runtime values. Add per-user Cooldown immediately after Maximum runtime in Admin; Unlimited/admin access ignores both settings.
+- Store cooldown preferences and per-run snapshots in separate additive tables, preserving the existing access/run schemas for rollback. Optional DEFAULT_RUN_SECONDS and DEFAULT_COOLDOWN_SECONDS server configuration persists across upgrades.
+- Remove target headers/footers and pot/cup headers. Drag their bodies with mouse, touch or keyboard; keep pot moisture/cup temperatures and settings/remove overlays. Controls and probes remain independent; existing sensing coordinates are retained.
+- Preserve the 3.20.2 source revision for rollback. The installer still prints separate backend and website rollback commands; restore backend first, website second, retaining private projects/database.
+- Automated checks use mocked services and sensors. Production Linux and physical-device validation remain manual.
 
 ### 3.20.2 — hardware examples and shared project information
 

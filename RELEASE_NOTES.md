@@ -1,3 +1,11 @@
+## 3.20.3 — independent cooldown and body dragging
+
+- Default guest/free runs to 60 seconds with a separate 10-second cooldown after completion or early Stop. Preserve existing saved per-user runtime values. Add per-user Cooldown immediately after Maximum runtime in Admin; Unlimited/admin access ignores both settings.
+- Store cooldown preferences and per-run snapshots in separate additive tables, preserving the existing access/run schemas for rollback. Optional DEFAULT_RUN_SECONDS and DEFAULT_COOLDOWN_SECONDS server configuration persists across upgrades.
+- Remove target headers/footers and pot/cup headers. Drag their bodies with mouse, touch or keyboard; keep pot moisture/cup temperatures and settings/remove overlays. Controls and probes remain independent; existing sensing coordinates are retained.
+- Preserve the 3.20.2 source revision for rollback. The installer still prints separate backend and website rollback commands; restore backend first, website second, retaining private projects/database.
+- Automated checks use mocked services and sensors. Production Linux and physical-device validation remain manual.
+
 ## 3.20.2 — hardware examples and shared project information
 
 - Remove numeric prefixes from example titles in the library, editor choices, saved names, Python title comments and reproducible zone builder. Refresh the fifteen affected archive checksums.

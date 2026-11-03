@@ -95,7 +95,7 @@ const {chromium}=require('playwright'),assert=require('assert/strict'),fs=requir
   await p.close();
   const a=await context.newPage();let saved;
   a.on('pageerror',e=>errors.push(e.message));
-  const access={role:'user',seconds:20,plan:'Subscription',starts:1893456000,ends:1924992000,unlimited_override:0,subscribed:false,unlimited:false};
+  const access={role:'user',seconds:20,cooldown:10,plan:'Subscription',starts:1893456000,ends:1924992000,unlimited_override:0,subscribed:false,unlimited:false};
   await a.route('**/api/**',async route=>{
    const req=route.request(),path=new URL(req.url()).pathname;let data;
    if(path==='/api/me')data={user:{user_id:'admin'},csrf:'csrf',access:{role:'admin',unlimited:true}};
@@ -106,15 +106,22 @@ const {chromium}=require('playwright'),assert=require('assert/strict'),fs=requir
   await a.goto(base+'/admin/');await a.waitForSelector('#users option');
   assert.match(await a.locator('#users option').textContent(),/learner@example.test/);
   await a.selectOption('#users','learner');assert.equal(await a.locator('#email').inputValue(),'learner@example.test');
+  assert.equal(await a.locator('#seconds').inputValue(),'20');
+  assert.equal(await a.locator('#cooldown').inputValue(),'10');
+  assert.equal(await a.evaluate(()=>document.getElementById('seconds').closest('label').nextElementSibling.contains(document.getElementById('cooldown'))),true);
+  await a.locator('#seconds').fill('60');await a.locator('#cooldown').fill('5');
   if(process.env.REVIEW_SHOTS)await a.screenshot({path:path.join(process.env.REVIEW_SHOTS,'admin.png')});
   const start=await a.locator('#starts').inputValue(),end=await a.locator('#ends').inputValue();
   await a.locator('#unlimited').check();assert.equal(await a.locator('#starts').isDisabled(),true);
+  assert.equal(await a.locator('#seconds').isDisabled(),true);assert.equal(await a.locator('#cooldown').isDisabled(),true);
   await a.locator('#save').click();await a.waitForFunction(()=>document.getElementById('status').textContent==='Saved');
   assert.equal(saved.unlimited,true);assert.equal(saved.starts,1893456000);assert.equal(saved.ends,1924992000);
+  assert.equal(saved.seconds,60);assert.equal(saved.cooldown,5);
   await a.locator('#unlimited').uncheck();assert.equal(await a.locator('#starts').isDisabled(),false);
   assert.equal(await a.locator('#starts').inputValue(),start);assert.equal(await a.locator('#ends').inputValue(),end);
   await a.locator('#save').click();await a.waitForFunction(()=>document.getElementById('status').textContent==='Saved');
   assert.equal(saved.unlimited,false);assert.equal(saved.starts,1893456000);
+  assert.equal(await a.locator('#cooldown').isDisabled(),false);assert.equal(saved.cooldown,5);
   console.log('PASS admin email and preserved UTC subscription dates across Unlimited toggles');
   assert.deepEqual(errors,[]);
  }finally{await browser.close();}

@@ -17,6 +17,10 @@ ID_ATTR = os.environ.get('CAS_ID_ATTRIBUTE', '__principal__')
 NAME_ATTR = os.environ.get('CAS_NAME_ATTRIBUTE', 'name')
 EMAIL_ATTR = os.environ.get('CAS_EMAIL_ATTRIBUTE', 'email')
 DB = os.environ.get('DATABASE', '/var/lib/codynick-cas/projects.sqlite3')
+DEFAULT_RUN_SECONDS=int(os.environ.get('DEFAULT_RUN_SECONDS','60'))
+DEFAULT_COOLDOWN_SECONDS=int(os.environ.get('DEFAULT_COOLDOWN_SECONDS','10'))
+if not 1<=DEFAULT_RUN_SECONDS<=86400 or not 0<=DEFAULT_COOLDOWN_SECONDS<=86400:
+    raise RuntimeError('Invalid default run/cooldown duration')
 COOKIE = '__Host-codynick_session'
 TTL = 8 * 3600
 SERVICE_URL = ORIGIN + '/auth/callback'
@@ -277,13 +281,15 @@ init_db()
 def init_access():
     with database() as db:
         db.executescript('''
-        CREATE TABLE IF NOT EXISTS account_access(user_id TEXT PRIMARY KEY,role TEXT NOT NULL DEFAULT 'user',seconds INTEGER NOT NULL DEFAULT 20,plan TEXT NOT NULL DEFAULT '',starts INTEGER,ends INTEGER);
+        CREATE TABLE IF NOT EXISTS account_access(user_id TEXT PRIMARY KEY,role TEXT NOT NULL DEFAULT 'user',seconds INTEGER NOT NULL DEFAULT 60,plan TEXT NOT NULL DEFAULT '',starts INTEGER,ends INTEGER);
         CREATE TABLE IF NOT EXISTS run_limits(user_id TEXT PRIMARY KEY,token TEXT NOT NULL,deadline REAL NOT NULL,ready REAL NOT NULL,seconds INTEGER NOT NULL,finished INTEGER NOT NULL DEFAULT 0);
         CREATE TABLE IF NOT EXISTS access_audit(id INTEGER PRIMARY KEY,actor TEXT NOT NULL,target TEXT NOT NULL,at INTEGER NOT NULL,before_json TEXT NOT NULL,after_json TEXT NOT NULL);
         ''')
 
     with database() as db:
         db.execute('BEGIN IMMEDIATE')
+        db.execute('CREATE TABLE IF NOT EXISTS account_cooldowns(user_id TEXT PRIMARY KEY,cooldown INTEGER NOT NULL)')
+        db.execute('CREATE TABLE IF NOT EXISTS run_cooldowns(user_id TEXT PRIMARY KEY,token TEXT NOT NULL,cooldown INTEGER NOT NULL)')
         db.execute('CREATE TABLE IF NOT EXISTS account_overrides(user_id TEXT PRIMARY KEY,unlimited_override INTEGER NOT NULL DEFAULT 0)')
         db.execute("INSERT OR IGNORE INTO account_overrides SELECT user_id,1 FROM account_access WHERE plan='Unlimited'")
 
@@ -291,8 +297,10 @@ def init_access():
 def access_for(uid):
     with database() as db:
         row=db.execute('SELECT a.*,coalesce(o.unlimited_override,0) AS unlimited_override FROM account_access a LEFT JOIN account_overrides o ON o.user_id=a.user_id WHERE a.user_id=?',(uid,)).fetchone()
+        cooldown=db.execute('SELECT cooldown FROM account_cooldowns WHERE user_id=?',(uid,)).fetchone()
         run=db.execute('SELECT ready FROM run_limits WHERE user_id=?',(uid,)).fetchone()
-    data=dict(row) if row else dict(user_id=uid,role='user',seconds=20,plan='',starts=None,ends=None,unlimited_override=0)
+    data=dict(row) if row else dict(user_id=uid,role='user',seconds=DEFAULT_RUN_SECONDS,plan='',starts=None,ends=None,unlimited_override=0)
+    data['cooldown']=cooldown['cooldown'] if cooldown else DEFAULT_COOLDOWN_SECONDS
     now=time.time()
     data['unlimited']=data['role']=='admin' or bool(data.get('unlimited_override',0))
     data['subscribed']=data['unlimited'] or bool(data['plan'] and data['starts'] is not None and data['starts']<=now and (data['ends'] is None or now<data['ends']))
@@ -316,7 +324,8 @@ def admin_users():
 @app.put('/api/admin/users/<path:uid>')
 def admin_update(uid):
     actor=admin_user(True);d=request.get_json()
-    if not isinstance(d,dict) or set(d)-{'role','seconds','plan','starts','ends','unlimited'} or not {'role','seconds','plan','starts','ends'}<=set(d):abort(400)
+    if not isinstance(d,dict) or set(d)-{'role','seconds','cooldown','plan','starts','ends','unlimited'} or not {'role','seconds','plan','starts','ends'}<=set(d):abort(400)
+    if 'cooldown' in d and (type(d['cooldown']) is not int or not 0<=d['cooldown']<=86400):abort(400)
     if 'unlimited' in d and type(d['unlimited']) is not bool:abort(400)
     if d['role'] not in ['admin','user'] or type(d['seconds']) is not int or not 1<=d['seconds']<=86400:abort(400)
     if not isinstance(d['plan'],str) or len(d['plan'])>80:abort(400)
@@ -331,6 +340,7 @@ def admin_update(uid):
         if before and before['role']=='admin' and d['role']!='admin' and db.execute("SELECT count(*) FROM account_access WHERE role='admin'").fetchone()[0]<=1:abort(409)
         db.execute('INSERT INTO account_access(user_id,role,seconds,plan,starts,ends) VALUES(?,?,?,?,?,?) ON CONFLICT(user_id) DO UPDATE SET role=excluded.role,seconds=excluded.seconds,plan=excluded.plan,starts=excluded.starts,ends=excluded.ends',(uid,d['role'],d['seconds'],d['plan'].strip(),d['starts'],d['ends']))
         db.execute('INSERT INTO account_overrides VALUES(?,?) ON CONFLICT(user_id) DO UPDATE SET unlimited_override=excluded.unlimited_override',(uid,int(d.get('unlimited',d['plan'].strip()=='Unlimited'))))
+        if 'cooldown' in d:db.execute('INSERT INTO account_cooldowns VALUES(?,?) ON CONFLICT(user_id) DO UPDATE SET cooldown=excluded.cooldown',(uid,d['cooldown']))
         db.execute('INSERT INTO access_audit(actor,target,at,before_json,after_json) VALUES(?,?,?,?,?)',(actor['user_id'],uid,int(time.time()),json.dumps(dict(before) if before else {}),json.dumps(d)))
     return jsonify(access=access_for(uid))
 
@@ -348,16 +358,17 @@ def run_start():
     guest_cookie=request.cookies.get('__Host-codynick_guest','')
     if not re_guest(guest_cookie):guest_cookie=secrets.token_urlsafe(32)
     uid=user['user_id'] if user else 'guest:'+digest(guest_cookie)
-    access=access_for(uid) if user else {'seconds':20,'subscribed':False}
+    access=access_for(uid) if user else {'seconds':DEFAULT_RUN_SECONDS,'cooldown':DEFAULT_COOLDOWN_SECONDS,'subscribed':False}
     now=time.time()
     if access['subscribed']:return jsonify(token=None,deadline=None,ready=0,server_time=now)
-    seconds=access['seconds'];token=secrets.token_urlsafe(32)
+    seconds=access['seconds'];cooldown=access['cooldown'];token=secrets.token_urlsafe(32)
     with database() as db:
         db.execute('BEGIN IMMEDIATE')
         previous=db.execute('SELECT ready FROM run_limits WHERE user_id=?',(uid,)).fetchone()
         if previous and previous['ready']>now:return jsonify(error='Wait',ready=previous['ready'],server_time=now),429
-        db.execute('INSERT INTO run_limits VALUES(?,?,?,?,?,0) ON CONFLICT(user_id) DO UPDATE SET token=excluded.token,deadline=excluded.deadline,ready=excluded.ready,seconds=excluded.seconds,finished=0',(uid,digest(token),now+seconds,now+2*seconds,seconds))
-    response=jsonify(token=token,deadline=now+seconds,ready=now+2*seconds,server_time=now)
+        db.execute('INSERT INTO run_limits VALUES(?,?,?,?,?,0) ON CONFLICT(user_id) DO UPDATE SET token=excluded.token,deadline=excluded.deadline,ready=excluded.ready,seconds=excluded.seconds,finished=0',(uid,digest(token),now+seconds,now+seconds+cooldown,seconds))
+        db.execute('INSERT INTO run_cooldowns VALUES(?,?,?) ON CONFLICT(user_id) DO UPDATE SET token=excluded.token,cooldown=excluded.cooldown',(uid,digest(token),cooldown))
+    response=jsonify(token=token,deadline=now+seconds,ready=now+seconds+cooldown,server_time=now)
     if not user:response.set_cookie('__Host-codynick_guest',guest_cookie,secure=True,httponly=True,samesite='Strict',path='/',max_age=86400*30)
     return response
 
@@ -374,11 +385,11 @@ def run_finish():
     now=time.time()
     with database() as db:
         db.execute('BEGIN IMMEDIATE')
-        row=db.execute('SELECT * FROM run_limits WHERE user_id=? AND token=?',(uid,digest(d['token']))).fetchone()
+        row=db.execute('SELECT r.*,coalesce(c.cooldown,r.seconds) AS cooldown FROM run_limits r LEFT JOIN run_cooldowns c ON c.user_id=r.user_id AND c.token=r.token WHERE r.user_id=? AND r.token=?',(uid,digest(d['token']))).fetchone()
         if not row:abort(409)
         ready=row['ready']
         if not row['finished']:
-            ready=min(now,row['deadline'])+row['seconds']
+            ready=min(now,row['deadline'])+row['cooldown']
             db.execute('UPDATE run_limits SET ready=?,finished=1 WHERE user_id=?',(ready,uid))
     return jsonify(ready=ready,server_time=now)
 

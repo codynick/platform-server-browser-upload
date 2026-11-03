@@ -16,7 +16,7 @@ class Reply:
 class Tests(unittest.TestCase):
  def setUp(self):
   with m.database() as db:
-   for table in ['login_confirmations','users','sessions','projects','logins','account_access','account_overrides','access_audit','run_limits']:db.execute('DELETE FROM '+table)
+   for table in ['login_confirmations','users','sessions','projects','logins','account_access','account_overrides','account_cooldowns','run_cooldowns','access_audit','run_limits']:db.execute('DELETE FROM '+table)
   self.client=m.app.test_client()
  def user(self,client,uid):
   token='token-'+uid;csrf='csrf-'+uid
@@ -41,15 +41,15 @@ class Tests(unittest.TestCase):
   with patch.object(m.time,'time',return_value=1000):
    run=self.call('post','/api/run/start',json={'example':'sensor-test-temperature'},headers=headers)
    self.assertEqual(run.status_code,200)
-   self.assertEqual(run.json['deadline'],1020)
-   self.assertEqual(run.json['ready'],1040)
+   self.assertEqual(run.json['deadline'],1060)
+   self.assertEqual(run.json['ready'],1070)
    self.assertTrue(run.json['token'])
    self.assertIn('HttpOnly',run.headers['Set-Cookie'])
    self.assertEqual(self.call('post','/api/run/start',json={},headers=headers).status_code,429)
   with patch.object(m.time,'time',return_value=1005):
    finish=self.call('post','/api/run/finish',json={'token':run.json['token']},headers=headers)
-   self.assertEqual(finish.json['ready'],1025)
-  with patch.object(m.time,'time',return_value=1025):
+   self.assertEqual(finish.json['ready'],1015)
+  with patch.object(m.time,'time',return_value=1015):
    self.assertEqual(self.call('post','/api/run/start',json={},headers=headers).status_code,200)
   self.assertEqual(self.call('post','/api/run/start',json={},headers={'Origin':'https://other.test'}).status_code,403)
 
@@ -59,16 +59,16 @@ class Tests(unittest.TestCase):
   with patch.object(m.time,'time',return_value=1000):
    run=self.call('post','/api/run/start',json={'example':'hello'},headers=headers)
    self.assertEqual(run.json['deadline'],1007)
-   self.assertEqual(run.json['ready'],1014)
+   self.assertEqual(run.json['ready'],1017)
 
  def test_admin_dates_override_and_email(self):
   headers=self.user(self.client,'admin')
   self.user(m.app.test_client(),'learner')
   with m.database() as db:db.execute("INSERT INTO account_access(user_id,role) VALUES('admin','admin')")
-  payload=dict(role='user',seconds=9,plan='Subscription',starts=2000,ends=3000,unlimited=False)
+  payload=dict(role='user',seconds=9,cooldown=4,plan='Subscription',starts=2000,ends=3000,unlimited=False)
   def update():return self.call('put','/api/admin/users/learner',json=payload,headers=headers)
   with patch.object(m.time,'time',return_value=1000):
-   self.assertFalse(update().json['access']['subscribed'])
+   self.assertFalse(update().json['access']['subscribed']);self.assertEqual(m.access_for('learner')['cooldown'],4)
    payload['unlimited']=True
    access=update().json['access'];self.assertTrue(access['unlimited']);self.assertEqual(access['starts'],2000);self.assertEqual(access['ends'],3000)
    payload['unlimited']=False
@@ -90,6 +90,56 @@ class Tests(unittest.TestCase):
    with patch.object(m,'DB',legacy):
     m.init_access();m.init_access()
     self.assertTrue(m.access_for('legacy')['unlimited'])
+
+ def test_independent_cooldown_snapshot_and_early_stop(self):
+  headers=self.user(self.client,'free')
+  with m.database() as db:
+   db.execute("INSERT INTO account_access(user_id,seconds) VALUES('free',7)")
+   db.execute("INSERT INTO account_cooldowns VALUES('free',3)")
+  with patch.object(m.time,'time',return_value=1000):
+   run=self.call('post','/api/run/start',json={},headers=headers)
+   self.assertEqual(run.json['deadline'],1007);self.assertEqual(run.json['ready'],1010)
+  with m.database() as db:db.execute("UPDATE account_cooldowns SET cooldown=8 WHERE user_id='free'")
+  with patch.object(m.time,'time',return_value=1002):
+   finish=self.call('post','/api/run/finish',json={'token':run.json['token']},headers=headers)
+   self.assertEqual(finish.json['ready'],1005)
+  with patch.object(m.time,'time',return_value=1004):
+   self.assertEqual(self.call('post','/api/run/start',json={},headers=headers).status_code,429)
+   self.assertEqual(self.call('post','/api/run/finish',json={'token':run.json['token']},headers=headers).json['ready'],1005)
+  with patch.object(m.time,'time',return_value=1005):
+   self.assertEqual(self.call('post','/api/run/start',json={},headers=headers).json['ready'],1020)
+
+ def test_cooldown_admin_validation_and_older_payload(self):
+  headers=self.user(self.client,'admin');self.user(m.app.test_client(),'learner')
+  with m.database() as db:db.execute("INSERT INTO account_access(user_id,role) VALUES('admin','admin')")
+  payload=dict(role='user',seconds=60,cooldown=10,plan='',starts=None,ends=None,unlimited=False)
+  def save():return self.call('put','/api/admin/users/learner',json=payload,headers=headers)
+  for invalid in [-1,True,1.5,86401]:
+   payload['cooldown']=invalid;self.assertEqual(save().status_code,400)
+  payload['cooldown']=0;self.assertEqual(save().json['access']['cooldown'],0)
+  del payload['cooldown'];self.assertEqual(save().json['access']['cooldown'],0)
+  self.assertEqual(m.access_for('new-account')['seconds'],60)
+  self.assertEqual(m.access_for('new-account')['cooldown'],10)
+
+ def test_rollback_compatible_tables_and_legacy_run(self):
+  headers=self.user(self.client,'legacy')
+  with m.database() as db:
+   self.assertEqual(len(list(db.execute('PRAGMA table_info(account_access)'))),6)
+   self.assertEqual(len(list(db.execute('PRAGMA table_info(run_limits)'))),6)
+   db.execute("INSERT INTO account_access VALUES('legacy','user',7,'',NULL,NULL)")
+   db.execute('INSERT INTO run_limits VALUES(?,?,?,?,?,0)',('legacy',m.digest('legacy-token'),1007,1014,7))
+  with patch.object(m.time,'time',return_value=1002):
+   finish=self.call('post','/api/run/finish',json={'token':'legacy-token'},headers=headers)
+   self.assertEqual(finish.json['ready'],1009)
+
+ def test_configurable_defaults_preserve_saved_runtime(self):
+  with m.database() as db:db.execute("INSERT INTO account_access(user_id,seconds) VALUES('saved',7)")
+  with patch.object(m,'DEFAULT_RUN_SECONDS',90),patch.object(m,'DEFAULT_COOLDOWN_SECONDS',4):
+   self.assertEqual(m.access_for('new')['seconds'],90)
+   self.assertEqual(m.access_for('saved')['seconds'],7)
+   with patch.object(m.time,'time',return_value=1000):
+    run=self.call('post','/api/run/start',json={},headers={'Origin':m.ORIGIN})
+    self.assertEqual(run.json['deadline'],1090);self.assertEqual(run.json['ready'],1094)
 
  def test_guest_denied(self):
   self.assertIsNone(self.call('get','/api/me').json['user'])
