@@ -16,7 +16,7 @@ class Reply:
 class Tests(unittest.TestCase):
  def setUp(self):
   with m.database() as db:
-   for table in ['login_confirmations','users','sessions','projects','logins']:db.execute('DELETE FROM '+table)
+   for table in ['login_confirmations','users','sessions','projects','logins','account_access','access_audit','run_limits']:db.execute('DELETE FROM '+table)
   self.client=m.app.test_client()
  def user(self,client,uid):
   token='token-'+uid;csrf='csrf-'+uid
@@ -26,6 +26,16 @@ class Tests(unittest.TestCase):
   client.set_cookie(m.COOKIE,token,domain='ide.codynick.com',secure=True)
   return {'Origin':m.ORIGIN,'X-CSRF-Token':csrf}
  def call(self,method,path,**kwargs):return getattr(self.client,method)(path,base_url=m.ORIGIN,**kwargs)
+ def test_first_admin_reservation_requires_verified_cas_sign_in(self):
+  import importlib.util
+  from pathlib import Path
+  spec=importlib.util.spec_from_file_location('bootstrap',Path(__file__).resolve().parents[1]/'bootstrap_admin.py');bootstrap=importlib.util.module_from_spec(spec);spec.loader.exec_module(bootstrap)
+  bootstrap.apply_id(Path(m.DB),'id-123')
+  self.assertIsNone(self.call('get','/api/me').json['user'])
+  self.begin();self.validate();csrf=self.form_token()
+  response=self.call('post','/auth/complete',data={'csrf':csrf},headers={'Origin':m.ORIGIN})
+  self.assertEqual(response.status_code,303)
+  me=self.call('get','/api/me').json;self.assertEqual(me['user']['user_id'],'id-123');self.assertEqual(me['access']['role'],'admin');self.assertTrue(me['access']['unlimited'])
  def test_guest_denied(self):
   self.assertIsNone(self.call('get','/api/me').json['user'])
   for method,path in [('get','/api/projects'),('post','/api/projects'),('get','/api/projects/known'),('delete','/api/projects/known')]:self.assertEqual(self.call(method,path).status_code,401)

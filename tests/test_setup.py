@@ -45,7 +45,8 @@ set -eu
 [[ -f "$FIXTURE_ROOT/etc/apache2/sites-enabled/tls.conf" ]] || exit 91
 printf '%s\\n' "'''+name+'''" >> "$FIXTURE_ROOT/deployment"
 ''')
-  self.env=dict(os.environ,PATH=str(self.root/'bin')+':'+os.environ['PATH'],FIXTURE_ROOT=str(self.root),FIXTURE_BUNDLE=str(self.bundle),CODYNICK_DOMAIN='code.codynick.com')
+  helper=self.bundle/'cas/bootstrap_admin.py';helper.write_text(helper.read_text().replace('/etc/codynick-cas',str(self.root/'etc/codynick-cas')).replace('/var/lib/codynick-cas',str(self.root/'var/lib/codynick-cas')))
+  self.env=dict(os.environ,CODYNICK_ADMIN_ID='fixture-admin',PATH=str(self.root/'bin')+':'+os.environ['PATH'],FIXTURE_ROOT=str(self.root),FIXTURE_BUNDLE=str(self.bundle),CODYNICK_DOMAIN='code.codynick.com')
  def run_setup(self,raw=False,**env):
   entry=self.bundle/'setup.sh'
   if raw:
@@ -79,6 +80,8 @@ printf '%s\\n' "'''+name+'''" >> "$FIXTURE_ROOT/deployment"
  def test_dns_failure_stops_before_deployment(self):
   self.assertNotEqual(self.run_setup(FAIL_DNS='1').returncode,0)
   self.assertFalse((self.root/'deployment').exists())
+ def test_missing_admin_stops_before_deployment(self):
+  result=self.run_setup(CODYNICK_ADMIN_ID='');self.assertNotEqual(result.returncode,0);self.assertIn('First admin required',result.stderr);self.assertFalse((self.root/'deployment').exists())
  def test_invalid_domain_rejected_before_package_install(self):
   self.assertNotEqual(self.run_setup(CODYNICK_DOMAIN='https://code.codynick.com').returncode,0)
   self.assertFalse((self.root/'calls').exists())

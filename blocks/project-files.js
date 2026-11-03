@@ -54,7 +54,7 @@
   if(s.state.simulatorView)$('simulatorFrame').contentWindow.CodySimulatorView?.restore(s.state.simulatorView);
   const dashboard=$('dashboardFrame').contentWindow;dashboard.CodyDashboardLayoutUI?.reload?.();
  }
- async function loadProject(s){stopped();validate(s);const previous=capture();try{await apply(s);}catch(e){try{await apply(previous);}catch{}throw e;}}
+ async function loadProject(s,exampleId=null){stopped();validate(s);const previous=capture();try{await apply(s);if(exampleId)window.CodyAccess?.example(exampleId);else window.CodyAccess?.personal();}catch(e){try{await apply(previous);}catch{}throw e;}}
  async function download(){if(busy)return;busy=true;try{const s=capture();validate(s);const bytes=await CodyProjectArchive.encode(s),a=document.createElement('a'),url=URL.createObjectURL(new Blob([bytes],{type:'application/zip'}));a.href=url;a.download=($('designName').value.trim()||'Untitled').replace(/[<>:"/\\|?*\u0000-\u001f]/g,'_').slice(0,100)+'.codynick';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);editor.saved();say('Downloaded complete project: Blocks, Python and saved scene state.');}catch(e){say(e.message);alert(e.message);}finally{busy=false;}}
  $('saveProject').onclick=download;$('menuUpload').onclick=()=>$('importFile').click();$('importFile').accept='.codynick';
  $('importFile').onchange=async()=>{try{stopped();const f=$('importFile').files[0];if(!f)return;if(f.size>8*1024*1024)throw Error('Project archive must be smaller than 8 MB.');const s=validate(await CodyProjectArchive.decode(await f.arrayBuffer()));if(!confirm('Replace both programs and saved scene state? Download your current project first to keep it.'))return;await loadProject(s);say('Complete project loaded. Programs remain stopped.');}catch(e){say('Project upload failed: '+e.message);alert('Project upload failed: '+e.message);}finally{$('importFile').value='';}};
@@ -64,7 +64,7 @@
  // Examples are full projects, regardless of which coding editor is selected.
  let exampleBusy=false;
  $('loadExample').onclick=async()=>{
-  if(exampleBusy)return;exampleBusy=true;const run=$('blockRunBtn'),previousDisabled=run.disabled;let locked=false;
+  if(exampleBusy)return;exampleBusy=true;window.CodyAccess?.loading(true);const run=$('blockRunBtn'),previousDisabled=run.disabled;let locked=false;
   try{
    stopped();const id=$('example').value;if(!id)return;run.disabled=true;locked=true;say('Loading complete example…');
    const metadataResponse=await fetch('python-examples.json',{cache:'no-cache'});if(!metadataResponse.ok)throw Error('Cannot load example catalogue.');
@@ -73,8 +73,8 @@
    const project=validate(await CodyProjectArchive.decode(await response.arrayBuffer()));
    const selected=window.CodyPythonPilot?.selected?'python':'blocks';
    if(!confirm('Load “'+entry.title+'”? This replaces both Blocks and Python programs, dashboard widgets/layout, simulation and sprite settings. Download your current project first to keep it.'))return;
-   project.editor.language=selected;await loadProject(project);$('examplesDialog').close();say('Loaded '+entry.title+' · Both programs and scene setup restored. Programs remain stopped.');
-  }catch(e){say('Example could not load: '+e.message);alert('Example could not load: '+e.message);}finally{if(locked)run.disabled=previousDisabled;exampleBusy=false;}
+   project.editor.language=selected;await loadProject(project,id);$('examplesDialog').close();say('Loaded '+entry.title+' · Both programs and scene setup restored. Programs remain stopped.');
+  }catch(e){say('Example could not load: '+e.message);alert('Example could not load: '+e.message);}finally{if(locked)run.disabled=previousDisabled;exampleBusy=false;window.CodyAccess?.loading(false);}
  };
  window.CodyProjectFiles={capture,validate,loadProject,read:CodyProjectArchive.decode,download};
 })();

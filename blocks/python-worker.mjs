@@ -1,5 +1,5 @@
 // A fresh worker per run makes even an infinite CPU loop stoppable.
-const pending=new Map();let serial=0,ready=false,outputStart=Date.now(),outputCount=0;
+let execute;const pending=new Map();let serial=0,ready=false,outputStart=Date.now(),outputCount=0;
 const request=(op,json)=>new Promise((resolve,reject)=>{const id=++serial;pending.set(id,{resolve,reject});postMessage({type:'rpc',id,op,json});});
 let notificationStart=Date.now(),notificationCount=0;
 const notify=(op,json)=>{
@@ -14,6 +14,7 @@ function output(text){
 }
 self.onmessage=async event=>{
  const msg=event.data;
+ if(msg.type==='execute'){execute?.();execute=null;return;}
  if(msg.type==='reply'){const p=pending.get(msg.id);if(p){pending.delete(msg.id);msg.error?p.reject(Error(msg.error)):p.resolve(msg.result);}return;}
  if(msg.type!=='run'||ready)return;ready=true;
  try{
@@ -24,6 +25,7 @@ self.onmessage=async event=>{
   py.registerJsModule('_codynick_bridge',{request,notify});
   const response=await fetch('./codynick.py');if(!response.ok)throw Error('Cannot load the CodyNick Python library.');
   py.FS.writeFile('/home/pyodide/codynick.py',await response.text());
+  await new Promise(resolve=>{execute=resolve;postMessage({type:'ready'});});
   postMessage({type:'phase',text:'Python running…'});
   const result=await py.runPythonAsync(msg.source,{filename:'program.py'});result?.destroy?.();
   postMessage({type:'done'});

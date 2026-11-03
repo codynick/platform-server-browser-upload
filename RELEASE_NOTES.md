@@ -1,3 +1,78 @@
+## 3.20.0 — cumulative sensor worlds, account access and first-admin setup
+
+- Publish the accepted local releases: water cups and extendable temperature probe; ultrasonic targets; soil pots, automatic watering can and moisture bar; three paired Sensor Test examples; Save As; read-only example code; per-user free runtime/cooldown; username menu; and the simple Unlimited checkbox admin panel. Admin accounts are unlimited automatically. Stopping preserves Hardware, Simulation and Dashboard outputs.
+- Ask for the first admin CodyNick ID during installation/update only when no admin is configured. Collect it before website deployment; support CODYNICK_ADMIN_ID for unattended installs. A fresh-install ID is reserved for matching CAS sign-in without creating a password, account or session. Existing admins and private projects are retained.
+- Deploy and roll back the admin page with the rest of the website. Keep frontend/backend cache references aligned. Validation and limits are recorded in VALIDATION.md; no physical-device or production VPS validation is claimed.
+
+## 3.19.7 — simple unlimited subscription checkbox (local patch)
+
+- Replace subscription names, dates, Unlimited action and Cancel subscription action with a single Unlimited subscription checkbox and Save. Ticking/unticking is applied only by Save.
+- Disable run/cooldown seconds when Unlimited is checked. Admin accounts show a checked, disabled checkbox automatically; switching back to User restores the explicit user selection.
+- Retain account access checks, code/example protections and data-preserving rollback. No pushed deployment or physical-device validation.
+
+## 3.19.6 — unlimited administrator and manual unlimited access (local patch)
+
+- Automatically grant unlimited runtime and no cooldown to admin accounts, regardless of subscription dates.
+- Add an Unlimited button to the admin panel to save permanent unlimited subscription access for any account, without granting the Admin role. Show Unlimited in subscription status and the account list.
+- Retain Save As, in-button countdowns, read-only examples, environment interaction, output-preserving stop, compatibility checks and rollback. Accept 3.19.3, 3.19.4 and 3.19.5. No pushed deployment or physical-device validation.
+
+## 3.19.5 — Save As dialog, button countdowns and account menu (local patch)
+
+- Open a named Save As dialog, save a complete independent copy, and load that saved copy as the active editable project. Keep the original example unchanged.
+- Show free-account runtime and cooldown inside the Run button: Run, Stop (n sec), disabled Wait (n sec), Run. Remove the separate status/countdown text.
+- Replace separate account controls with the username button and a Subscription/Sign out menu. Show subscription status and end date; include Admin Panel only for admins.
+- Retain the access policy, default 20-second duration, per-user admin settings, output-preserving stop, compatibility checks and data-preserving rollback. Accept 3.19.3 or 3.19.4. No pushed deployment or physical-device validation.
+
+## 3.19.4 — Save As and manual account access (local patch)
+
+- Add Save As for an independent cloud copy of both programs and complete environment. Keep example Blocks/Python read-only for all accounts until Save As; allow environment interaction.
+- Guests can run original examples without a time limit but cannot create, edit, import or save code/projects. Free users can edit/save personal projects with a default 20-second run and matching cooldown; admins set the duration per user. Subscribed users have no policy run/cooldown limit. Example runs remain unlimited for everyone.
+- Add server-backed account roles, subscription dates, run admission/cooldown persistence, original-example code verification, and an admin page with audited manual changes. Never remove the last admin. Stop execution without clearing Hardware, Simulation or Dashboard outputs.
+- Use short colored access labels and preserve horizontal category tabs. Deliver only a local checked patch, backup and rollback; no pushed upgrade or physical-device validation.
+
+## 3.19.3 — soil moisture and automatic watering (local patch)
+
+- Add soil pots and a reusable bare watering can; overlap tilts the can 45 degrees and waters automatically. Double-click the can to remove it or a pot to reset moisture to zero.
+- Show moisture with a bottom progress bar. Remove soil timing/speed controls; double drying and drainage rates for sandy, loamy and clay soil while retaining soaking differences and the extendable two-prong probe.
+- Include all three simulation-only Sensor Test examples: Temperature, Ultrasonic and Soil Moisture, with paired Blocks/Python programs.
+- Targeted cumulative patch accepts supported 3.19.1 and 3.19.2 files, preserves deployed editor HTML, and includes backup and rollback. No backend, firmware or database changes. See patch VALIDATION.txt for test limits.
+
+## 3.19.3-preview.3 — interactive soil and watering can (local preview only)
+
+- Simplify the can to an unframed, button-free reusable draggable image; overlapping a pot tilts it 45 degrees and waters automatically, while moving away stops watering. Double-click removes the can.
+- Remove soil timing, speed and pause controls. Show live moisture as a bar in the pot bottom strip instead of a header number; double all three soil types’ drying/drainage rates; double-click a pot to reset its soil and surface water to zero. Retain the extendable two-prong probe, soil-type settings and other existing assets.
+- Include Sensor Test: Soil Moisture with matching simulation-only Blocks/Python, saved garden state, simulated display and threshold LED. Rebase saved state on load; automatic watering depends only on can/pot overlap.
+- This build is isolated localhost preview work. No production deployment, installer, physical-device validation or original-project modification is claimed.
+
+## 3.19.3-preview.2 — simplified watering and dry reset (local preview only)
+
+- Replace the framed watering can and Pour/Refill buttons with a reusable draggable image that tilts 45 degrees and waters automatically on pot overlap. Double-click removes the can.
+- Remove soil time, speed and pause controls; display live moisture in the pot header. Double-click the pot to reset moisture and surface water to zero.
+- Preserve soil types, the two-prong probe and the simulation-only example. Verify the interactions in the browser; no original project or server changes.
+
+## 3.19.3-preview.1 — interactive soil and watering can (local preview only)
+
+- Add separate soil pots and finite 500 ml watering cans. Hold Pour/Refill, placement-dependent water landing, gradual soaking, soil-type drainage/drying, surface pooling and overflow.
+- Add an extendable two-prong soil probe, world/manual sensing, a simulation clock with 1x/10x/60x/300x speeds and pause, and per-pot gear settings for soil type and starting moisture. Preserve the existing simulator and previous assets.
+- Include Sensor Test: Soil Moisture with matching simulation-only Blocks/Python, saved garden state, simulated display and threshold LED. Rebase saved clocks and cancel held pours on project load; short pour leases and pointer/keyboard/visibility cleanup prevent stuck watering.
+- This build is isolated localhost preview work. No production deployment, installer, physical-device validation or original-project modification is claimed.
+
+
+## 3.19.2 — simulation-only sensor tests and ultrasonic targets (local patch)
+
+- Add a movable/resizable target block, rotatable 30-degree ultrasonic detection cone, scale-independent 2–400 cm surface-distance sensing, and zero for no echo. Preserve manual ultrasonic inputs unless world sensing is enabled. UltraSeg remains manual in this patch.
+- Add a Sensor tests Examples group with Sensor Test: Temperature and Sensor Test: Ultrasonic, each containing matching Blocks/Python and complete simulation-only scenes, simulated seven-segment readings, and CJP LED warnings. No dashboard, sprites or hardware actions.
+- Keep water cups/temperature probe, include world state in saved projects, and perform sensor calculations in shared live state even with the simulator hidden.
+- Deliver a targeted 3.19.1-to-3.19.2 patch with baseline checks, original-file backup, failure recovery and rollback. Preserve deployed editor HTML while updating required script references and adding the example-group script. No backend, firmware or database changes.
+- Validation and production/physical-device test limits are listed in VALIDATION.txt in the patch.
+
+## 3.19.1 — interactive water assets (local server upgrade)
+
+- Add movable hot/cold water cups, per-cup gear temperature dialogs, and an extendable temperature probe without replacing the simulator stage or gadget controls.
+- Save cups and probe state inside complete projects. Compute gradual water/air response in shared live state so sensor reads also work without an active simulator view. Keep manual temperature controls when no cups are present.
+- Supply a checksum-verified, baseline-checked local upgrade with file backups, automatic recovery on installation failure, and explicit rollback. Installer revision r2 preserves deployed editor HTML and patches only the two required local script cache versions. Accounts, projects database, firmware and services are not modified.
+- Browser and automated validation are documented in the upgrade package; physical hardware and production Linux deployment are not claimed as tested.
+
 ## 3.19.0 — numbered zone examples
 
 - Publish fifteen complete numbered examples covering each of Hardware, Simulation, Dashboard and Sprite, every pair, every triple and all four together.

@@ -1,5 +1,5 @@
 """Exercise the installer's exact Apache patch in an isolated fixture."""
-import ast,pathlib,re,subprocess,tempfile
+import ast,pathlib,re,subprocess,tempfile,sys,os
 source=pathlib.Path(__file__).with_name('update.sh').read_text()
 blocks=re.findall(r"<<'PY'\n(.*?)\nPY",source,re.S)
 for code in blocks:ast.parse(code)
@@ -24,30 +24,30 @@ with tempfile.TemporaryDirectory() as temp:
 </VirtualHost>
 '''
  p.write_text(original)
- code=patch.replace('/etc/apache2/sites-enabled',str(sites))
- subprocess.run(['python3','-c',code,'ide.codynick.com'],check=True)
+ code=patch.replace('/etc/apache2/sites-enabled',sites.as_posix())
+ subprocess.run([sys.executable,'-c',code,'ide.codynick.com'],check=True)
  updated=p.read_text()
  assert updated.count('# CodyNick CAS integration')==1
  assert 'http.log combined' in updated and 'other.log combined' in updated
  assert 'portal.log codynick_private' in updated
  assert '%m %U %H' in updated and '%r' not in updated
- subprocess.run(['python3','-c',code,'ide.codynick.com'],check=True)
+ subprocess.run([sys.executable,'-c',code,'ide.codynick.com'],check=True)
  assert updated==p.read_text(),'patch must be idempotent'
 with tempfile.TemporaryDirectory() as temp:
  import json
  from urllib.parse import urlsplit,parse_qs
  config=pathlib.Path(temp)/'config.json'
  config.write_text(json.dumps({'CAS_BASE_URL':'https://id.codynick.com/cas','CAS_ID_ATTRIBUTE':'uid','CAS_LOGOUT_URL':'https://id.codynick.com/custom/logout?keep=yes&service=https%3A%2F%2Fold.example%2Fblocks%2F'}))
- code=config_code.replace('/etc/codynick-cas/config.json',str(config))
+ code=config_code.replace('/etc/codynick-cas/config.json',config.as_posix())
  for domain in ['code.codynick.com','another.example']:
-  subprocess.run(['python3','-c',code,domain],check=True)
+  subprocess.run([sys.executable,'-c',code,domain],check=True)
   data=json.loads(config.read_text())
   assert data['PUBLIC_ORIGIN']=='https://'+domain
   assert data['CAS_ID_ATTRIBUTE']=='uid'
   q=parse_qs(urlsplit(data['CAS_LOGOUT_URL']).query)
   assert q['service']==['https://'+domain+'/blocks/'] and q['keep']==['yes']
-  before=config.read_text();subprocess.run(['python3','-c',code,domain],check=True)
+  before=config.read_text();subprocess.run([sys.executable,'-c',code,domain],check=True)
   assert before==config.read_text()
 for name in ['update.sh','rollback.sh']:
- subprocess.run(['bash','-n',str(pathlib.Path(__file__).with_name(name))],check=True)
+ subprocess.run([os.environ.get('BASH','bash'),'-n',pathlib.Path(__file__).with_name(name).as_posix()],check=True)
 print('PASS: embedded Python parsing, targeted Apache patch, idempotency, shell syntax')

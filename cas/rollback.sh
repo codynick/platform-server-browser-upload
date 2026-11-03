@@ -5,9 +5,9 @@ cd -- "$(dirname -- "${BASH_SOURCE[0]}")"
 read -r domain < domain
 root=/var/www/$domain
 systemctl stop codynick-cas || true
-for section in blocks simulator dashboard; do
+for section in blocks simulator dashboard admin; do
  rm -rf -- "$root/$section"
- cp -a "$section" "$root/$section"
+ if [[ -e "$section" ]]; then cp -a "$section" "$root/$section"; fi
 done
 cp -a apache/sites-available/. /etc/apache2/sites-available/
 for base in opt etc; do

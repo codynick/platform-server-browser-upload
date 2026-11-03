@@ -22,7 +22,7 @@
 
  const exampleNote=document.querySelector('.examples-note'),blockNote=exampleNote.textContent;
  const status=text=>{const target=$(api.selected?'pythonStatusBar':'workspaceStatus');target.textContent=text;target.title=text;};
- const examplesReady=fetch('python-examples.json').then(r=>{if(!r.ok)throw Error('Cannot load Python examples');return r.json();});
+ const examplesReady=fetch('python-examples.json?v=3.20.0').then(r=>{if(!r.ok)throw Error('Cannot load Python examples');return r.json();});
  examplesReady.catch(e=>status(e.message));
  let examples={},heartbeat=null,finishing=null,started=false,workerGeneration=0;
  let blockDesignName=$('designName').value,pythonDesignName='';
@@ -41,7 +41,7 @@
    $(id).title=api.selected?label:blockFiles[id].title;
   }
   $('viewPython').hidden=api.selected;
-  source.readOnly=api.running;
+  source.readOnly=api.running;window.CodyAccess?.refresh();
   for(const id of ['pythonFile','blocksEditorTab','pythonEditorTab'])$(id).disabled=api.running;
  }
  async function select(python){
@@ -66,7 +66,7 @@
    // Preserve serial exclusivity until an outstanding sensor request settles.
    await api.bridge.router.hardware.tail.catch(()=>{});
    heartbeat?.();heartbeat=null;if(started)window.CodyLiveStore.stop(api.token);started=false;
-   api.running=false;window.CodyBlockExecution.lock(false);controls();status(message);print(message);
+   api.running=false;window.CodyBlockExecution.lock(false);await window.CodyAccess?.end();controls();status(message);print(message);
    if(error){highlightError(message);window.alert('Python program ended with an error:\n\n'+message.slice(-2500));}
   })();
   try{await finishing;}finally{finishing=null;}
@@ -77,18 +77,20 @@
   if(source.value.length>100000){status('Python source must be under 100,000 characters.');return;}
   if(!source.value.trim()){status('Write a program or open a Python example first.');return;}
   const token='python-'+Date.now()+'-'+Math.random();
-  try{window.CodyLiveStore.start(token);started=true;}catch(e){status(e.message);return;}
+  try{window.CodyLiveStore.start(token);started=true;}catch(e){await window.CodyAccess?.end();status(e.message);return;}
   api.token=token;api.running=true;api.controller=new AbortController();
   api.bridge=new window.CodyPythonBridge(new window.LiveRouter(new window.CjpHardware(window.CJP),window.CodyLiveStore),window.CodyLiveStore,api.controller.signal);
   window.CodyBlockExecution.lock(true);controls();output.textContent='';source.classList.remove('python-error');status('Starting Python…');
   heartbeat=window.CodyScheduler.every(()=>window.CodyLiveStore.heartbeat(token),800);
   const generation=++workerGeneration;let activeRequests=0;
   try{
-   const worker=new Worker(new URL('python-worker.mjs',location.href),{type:'module'});api.worker=worker;
+   const worker=new Worker(new URL('python-worker.mjs?v=3.20.0',location.href),{type:'module'});api.worker=worker;
    worker.onerror=event=>{event.preventDefault();void finish('Python worker failed to load. Check the Internet connection and reload the local pilot.',true);};
    worker.onmessage=async event=>{
     if(generation!==workerGeneration||!api.running||finishing)return;
+    if(window.CodyAccess?.expired()){await finish('Limit reached');return;}
     const m=event.data;
+    if(m.type==='ready'){const allowed=!window.CodyAccess||await CodyAccess.begin();if(generation!==workerGeneration||finishing||!api.running){await window.CodyAccess?.end();return;}if(!allowed){await finish('Wait');return;}worker.postMessage({type:'execute'});return;}
     if(m.type==='phase'){status(m.text);print(m.text);return;}
     if(m.type==='output'){print(m.text);return;}
     if(m.type==='done'){await finish('Python program finished.');return;}
@@ -131,6 +133,7 @@
  window.addEventListener('cjp-disconnected',()=>{if(api.running&&api.bridge.hardwareUsed)void finish('CJP disconnected. Reconnect it before running again.',true);});
  window.addEventListener('beforeunload',event=>{if(api.dirty||api.running){event.preventDefault();event.returnValue='';}});
  api.exportPythonSource=downloadPython;
+ api.renameProject=name=>{blockDesignName=name;pythonDesignName=name;$('designName').value=name;};
  api.markProjectSaved=()=>{api.dirty=false;};
  api.exportProjectState=()=>({source:source.value,names:{blocks:api.selected?blockDesignName:$('designName').value,python:api.selected?$('designName').value:pythonDesignName},language:api.selected?'python':'blocks',help:$('pythonExampleHelp').textContent,console:output.textContent,cursorStart:source.selectionStart,cursorEnd:source.selectionEnd,scrollTop:source.scrollTop,scrollLeft:source.scrollLeft});
  api.restoreProjectState=async data=>{

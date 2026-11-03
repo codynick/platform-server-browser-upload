@@ -1,4 +1,40 @@
 {
+  "sensor-test-soil-moisture": {
+    "title": "Sensor Test: Soil Moisture",
+    "help": "Simulation only. Insert BOTH gold probe tips in the soil. Drag the bare watering can to overlap the pot; it tilts 45 degrees and waters automatically. Move it away to stop. Double-click the can to remove it. Double-click the pot to reset moisture to 0%. Water soaks in gradually; soil type affects soaking, retention and drainage. The bar in the pot bottom strip shows current moisture. The simulated display shows 0–100 moisture; LED 0 is red below 30%, green otherwise. Air is a dry reference (0%), not a calibrated hardware measurement. Choose Blocks or Python, then Run; Stop ends the program. No CJP, Dashboard or Sprites required.",
+    "simulation": [
+      "soil",
+      "seven"
+    ],
+    "stage": false,
+    "dashboard": false,
+    "category": "Sensor tests",
+    "archive": "examples/sensor-test-soil-moisture.codynick"
+  },
+  "sensor-test-temperature": {
+    "title": "Sensor Test: Temperature",
+    "help": "Simulation only. Drag the metal probe into the hot/cold cups; use each gear to trim water temperature. The seven-segment shows degrees C; LED 0 turns red above 30 C, green otherwise. Choose Blocks or Python, then Run; Stop ends the test. No CJP, dashboard or sprite is required.",
+    "simulation": [
+      "temperature",
+      "seven"
+    ],
+    "stage": false,
+    "dashboard": false,
+    "category": "Sensor tests",
+    "archive": "examples/sensor-test-temperature.codynick"
+  },
+  "sensor-test-ultrasonic": {
+    "title": "Sensor Test: Ultrasonic",
+    "help": "Simulation only. Move the striped target by its title bar. Aim the ultrasonic marker with the angle control. The seven-segment shows cm; LED 0 is red for a valid echo below 20 cm, green for farther targets, and blue for no echo (0). Target gear changes its size; 1 stage unit = 1 cm. Range 2–400 cm, 30-degree cone. Choose Blocks or Python, then Run; Stop ends the test. No CJP, dashboard or sprite is required.",
+    "simulation": [
+      "ultrasonic",
+      "seven"
+    ],
+    "stage": false,
+    "dashboard": false,
+    "category": "Sensor tests",
+    "archive": "examples/sensor-test-ultrasonic.codynick"
+  },
   "zone-01": {
     "title": "1. HW - Real Sensor and Light",
     "help": "Requires: CJP and temperature sensor. Try warming the real temperature sensor. Above 30 C, RGB LED 0 turns red; otherwise green. Choose Blocks or Python, then Run. Press Stop to finish. Hardware outputs keep their last state after Stop.",

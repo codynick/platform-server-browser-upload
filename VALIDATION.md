@@ -1,3 +1,14 @@
+# Validation for 3.20.0
+
+- First-admin helper: 14 tests cover a fresh database, an existing pre-policy database, a configured/pending admin, blank input, EOF, unattended configuration, read-only selection, concurrent application, exact-ID handling, preserving private projects/settings, and the unprivileged apply path avoiding root-only config reads. An actual interactive terminal prompt was exercised locally, including capturing only the selected ID for the installer.
+- CAS/private projects: 16 tests pass, including first-admin reservation followed by verified CAS sign-in and unlimited admin access. Reservation alone creates neither a user nor a session.
+- Apache configuration patch/idempotence and embedded Python parsing pass. setup.sh, install.sh, cas/update.sh and both rollback scripts pass Bash syntax checks. Installer ordering and admin-page deployment/rollback are checked by tests. Linux setup fixture tests were extended for first-admin selection; a complete apt/systemd/VPS installation was not run on this Windows host.
+- Existing Node tests pass for actual Blockly/LiveRouter mixed Hardware/Simulation execution, complete project archive roundtrip/rejection, and simulator viewport bounds. Thirty example archives pass ZIP integrity and payload checksum checks; their Python programs compile. The firmware hash matches its manifest and remains unchanged.
+- Sensor worlds, Save As, in-button countdowns, account menu and the simple admin checkbox retain the previously tested local implementations (3.19.1–3.19.7). Those local tests cover policy, installer/rollback, browser UI and retained outputs. Python UI cutoff checks used a controlled worker; no new physical-board or production VPS validation is claimed.
+- Publishing this release does not itself deploy it. Browser-side execution is not a hostile-client-proof sandbox; server authorization, original-example verification and run/cooldown admission remain enforced.
+
+Previous validation history follows.
+
 # Validation for 3.19.0
 
 The fifteen numbered archives are built from one shared program description for

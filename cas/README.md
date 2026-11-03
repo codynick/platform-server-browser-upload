@@ -1,3 +1,9 @@
+# First admin setup (3.20.0)
+
+setup.sh and cas/update.sh ask for the first admin CodyNick ID when none is configured. The normal interactive setup asks before website deployment. Existing admins cause the prompt to be skipped. CODYNICK_ADMIN_ID supplies it noninteractively. Blank input is retried; EOF/missing unattended input aborts with instructions.
+
+The exact stable CAS identity is reserved. If the account has not signed in yet, the reservation becomes effective only after successful matching CAS sign-in; the installer creates no user/password/session. The reservation counts as a configured admin on later updates. Verify the ID before entering it. bootstrap_admin.py --select performs no database writes; --apply assigns the role transactionally and records an audit entry. Apply runs as the service user after schema initialization. Existing projects and account settings are preserved.
+
 # Local CodyNick upgrade
 
 This upgrades your existing website and CAS backend in place. No repository

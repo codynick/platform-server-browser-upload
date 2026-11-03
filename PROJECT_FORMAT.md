@@ -53,3 +53,35 @@ sprite state, while preserving the selected editor and leaving execution stopped
 The catalogue in blocks/python-examples.json contains metadata/archive paths only;
 program source and initial scene state live in each .codynick archive. Widgets
 appear before Run. Cancellation/validation failure preserves the current project.
+
+## 3.19.1 simulation water assets
+
+Optional state/live.json scene.world contains up to 100 hot/cold water assets
+(id, kind, temperature, x, y) and probe (x, y, temperature, at). Position and
+temperature are validated by CodyLiveStore.scene. Loading rebases the probe clock
+to the load time, retaining the saved measured temperature. Older projects omit
+world and keep their manual temperature behavior. No schema version changes.
+
+## 3.19.2 ultrasonic targets
+
+scene.world.assets also accepts target blocks (id,kind=target,x,y,width,height).
+scene.world.ultrasonic contains enabled (boolean) and angle (-180 to 180 degrees).
+Target width/height are 10–200 cm. x/y locate the title bar; the physical rectangle
+starts at x+4,y+36. One unzoomed stage unit is one centimetre. The ultrasonic
+origin is gadget x+306,y+110 and a 30-degree cone extends up to 400 cm.
+Only target blocks reflect sound in this educational model. No echo is 0; valid
+surface distance is 2–400 cm. Cups do not become ultrasound obstacles.
+Older projects without ultrasonic.enabled retain their manual distance.
+
+## 3.19.3-preview.1 garden state
+
+Optional scene.garden stores soil pots (type, contained water, surface pool, overflow,
+drained amount), watering cans (0–500 ml), soil probe position/response, soil time,
+speed and pause/world-sensing switches. The shared model validates these fields.
+Pour leases expire after 350 ms without renewal; project restoration clears them
+and rebases the clock, preserving moisture without replaying elapsed closed time.
+Each pot is one moisture zone, with geometry for both prongs and spout landing.
+
+
+## 3.19.3 current garden state
+scene.garden contains enabled, at, pots and cans arrays, and probe {x,y,value}. Pots retain id,x,y,type,water,surface,overflow,drained. Cans retain id,x,y only; watering follows overlap. Legacy speed, clock, paused, level and pourUntil fields are ignored. Both probe tips must enter soil. Saved garden timestamps are rebased on restore.

@@ -14,3 +14,13 @@
 @media(max-width:500px){.topbar .connection-group{flex:1 1 100%;width:100%;margin-left:0}.toolbar>#toggleSpaces{padding-left:8px;padding-right:8px}.topbar .project-menu>summary{padding-left:8px;padding-right:8px}}
 
 .topbar #headerExamples{white-space:nowrap;flex:0 0 auto}
+/* Account menu stays anchored to the username, without changing header rows. */
+.account-controls{position:relative;display:block;flex:0 0 150px;z-index:50}
+.account-controls>#accountButton{width:100%;max-width:100%;overflow:hidden;text-overflow:ellipsis;text-align:center;min-height:38px}
+.account-menu{position:absolute;right:0;top:calc(100% + 8px);width:250px;max-width:calc(100vw - 32px);padding:6px;background:white;border:1px solid #cbd7e3;border-radius:9px;box-shadow:0 8px 28px #183b6b26;text-align:left;z-index:1000}
+.account-menu[hidden],.account-menu [hidden]{display:none!important}
+.account-menu>button,.account-menu>a{display:block;width:100%;padding:11px 12px;border:0;border-radius:5px;background:white;color:#183b6b;text-align:left;text-decoration:none;font:600 14px system-ui;white-space:normal}
+.account-menu>button:hover,.account-menu>a:hover,.account-menu>button:focus-visible,.account-menu>a:focus-visible{background:#eef5fc;outline:2px solid #8bb8df;outline-offset:-2px}
+.subscription-status{display:grid;gap:5px;margin:0 6px 6px;padding:10px 8px;background:#f5f8fc;border-radius:5px;font:13px system-ui;color:#40566e;overflow-wrap:anywhere}
+.subscription-active{color:#146c43}.subscription-inactive{color:#8a4800}
+@media(max-width:1050px){.account-controls{flex-basis:125px}}

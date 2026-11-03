@@ -41,3 +41,9 @@
   .sprite-canvas { max-width:480px; margin:auto; }
   .main.stage-collapsed { grid-template-rows:minmax(0,1fr); }
 }
+
+/* Keep category tabs together; long project messages yield the remaining space. */
+.workspace-shell .panel-head{min-width:0}
+.workspace-shell .panel-head .toolbox-modes{flex:0 0 auto;flex-wrap:nowrap!important;max-width:100%;overflow-x:auto}
+.workspace-shell .panel-head #workspaceStatus{flex:1 1 0;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+@media(max-width:550px){.workspace-shell .panel-head{height:auto;min-height:42px}.workspace-shell .panel-head #workspaceStatus{flex-basis:100%}}

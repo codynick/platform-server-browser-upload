@@ -38,10 +38,15 @@ if [[ ! -f /etc/codynick-cas/config.json && -t 0 ]]; then
  read -rp "Email attribute [$emailattr]: " cas_input
  emailattr=${cas_input:-$emailattr}
 fi
+# Prompt before backups or deployment when no admin is configured.
+admin_id=$(python3 bootstrap_admin.py --select)
+
 apt-get update
 apt-get install -y python3-venv python3-pip apache2 curl
 backup=$(mktemp -d /root/codynick-cas-backup-XXXXXXXX)
-cp -a "$root/blocks" "$root/simulator" "$root/dashboard" "$backup/"
+for section in blocks simulator dashboard admin; do
+ if [[ -e "$root/$section" ]]; then cp -a "$root/$section" "$backup/"; fi
+done
 mkdir -p "$backup/apache"
 cp -a /etc/apache2/sites-available "$backup/apache/"
 for dir in /opt/codynick-cas /etc/codynick-cas; do
@@ -89,7 +94,9 @@ c['CAS_LOGOUT_URL']=urlunsplit((u.scheme,u.netloc,u.path,urlencode(q),u.fragment
 with open(p,'w') as f:json.dump(c,f,indent=2)
 PYCFG
 chmod 600 /etc/codynick-cas/config.json
-cp backend/app.py backend/requirements.txt /opt/codynick-cas/
+# Read root-only configuration here, not in the unprivileged bootstrap process.
+database=$(python3 -c 'import json; print(json.load(open("/etc/codynick-cas/config.json")).get("DATABASE","/var/lib/codynick-cas/projects.sqlite3"))')
+install -m 644 backend/app.py backend/requirements.txt bootstrap_admin.py /opt/codynick-cas/
 python3 -m venv /opt/codynick-cas/venv
 /opt/codynick-cas/venv/bin/pip install -r /opt/codynick-cas/requirements.txt
 cat > /opt/codynick-cas/start.py <<'PY'
@@ -164,6 +171,10 @@ systemctl enable --now codynick-cas
 systemctl restart codynick-cas
 systemctl reload apache2
 curl --fail --silent --retry 10 --retry-connrefused --retry-delay 1 http://127.0.0.1:8791/api/me
+# The service has initialized its additive access tables. Run as its owner.
+if [[ -n $admin_id ]]; then
+ (cd /opt/codynick-cas && runuser -u codynick-cas -- /opt/codynick-cas/venv/bin/python /opt/codynick-cas/bootstrap_admin.py --database "$database" --apply --admin-id="$admin_id")
+fi
 trap - ERR
-printf '\nInstalled CAS test update. Open https://%s/blocks/ and Ctrl+F5.\nRollback: bash %s/rollback.sh\n' "$domain" "$backup"
+printf '\nInstalled CodyNick accounts and access controls. Open https://%s/blocks/ and Ctrl+F5.\nRollback: bash %s/rollback.sh\n' "$domain" "$backup"
 printf 'CAS exact login service: https://%s/auth/callback\nCAS exact logout return service: https://%s/blocks/\n' "$domain" "$domain"
