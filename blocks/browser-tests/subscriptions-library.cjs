@@ -17,11 +17,16 @@ const {chromium}=require('playwright'),assert=require('assert/strict'),fs=requir
    const path=new URL(route.request().url()).pathname;let data;
    if(path==='/api/me')data={user:null,access:null,csrf:null};
    else if(path==='/api/run/start'){starts++;assert.equal(route.request().postDataJSON().example,null);data={token:'test',deadline:Date.now()/1000+1,ready:Date.now()/1000+2,server_time:Date.now()/1000};}
-   else data={ready:Date.now()/1000+1,server_time:Date.now()/1000};
+   else data={ready:Date.now()/1000+5,server_time:Date.now()/1000};
    await route.fulfill({json:data});
   });
   await p.goto(base+'/blocks/',{waitUntil:'domcontentloaded'});
   await p.waitForFunction(()=>document.getElementById('designName').value==='Sensor Test: Soil Moisture'&&!document.getElementById('blockRunBtn').disabled);
+  assert.equal(await p.locator('#pythonInfo').isVisible(),true);
+  await p.locator('#pythonInfo').click();
+  assert.equal(await p.evaluate(()=>document.getElementById('pythonHelpBubble').matches(':popover-open')),true);
+  assert.match(await p.locator('#pythonExampleHelp').textContent(),/gold probe tips/);
+  await p.locator('#pythonInfo').click();
   assert.equal(await p.evaluate(()=>CodyAccess.canEdit()),true);
   assert.equal(await p.locator('#designName').getAttribute('readonly'),null);
   await p.locator('#designName').fill('My soil experiment');
@@ -29,10 +34,20 @@ const {chromium}=require('playwright'),assert=require('assert/strict'),fs=requir
   await p.locator('#blockRunBtn').click();
   await p.waitForFunction(()=>window.blockProgramRunning===true);
   await p.waitForFunction(()=>!window.blockProgramRunning);
+  await p.waitForFunction(()=>document.getElementById('blockRunBtn').textContent.startsWith('Wait'));
   assert.equal(starts,1);assert.match(await p.locator('#blockRunBtn').textContent(),/Wait/);
   await p.evaluate(()=>CodyAccess.setIdentity(null,null,''));
   assert.match(await p.locator('#blockRunBtn').textContent(),/Wait/);
   await p.locator('#headerExamples').click();
+  await p.locator('.example-categories button').filter({hasText:'Hardware'}).click();
+  assert.equal(await p.locator('.example-card').count(),14);
+  const hardware=await p.evaluate(async()=>{
+   const catalog=await(await fetch('python-examples.json')).json();
+   if(Object.values(catalog).some(e=>/^\d+\./.test(e.title)))throw Error('Numbered catalog title');
+   return Object.values(catalog).filter(e=>e.hardware).map(e=>e.title).sort();
+  });
+  assert.deepEqual((await p.locator('.example-card strong').allTextContents()).sort(),hardware);
+  if(process.env.REVIEW_SHOTS){fs.mkdirSync(process.env.REVIEW_SHOTS,{recursive:true});await p.screenshot({path:path.join(process.env.REVIEW_SHOTS,'hardware-library.png')});}
   await p.locator('.example-categories button').filter({hasText:'Sensors'}).click();
   assert.equal(await p.locator('.example-card').count(),3);
   if(process.env.REVIEW_SHOTS){fs.mkdirSync(process.env.REVIEW_SHOTS,{recursive:true});await p.screenshot({path:path.join(process.env.REVIEW_SHOTS,'library.png')});}
@@ -40,6 +55,10 @@ const {chromium}=require('playwright'),assert=require('assert/strict'),fs=requir
   await p.locator('.example-card').click();await p.locator('#loadExample').click();
   await p.waitForFunction(()=>document.getElementById('designName').value==='Sensor Test: Ultrasonic');
   await p.locator('#pythonEditorTab').click();
+  assert.equal(await p.locator('#pythonInfo').isVisible(),true);
+  await p.locator('#pythonInfo').click();
+  assert.match(await p.locator('#pythonExampleHelp').textContent(),/striped target/);
+  await p.locator('#pythonInfo').click();
   await p.locator('#pythonSource').fill('print("My copy")');
   assert.equal(await p.locator('#pythonSource').inputValue(),'print("My copy")');
   await p.goto(base+'/blocks/?example=zone-04');
@@ -52,12 +71,20 @@ const {chromium}=require('playwright'),assert=require('assert/strict'),fs=requir
     for(const[id,e]of Object.entries(catalog)){
      await CodyProjectFiles.loadExample(id,false);
      const expected=await CodyProjectArchive.decode(await(await fetch(e.archive)).arrayBuffer()),actual=CodyProjectFiles.capture();
+     if(id.startsWith('zone-')&&(actual.editor.names.blocks!==e.title||actual.editor.names.python!==e.title||/^# \d+\./.test(actual.python)))throw Error('Numbered saved title: '+id);
      if(actual.python!==expected.python||JSON.stringify(actual.editor.names)!==JSON.stringify(expected.editor.names)||actual.editor.language!==language)throw Error('Incorrect example restore: '+id+' '+language);
      count++;
     }
    }return count;
   });assert.equal(restored,60);
   console.log('PASS all 30 examples restore both programs in both editor modes');
+  await p.goto(base+'/blocks/?python=0&example=zone-02');
+  await p.waitForFunction(()=>document.getElementById('designName').value==='Sim - Simulated Sensor and Light');
+  assert.equal(await p.evaluate(()=>!!window.CodyPythonPilot),false);
+  await p.locator('#pythonInfo').click();
+  assert.equal(await p.evaluate(()=>document.getElementById('pythonHelpBubble').matches(':popover-open')),true);
+  assert.match(await p.locator('#pythonExampleHelp').textContent(),/change temperature across 30 C/);
+  console.log('PASS unnumbered saved titles, all hardware examples and project information in Blocks, Python and Blocks-only mode');
   console.log('PASS guest automatic/default and linked examples, editable copies, timed stop/cooldown, sensor categories/search, Python editing');
   await p.goto(base+'/');
   assert.equal(await p.locator('.example-list a[href*="example="]').count(),7);

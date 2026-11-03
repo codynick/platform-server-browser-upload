@@ -1,3 +1,9 @@
+# Validation for 3.20.2
+
+- Browser regression passes for the inclusive Hardware category (all fourteen projects), unnumbered catalog/saved titles, and the shared description popover in Blocks, Python and Blocks-only mode. All thirty examples restore in both editors (sixty restores); existing subscription/admin checks still pass. Tests use local static assets and mocked services.
+- All thirty archives pass ZIP integrity, manifest checksums and Python compilation. Program code and scene payloads match 3.20.1 except for title comments and saved names. The project archive regression passes; the updated builder parses.
+- Firmware, account policy and server installer are unchanged. Physical devices, real CAS and Linux production deployment remain manual.
+
 # Validation for 3.20.1
 
 - CAS/backend: 20 tests pass, including timed guest/example admission, configured free-user duration, cooldown, subscription dates/expiry, Unlimited override, CAS email, admin authorization and idempotent legacy Unlimited migration.

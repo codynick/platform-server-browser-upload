@@ -19,16 +19,17 @@
  const path=document.createElement('p');path.setAttribute('aria-live','polite');library.before(path);
  let catalog={},category='All examples',selected='';
  const group=e=>e.title.startsWith('Sensor Test')?'Sensors':e.stage&&e.dashboard?'Combined projects':e.stage?'Sprites':e.dashboard?'Dashboards':'General';
+ const matches=(name,e)=>name==='All examples'||(name==='Hardware'?e.hardware:group(e)===name);
  function render(){
-  const categories=['All examples','General','Sensors','Dashboards','Sprites','Combined projects'];nav.replaceChildren();results.replaceChildren();
-  for(const name of categories){const count=Object.values(catalog).filter(e=>name==='All examples'||group(e)===name).length;if(!count)continue;const b=document.createElement('button');b.type='button';b.textContent=name+' ('+count+')';b.setAttribute('aria-pressed',String(name===category));b.onclick=()=>{category=name;render();};nav.append(b);}
+  const categories=['All examples','General','Sensors','Hardware','Dashboards','Sprites','Combined projects'];nav.replaceChildren();results.replaceChildren();
+  for(const name of categories){const count=Object.values(catalog).filter(e=>matches(name,e)).length;if(!count)continue;const b=document.createElement('button');b.type='button';b.textContent=name+' ('+count+')';b.setAttribute('aria-pressed',String(name===category));b.onclick=()=>{category=name;render();};nav.append(b);}
   const query=search.value.trim().toLowerCase();let count=0;
   for(const[id,e]of Object.entries(catalog)){
-   if(category!=='All examples'&&group(e)!==category||query&&!(e.title+' '+e.help).toLowerCase().includes(query))continue;
+   if(!matches(category,e)||query&&!(e.title+' '+e.help).toLowerCase().includes(query))continue;
    count++;const card=document.createElement('button');card.type='button';card.className='example-card';card.setAttribute('aria-pressed',String(id===selected));
    const title=document.createElement('strong');title.textContent=e.title;
    const help=document.createElement('small');help.textContent=(e.help||'').split(/(?<=[.!?])\s/).slice(0,2).join(' ');
-   const tags=document.createElement('span');tags.className='example-tags';tags.textContent=[group(e),e.stage?'Sprite':'',e.dashboard?'Dashboard':'',e.simulation?.length?'Simulation':''].filter(Boolean).join(' · ');
+   const tags=document.createElement('span');tags.className='example-tags';tags.textContent=[group(e),e.hardware?'Hardware':'',e.stage?'Sprite':'',e.dashboard?'Dashboard':'',e.simulation?.length?'Simulation':''].filter(Boolean).join(' · ');
    card.append(title,help,tags);card.onclick=()=>{selected=id;if(![...select.options].some(o=>o.value===id)){const o=new Option(e.title,id);select.append(o);}select.value=id;render();$('loadExample').focus();};card.ondblclick=()=>$('loadExample').click();results.append(card);
   }path.textContent='Examples › '+category+' · '+count+' results';if(!count)results.textContent='No matching examples.';
  }

@@ -49,7 +49,7 @@
   const clean={};for(const [id,r] of Object.entries(s.state.layout))Object.defineProperty(clean,id,{value:CodyDashboardLayout.clean(r),enumerable:true});
   localStorage.setItem(layoutKey,JSON.stringify(clean));window.dispatchEvent(new StorageEvent('storage',{key:layoutKey,newValue:JSON.stringify(clean)}));
   if(window.CodyPythonPilot)await CodyPythonPilot.restoreProjectState({source:s.python,...s.editor});
-  else $('designName').value=s.editor.names.blocks;
+  else{$('designName').value=s.editor.names.blocks;$('pythonExampleHelp').textContent=s.editor.help;}
   $('liveMain').classList.toggle('stage-collapsed',s.editor.collapsed);$('toggleSpaces').textContent=s.editor.collapsed?'Show Spaces':'Hide Spaces';CodySpaces.show(s.editor.space);B.svgResize(window.codyWorkspace);
   if(s.state.simulatorView)$('simulatorFrame').contentWindow.CodySimulatorView?.restore(s.state.simulatorView);
   const dashboard=$('dashboardFrame').contentWindow;dashboard.CodyDashboardLayoutUI?.reload?.();

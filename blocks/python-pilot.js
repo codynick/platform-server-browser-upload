@@ -11,18 +11,10 @@
  for(const id of ['menuUpload','saveProject','newProject']){const button=$(id);blockFiles[id]={handler:button.onclick,label:button.querySelector('span:last-child').textContent,title:button.title};}
  const bubble=$('pythonHelpBubble');
  const closeInfo=()=>{if(bubble.matches(':popover-open'))bubble.hidePopover();};
- $('pythonInfo').onclick=()=>{
-  if(bubble.matches(':popover-open')){bubble.hidePopover();return;}
-  bubble.showPopover();const button=$('pythonInfo').getBoundingClientRect(),bounds=bubble.getBoundingClientRect();
-  bubble.style.left=Math.max(12,Math.min(button.right-bounds.width,innerWidth-bounds.width-12))+'px';
-  bubble.style.top=Math.max(12,Math.min(button.bottom+8,innerHeight-bounds.height-12))+'px';
- };
- bubble.addEventListener('toggle',()=>{$('pythonInfo').setAttribute('aria-expanded',String(bubble.matches(':popover-open')));});
- window.addEventListener('resize',closeInfo);
 
  const exampleNote=document.querySelector('.examples-note'),blockNote=exampleNote.textContent;
  const status=text=>{const target=$(api.selected?'pythonStatusBar':'workspaceStatus');target.textContent=text;target.title=text;};
- const examplesReady=fetch('python-examples.json?v=3.20.1').then(r=>{if(!r.ok)throw Error('Cannot load Python examples');return r.json();});
+ const examplesReady=fetch('python-examples.json?v=3.20.2').then(r=>{if(!r.ok)throw Error('Cannot load Python examples');return r.json();});
  examplesReady.catch(e=>status(e.message));
  let examples={},heartbeat=null,finishing=null,started=false,workerGeneration=0;
  let blockDesignName=$('designName').value,pythonDesignName='';
@@ -35,7 +27,7 @@
   $('toolboxWorkspace').hidden=api.selected;$('pythonPanel').hidden=!api.selected;
   for(const id of ['generalToolboxTab','hardwareToolboxTab','dashboardToolboxTab','spritesToolboxTab'])$(id).hidden=api.selected;
   for(const id of fileButtons)$(id).disabled=id==='saveProject'?false:!!window.blockProgramRunning;
-  $('pythonInfo').hidden=!api.selected;$('saveNamed').hidden=false;$('importPythonSource').hidden=!api.selected;$('exportPythonSource').hidden=!api.selected;$('importPythonSource').disabled=api.running;
+  $('pythonInfo').hidden=false;$('saveNamed').hidden=false;$('importPythonSource').hidden=!api.selected;$('exportPythonSource').hidden=!api.selected;$('importPythonSource').disabled=api.running;
   for(const [id,label] of Object.entries({menuUpload:'Upload Project',saveProject:'Download Project',newProject:'New Project'})){
    $(id).querySelector('span:last-child').textContent=api.selected?label:blockFiles[id].label;
    $(id).title=api.selected?label:blockFiles[id].title;
@@ -84,7 +76,7 @@
   heartbeat=window.CodyScheduler.every(()=>window.CodyLiveStore.heartbeat(token),800);
   const generation=++workerGeneration;let activeRequests=0;
   try{
-   const worker=new Worker(new URL('python-worker.mjs?v=3.20.1',location.href),{type:'module'});api.worker=worker;
+   const worker=new Worker(new URL('python-worker.mjs?v=3.20.2',location.href),{type:'module'});api.worker=worker;
    worker.onerror=event=>{event.preventDefault();void finish('Python worker failed to load. Check the Internet connection and reload the local pilot.',true);};
    worker.onmessage=async event=>{
     if(generation!==workerGeneration||!api.running||finishing)return;

@@ -1,3 +1,10 @@
+## 3.20.2 — hardware examples and shared project information
+
+- Remove numeric prefixes from example titles in the library, editor choices, saved names, Python title comments and reproducible zone builder. Refresh the fifteen affected archive checksums.
+- Add an inclusive Hardware category containing all fourteen real-hardware projects, including mixed projects; retain their other categories.
+- Show the project description info button in both Blocks and Python, including Blocks-only mode. Both views use the saved project description and the same popover.
+- Check archive integrity and all thirty examples in both editors using mocked services; physical hardware and Linux production deployment remain manual.
+
 ## 3.20.1 — subscription dates and example library
 
 - Add UTC subscription start/end fields and a date-independent Unlimited override; preserve CAS email in admin list and account details.

@@ -1,11 +1,11 @@
-# CodyNick Portal 3.20.1
+# CodyNick Portal 3.20.2
 
 CodyNick is a browser-based programming environment with Blocks and Python editors
 for real CodyNick gadgets, simulated gadgets, live dashboards and a sprite stage.
 
 Repository: [codynick/platform-server-browser-upload](https://github.com/codynick/platform-server-browser-upload)
 
-The searchable example library groups projects into General, Sensors, Dashboards,
+The searchable example library groups projects into General, Sensors, Hardware, Dashboards,
 Sprites and Combined projects. A fresh editor loads the first catalog example;
 landing-page cards open their selected example. Every example is an editable
 personal copy containing both programs and complete panel setup, initially stopped.
@@ -244,6 +244,13 @@ Keep this history current in every revision, with the newest revision first.
 Entries below describe the documented changes; earlier test limitations apply to
 their original releases. Desktop and mobile firmware uploads have since been
 confirmed by the user, as recorded in 3.11.5.
+
+### 3.20.2 — hardware examples and shared project information
+
+- Remove numeric prefixes from example titles in the library, editor choices, saved names, Python title comments and reproducible zone builder. Refresh the fifteen affected archive checksums.
+- Add an inclusive Hardware category containing all fourteen real-hardware projects, including mixed projects; retain their other categories.
+- Show the project description info button in both Blocks and Python, including Blocks-only mode. Both views use the saved project description and the same popover.
+- Check archive integrity and all thirty examples in both editors using mocked services; physical hardware and Linux production deployment remain manual.
 
 ### 3.20.1 — subscription dates and example library
 

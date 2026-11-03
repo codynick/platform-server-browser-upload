@@ -11,7 +11,7 @@ import re
 import zipfile
 
 ROOT = Path(__file__).resolve().parents[1]
-VERSION = '3.19.0'
+VERSION = (ROOT / 'VERSION').read_text().strip()
 
 def block(kind, fields=None, **inputs):
     return dict(type=kind, **({'fields': fields} if fields else {}),
@@ -106,7 +106,7 @@ def wait(seconds): return stmt(f'await wait({seconds})', block('cn_wait', SECOND
 class Project:
     def __init__(self, number, zones, title, description, required='', simulation=(), appearance='rocket'):
         self.id = f'zone-{number:02d}'
-        self.title = f'{number}. {zones} - {title}'
+        self.title = f'{zones} - {title}'
         self.zones, self.description, self.required = zones, description, required
         self.simulation, self.appearance = list(simulation), appearance
         self.widgets, self.setup, self.loop = {}, [], []
@@ -160,7 +160,7 @@ class Project:
         with zipfile.ZipFile(ROOT / 'blocks' / archive, 'w', zipfile.ZIP_DEFLATED) as z:
             for name, data in payload.items(): z.writestr(name, data)
             z.writestr('manifest.json', json_bytes(manifest))
-        return dict(title=self.title, help=self.help, simulation=self.simulation, stage='Sprite' in self.zones, dashboard=bool(self.widgets), archive=archive)
+        return dict(title=self.title, hardware=bool(self.required), help=self.help, simulation=self.simulation, stage='Sprite' in self.zones, dashboard=bool(self.widgets), archive=archive)
 
 def json_bytes(value): return (json.dumps(value, ensure_ascii=False, indent=2) + '\n').encode('utf-8')
 
@@ -226,7 +226,7 @@ def main():
     options = ''.join(f'<option value="{key}">{html.escape(e["title"])}</option>' for key, e in catalog.items())
     source = re.sub(r'(<select id="example"[^>]*>).*?(</select>)', lambda m: m[1] + options + m[2], source, flags=re.S)
     index.write_text(source, encoding='utf-8', newline='\n')
-    guide = '# Numbered zone examples\n\nEach `.codynick` ZIP includes matching Blocks and Python, saved panels, widget layout and sprite state. Load via Examples or File > Open, select a language, then Run. Loading leaves execution stopped. Hardware examples require a connected CJP with gateway firmware; no autonomous firmware is compiled.\n\nUse Open Dashboard / Open Stage for side-by-side interaction. Green dashboard Warning/Edge means True; red means False. A red RGB hardware/simulation LED means the warning is active.\n\n'
+    guide = '# Zone examples\n\nEach `.codynick` ZIP includes matching Blocks and Python, saved panels, widget layout and sprite state. Load via Examples or File > Open, select a language, then Run. Loading leaves execution stopped. Hardware examples require a connected CJP with gateway firmware; no autonomous firmware is compiled.\n\nUse Open Dashboard / Open Stage for side-by-side interaction. Green dashboard Warning/Edge means True; red means False. A red RGB hardware/simulation LED means the warning is active.\n\n'
     guide += '| Project | Required hardware | Try this and expected result |\n|---|---|---|\n'
     for p in projects: guide += f'| {p.title} | {p.required or "None"} | {p.description} |\n'
     guide += '\nValidation: the automated suite uses actual Blockly execution and real browser Pyodide with a mocked CJP transport. This verifies software routing and reactions; it does not validate physical sensors or a real board.\n'
