@@ -1,20 +1,10 @@
-CodyNick Portal 3.20.4
+CodyNick Platform 3.21.0
 
-Demo category: Temperature sensor: HW and SIM; Soil Moisture: SIM to HW; Move Sprite with HW Joystick.
-Unnumbered example titles, inclusive Hardware category and shared Blocks/Python project description info.
-Subscription dates, CAS email, searchable example library, editable copies and linked landing examples.
-Free and guest defaults: 60 seconds maximum runtime and 10 seconds cooldown. Existing saved per-user runtime values are preserved. Admin has separate Runtime and Cooldown fields.
-Target, pot and cup bodies are draggable; their visible headers are removed.
-Keep BOTH rollback commands printed by the installer. Restore backend first, then website. Private projects/database are retained.
-Unlimited overrides saved subscription dates. Active dated subscriptions retain unrestricted runs.
+Upgrade the existing server using the normal setup.sh command in README.md.
+Community and Publish are on the toolbar; File > My published projects opens
+publication management. Sign in/account is the rightmost header control.
+Admin Panel includes persistent default runtime and cooldown controls.
 
-Run the standard setup/update command from an interactive terminal on the VPS:
-
-wget -4 -O /tmp/codynick-browser-setup.sh "https://raw.githubusercontent.com/codynick/platform-server-browser-upload/main/setup.sh?$(date +%s)" && sudo bash /tmp/codynick-browser-setup.sh
-
-If no admin is configured, enter the exact first admin CodyNick ID when asked.
-On a fresh installation it is reserved for matching CAS sign-in; no password or login session is created. Existing admins are retained without prompting.
-For unattended setup: sudo env CODYNICK_ADMIN_ID='actual-id' bash /tmp/codynick-browser-setup.sh
-Close CodyNick tabs before updating. Reopen and Ctrl+F5 afterward. Keep the printed website/account rollback commands; private projects are retained.
-
-Automated checks use mocked services and hardware. Production Linux deployment and physical-device checks remain manual.
+Website/account backups and rollback paths are printed during setup.
+Existing private projects, publications, configuration and per-user limits remain.
+This release does not upload or change device firmware during server setup.

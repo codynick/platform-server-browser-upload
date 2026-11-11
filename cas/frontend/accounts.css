@@ -24,3 +24,6 @@
 .subscription-status{display:grid;gap:5px;margin:0 6px 6px;padding:10px 8px;background:#f5f8fc;border-radius:5px;font:13px system-ui;color:#40566e;overflow-wrap:anywhere}
 .subscription-active{color:#146c43}.subscription-inactive{color:#8a4800}
 @media(max-width:1050px){.account-controls{flex-basis:125px}}
+
+/* Account stays rightmost after optional toolbar actions are inserted. */
+.topbar .toolbar>.account-controls{order:100;margin-left:auto}

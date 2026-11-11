@@ -14,7 +14,7 @@
   function walk(b,depth=0){if(!b)return;if(depth>150||++count>2000||!supported.has(b.type))throw Error('Invalid or unsupported block in project.');for(const input of Object.values(b.inputs||{})){walk(input.block,depth+1);walk(input.shadow,depth+1);}walk(b.next?.block,depth+1);}
   s.workspace.blocks.blocks.forEach(b=>walk(b));
   const temporary=new B.Workspace();try{B.serialization.workspaces.load(s.workspace,temporary);}finally{temporary.dispose();}
-  object(s.editor,'editor state');object(s.editor.names,'design names');string(s.editor.names.blocks,120,'Blocks design name');string(s.editor.names.python,120,'Python design name');
+  object(s.editor,'editor state');if(s.editor.publication!=null){object(s.editor.publication,'publication reference');if(!/^[A-Za-z0-9_-]{24}$/.test(s.editor.publication.id||''))throw Error('Invalid publication reference.');}object(s.editor.names,'design names');string(s.editor.names.blocks,120,'Blocks design name');string(s.editor.names.python,120,'Python design name');
   if(!['blocks','python'].includes(s.editor.language)||!['simulator','dashboard','sprites'].includes(s.editor.space)||typeof s.editor.collapsed!=='boolean')throw Error('Invalid selected editor or space.');
   string(s.editor.help,4000,'example description');string(s.editor.console,60000,'Python console');
   for(const key of ['cursorStart','cursorEnd','scrollTop','scrollLeft'])number(s.editor[key],0,10000000,'editor '+key);
@@ -39,13 +39,13 @@
  function capture(){
   const workspace=B.serialization.workspaces.save(window.codyWorkspace);workspace.blocks??={languageVersion:0,blocks:[]};delete workspace.codynick_live_scene;delete workspace.codynick_sprite_stage;
   const py=window.CodyPythonPilot?.exportProjectState()||{source:$('pythonSource').value,names:{blocks:$('designName').value,python:''},language:'blocks',help:$('pythonExampleHelp').textContent,console:$('pythonOutput').textContent,cursorStart:0,cursorEnd:0,scrollTop:0,scrollLeft:0};
-  const {source,...editorState}=py;const state=CodyLiveStore.read(),live={};for(const key of liveFields)live[key]=clone(state[key]);for(const w of Object.values(live.widgets)){delete w.inputAt;delete w.inputOwner;delete w.clicks;if(w.type==='button')w.value=false;}
+  const {source,...editorState}=py;editorState.publication=window.CodyPublication?.reference()||null;const state=CodyLiveStore.read(),live={};for(const key of liveFields)live[key]=clone(state[key]);for(const w of Object.values(live.widgets)){delete w.inputAt;delete w.inputOwner;delete w.clicks;if(w.type==='button')w.value=false;}
   let simulatorView=null;try{simulatorView=$('simulatorFrame').contentWindow.CodySimulatorView?.snapshot()||null;}catch{}
   let layout={};try{layout=JSON.parse(localStorage.getItem(layoutKey)||'{}');}catch{}
   return {format:'codynick-webserial',version:3,projectSchema:'codynick-project/1',applicationVersion:window.CODYNICK_VERSION,workspace,python:source,editor:{...editorState,space:['simulator','dashboard','sprites'].find(n=>$('show-'+n).getAttribute('aria-pressed')==='true')||'simulator',collapsed:$('liveMain').classList.contains('stage-collapsed')},state:{live,sprite:CodySpriteStage.snapshotProject(),layout,simulatorView}};
  }
  async function apply(s){
-  editor.load(s.workspace);CodyLiveStore.restoreProject(s.state.live);CodySpriteStage.restoreProject(s.state.sprite);
+  editor.load(s.workspace);window.CodyPublication?.restore(s.editor.publication||null,{legacy:!Object.hasOwn(s.editor,'publication')});CodyLiveStore.restoreProject(s.state.live);CodySpriteStage.restoreProject(s.state.sprite);
   const clean={};for(const [id,r] of Object.entries(s.state.layout))Object.defineProperty(clean,id,{value:CodyDashboardLayout.clean(r),enumerable:true});
   localStorage.setItem(layoutKey,JSON.stringify(clean));window.dispatchEvent(new StorageEvent('storage',{key:layoutKey,newValue:JSON.stringify(clean)}));
   if(window.CodyPythonPilot)await CodyPythonPilot.restoreProjectState({source:s.python,...s.editor});
@@ -54,11 +54,11 @@
   if(s.state.simulatorView)$('simulatorFrame').contentWindow.CodySimulatorView?.restore(s.state.simulatorView);
   const dashboard=$('dashboardFrame').contentWindow;dashboard.CodyDashboardLayoutUI?.reload?.();
  }
- async function loadProject(s,exampleId=null){stopped();validate(s);const previous=capture();try{await apply(s);if(exampleId)window.CodyAccess?.example(exampleId);else window.CodyAccess?.personal();}catch(e){try{await apply(previous);}catch{}throw e;}}
+ async function loadProject(s,exampleId=null){stopped();validate(s);const previous=capture();try{await apply(s);if(exampleId)window.CodyPublication?.clear();if(exampleId)window.CodyAccess?.example(exampleId);else window.CodyAccess?.personal();}catch(e){try{await apply(previous);}catch{}throw e;}}
  async function download(){if(busy)return;busy=true;try{const s=capture();validate(s);const bytes=await CodyProjectArchive.encode(s),a=document.createElement('a'),url=URL.createObjectURL(new Blob([bytes],{type:'application/zip'}));a.href=url;a.download=($('designName').value.trim()||'Untitled').replace(/[<>:"/\\|?*\u0000-\u001f]/g,'_').slice(0,100)+'.codynick';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);editor.saved();say('Downloaded complete project: Blocks, Python and saved scene state.');}catch(e){say(e.message);alert(e.message);}finally{busy=false;}}
  $('saveProject').onclick=download;$('menuUpload').onclick=()=>$('importFile').click();$('importFile').accept='.codynick';
  $('importFile').onchange=async()=>{try{stopped();const f=$('importFile').files[0];if(!f)return;if(f.size>8*1024*1024)throw Error('Project archive must be smaller than 8 MB.');const s=validate(await CodyProjectArchive.decode(await f.arrayBuffer()));if(!confirm('Replace both programs and saved scene state? Download your current project first to keep it.'))return;await loadProject(s);say('Complete project loaded. Programs remain stopped.');}catch(e){say('Project upload failed: '+e.message);alert('Project upload failed: '+e.message);}finally{$('importFile').value='';}};
- $('newProject').onclick=async()=>{try{stopped();if(!confirm('Create a new project? This clears both programs and all simulated/dashboard/sprite state. Download first to keep the current project.'))return;const s=capture();s.workspace={blocks:{languageVersion:0,blocks:[]}};s.python='';s.editor={...s.editor,names:{blocks:'',python:''},help:'Open Examples to begin.',console:'',cursorStart:0,cursorEnd:0,scrollTop:0,scrollLeft:0};const base=CodyLiveStore.defaults();for(const key of liveFields)s.state.live[key]=clone(base[key]);const model=new CodySpriteModel();s.state.sprite=model.snapshotProject();s.state.layout={};s.state.simulatorView=null;await loadProject(s);say('New project · Ready.');}catch(e){say(e.message);alert(e.message);}};
+ $('newProject').onclick=async()=>{try{stopped();if(!confirm('Create a new project? This clears both programs and all simulated/dashboard/sprite state. Download first to keep the current project.'))return;const s=capture();s.workspace={blocks:{languageVersion:0,blocks:[]}};s.python='';s.editor={...s.editor,publication:null,names:{blocks:'',python:''},help:'Open Examples to begin.',console:'',cursorStart:0,cursorEnd:0,scrollTop:0,scrollLeft:0};const base=CodyLiveStore.defaults();for(const key of liveFields)s.state.live[key]=clone(base[key]);const model=new CodySpriteModel();s.state.sprite=model.snapshotProject();s.state.layout={};s.state.simulatorView=null;await loadProject(s);say('New project · Ready.');}catch(e){say(e.message);alert(e.message);}};
  $('importPythonSource').onclick=()=>$('pythonFile').click();$('exportPythonSource').onclick=()=>CodyPythonPilot.exportPythonSource();
  editor.project=capture;editor.loadProject=loadProject;editor.saved=()=>window.CodyPythonPilot?.markProjectSaved();
  // Examples are full projects, regardless of which coding editor is selected.
@@ -80,6 +80,7 @@
  let initialLoaded=false;
  window.addEventListener('codynick-account-ready',async()=>{
   if(initialLoaded)return;initialLoaded=true;
+  if(new URLSearchParams(location.search).has('shared')){if(window.CodySharingImport)await window.CodySharingImport();else window.addEventListener('codynick-sharing-import-ready',()=>void window.CodySharingImport(),{once:true});return;}
   const requested=new URLSearchParams(location.search).get('example');
   try{const response=await fetch('python-examples.json');if(!response.ok)throw Error('Cannot load examples');const catalog=await response.json();const id=requested||Object.keys(catalog)[0];if(!catalog[id])throw Error('Unknown example');await loadExample(id,false);}catch(e){say(e.message);}
  });

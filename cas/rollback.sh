@@ -5,7 +5,7 @@ cd -- "$(dirname -- "${BASH_SOURCE[0]}")"
 read -r domain < domain
 root=/var/www/$domain
 systemctl stop codynick-cas || true
-for section in blocks simulator dashboard admin; do
+for section in blocks simulator dashboard admin sharing; do
  rm -rf -- "$root/$section"
  if [[ -e "$section" ]]; then cp -a "$section" "$root/$section"; fi
 done

@@ -1,0 +1,3 @@
+.top{gap:12px;flex-wrap:wrap}.top .brand{margin-right:auto}.top-link{white-space:nowrap}@media(max-width:600px){.top .brand{flex-basis:100%}.top{justify-content:flex-start}}
+
+a,a:hover{text-decoration:none!important}.foot a{display:inline-flex;padding:8px 12px;border:1px solid currentColor;border-radius:8px}

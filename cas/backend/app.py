@@ -288,19 +288,29 @@ def init_access():
 
     with database() as db:
         db.execute('BEGIN IMMEDIATE')
+        db.execute('CREATE TABLE IF NOT EXISTS platform_defaults(id INTEGER PRIMARY KEY CHECK(id=1),seconds INTEGER NOT NULL,cooldown INTEGER NOT NULL,revision INTEGER NOT NULL)')
+        db.execute('INSERT OR IGNORE INTO platform_defaults VALUES(1,?,?,1)',(DEFAULT_RUN_SECONDS,DEFAULT_COOLDOWN_SECONDS))
         db.execute('CREATE TABLE IF NOT EXISTS account_cooldowns(user_id TEXT PRIMARY KEY,cooldown INTEGER NOT NULL)')
         db.execute('CREATE TABLE IF NOT EXISTS run_cooldowns(user_id TEXT PRIMARY KEY,token TEXT NOT NULL,cooldown INTEGER NOT NULL)')
         db.execute('CREATE TABLE IF NOT EXISTS account_overrides(user_id TEXT PRIMARY KEY,unlimited_override INTEGER NOT NULL DEFAULT 0)')
         db.execute("INSERT OR IGNORE INTO account_overrides SELECT user_id,1 FROM account_access WHERE plan='Unlimited'")
 
 
+def runtime_defaults():
+    with database() as db:
+        return dict(db.execute('SELECT seconds,cooldown,revision FROM platform_defaults WHERE id=1').fetchone())
+
+
 def access_for(uid):
+    defaults=runtime_defaults()
     with database() as db:
         row=db.execute('SELECT a.*,coalesce(o.unlimited_override,0) AS unlimited_override FROM account_access a LEFT JOIN account_overrides o ON o.user_id=a.user_id WHERE a.user_id=?',(uid,)).fetchone()
         cooldown=db.execute('SELECT cooldown FROM account_cooldowns WHERE user_id=?',(uid,)).fetchone()
         run=db.execute('SELECT ready FROM run_limits WHERE user_id=?',(uid,)).fetchone()
-    data=dict(row) if row else dict(user_id=uid,role='user',seconds=DEFAULT_RUN_SECONDS,plan='',starts=None,ends=None,unlimited_override=0)
-    data['cooldown']=cooldown['cooldown'] if cooldown else DEFAULT_COOLDOWN_SECONDS
+    data=dict(row) if row else dict(user_id=uid,role='user',seconds=defaults['seconds'],plan='',starts=None,ends=None,unlimited_override=0)
+    data['cooldown']=cooldown['cooldown'] if cooldown else defaults['cooldown']
+    data['uses_default_seconds']=row is None
+    data['uses_default_cooldown']=cooldown is None
     now=time.time()
     data['unlimited']=data['role']=='admin' or bool(data.get('unlimited_override',0))
     data['subscribed']=data['unlimited'] or bool(data['plan'] and data['starts'] is not None and data['starts']<=now and (data['ends'] is None or now<data['ends']))
@@ -312,6 +322,27 @@ def admin_user(write=False):
     u=authenticated(write)
     if access_for(u['user_id'])['role']!='admin':abort(403)
     return u
+
+@app.get('/api/admin/defaults')
+def admin_defaults():
+    admin_user()
+    return jsonify(defaults=runtime_defaults())
+
+@app.put('/api/admin/defaults')
+def update_admin_defaults():
+    actor=admin_user(True);data=request.get_json()
+    if not isinstance(data,dict) or set(data)!={'seconds','cooldown','revision'}:abort(400)
+    if type(data['seconds']) is not int or not 1<=data['seconds']<=86400:abort(400)
+    if type(data['cooldown']) is not int or not 0<=data['cooldown']<=86400:abort(400)
+    if type(data['revision']) is not int:abort(400)
+    with database() as db:
+        db.execute('BEGIN IMMEDIATE')
+        before=dict(db.execute('SELECT seconds,cooldown,revision FROM platform_defaults WHERE id=1').fetchone())
+        if before['revision']!=data['revision']:return jsonify(error='Defaults changed in another tab. Reload before saving.'),409
+        db.execute('UPDATE platform_defaults SET seconds=?,cooldown=?,revision=revision+1 WHERE id=1',(data['seconds'],data['cooldown']))
+        after=dict(db.execute('SELECT seconds,cooldown,revision FROM platform_defaults WHERE id=1').fetchone())
+        db.execute('INSERT INTO access_audit(actor,target,at,before_json,after_json) VALUES(?,?,?,?,?)',(actor['user_id'],'_platform_defaults',int(time.time()),json.dumps(before),json.dumps(after)))
+    return jsonify(defaults=after)
 
 @app.get('/api/admin/users')
 def admin_users():
@@ -358,7 +389,7 @@ def run_start():
     guest_cookie=request.cookies.get('__Host-codynick_guest','')
     if not re_guest(guest_cookie):guest_cookie=secrets.token_urlsafe(32)
     uid=user['user_id'] if user else 'guest:'+digest(guest_cookie)
-    access=access_for(uid) if user else {'seconds':DEFAULT_RUN_SECONDS,'cooldown':DEFAULT_COOLDOWN_SECONDS,'subscribed':False}
+    access=access_for(uid) if user else dict(runtime_defaults(),subscribed=False)
     now=time.time()
     if access['subscribed']:return jsonify(token=None,deadline=None,ready=0,server_time=now)
     seconds=access['seconds'];cooldown=access['cooldown'];token=secrets.token_urlsafe(32)
@@ -394,3 +425,7 @@ def run_finish():
     return jsonify(ready=ready,server_time=now)
 
 init_access()
+
+# Unlisted publication snapshots (additive schema).
+from sharing import register_sharing
+register_sharing(app, database, authenticated, access_for, ORIGIN)

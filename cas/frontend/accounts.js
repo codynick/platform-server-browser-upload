@@ -83,7 +83,7 @@
    busy=true;const saveGeneration=generation;
    try{
     const title=newTitle||document.getElementById('designName').value.trim()||'Untitled';
-    const data={title,project:editor.project()};if(asNew){data.project.editor.names={blocks:title,python:title};}if(new TextEncoder().encode(JSON.stringify(data)).length>1900000)throw Error('This project is too large for account saving. Download .codynick instead.');
+    const data={title,project:editor.project()};if(asNew){data.project.editor.names={blocks:title,python:title};data.project.editor.publication=null;}if(new TextEncoder().encode(JSON.stringify(data)).length>1900000)throw Error('This project is too large for account saving. Download .codynick instead.');
     // A changed title creates a new project; same title updates only the loaded/saved project.
     const existing=!asNew&&current&&current.title===title;
     if(existing)data.revision=current.revision;

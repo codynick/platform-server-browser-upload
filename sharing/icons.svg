@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+<symbol fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" id="publish" viewBox="0 0 32 32"><path d="M9 21l-4 6 7-3M11 19C12 10 20 5 27 5c0 8-4 15-13 17z"/><circle cx="21" cy="11" r="2.5"/><path d="M11 14H6l-3 6 8-1M18 22v5l-6 3 1-8"/></symbol>
+<symbol fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" id="gallery" viewBox="0 0 32 32"><rect x="4" y="4" width="10" height="10" rx="2"/><rect x="18" y="4" width="10" height="10" rx="2"/><rect x="4" y="18" width="10" height="10" rx="2"/><path d="M18 23h10M23 18v10"/></symbol>
+<symbol fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" id="code" viewBox="0 0 32 32"><path d="M11 8l-8 8 8 8M21 8l8 8-8 8M19 5l-6 22"/></symbol>
+<symbol fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" id="clock" viewBox="0 0 32 32"><circle cx="16" cy="16" r="12"/><path d="M16 8v8l5 3"/></symbol>
+<symbol fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" id="empty" viewBox="0 0 64 48"><rect x="9" y="5" width="46" height="34" rx="5"/><path d="M9 14h46M18 10h1m5 0h1m5 0h1M22 22l-5 5 5 5m20-10 5 5-5 5M29 34l6-14M23 44h18"/></symbol>
+</svg>

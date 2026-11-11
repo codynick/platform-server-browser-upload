@@ -46,7 +46,7 @@ else
   git clone --branch main --single-branch https://github.com/codynick/platform-server-browser-upload.git "$repo"
  fi
 fi
-for required in VERSION install.sh cas/bootstrap_admin.py admin/index.html blocks/access.js blocks/access.css simulator/world-assets.js simulator/world-assets.css simulator/soil-world.js simulator/soil-world.css cas/update.sh cas/patch_frontend.py cas/backend/app.py cas/frontend/accounts.js cas/frontend/accounts.css blocks/index.html blocks/examples/hello.codynick blocks/examples/sim-dashboard.codynick blocks/examples/mixed.codynick blocks/examples/Real-temperature-Sim-distance.codynick blocks/examples/blink.codynick blocks/examples/temperature.codynick blocks/examples/joystick.codynick blocks/examples/stage-keyboard.codynick blocks/examples/stage-temperature.codynick blocks/examples/stage-joystick.codynick blocks/examples/dashboard-controls.codynick blocks/examples/dashboard-sprite.codynick blocks/stage.html blocks/stage-page.css blocks/stage-link.js dashboard/push-button.css dashboard/inputs.js blocks/examples/dashboard-controls.codynick blocks/examples/dashboard-sprite.codynick blocks/sprite-looks.js blocks/project-archive.js blocks/project-files.js blocks/vendor/jszip.min.js blocks/vendor/JSZIP-LICENSE.md blocks/sprites/appearances/rocket.svg blocks/sprites/appearances/ball.svg blocks/sprites/appearances/bee.svg blocks/sprites/appearances/bird.svg blocks/sprites/appearances/dog.svg blocks/sprites/appearances/athlete.svg blocks/sprites/appearances/cactus.svg blocks/sprites/appearances/apple.svg blocks/sprites/appearances/apartment.svg blocks/sprites/appearances/bike.svg blocks/sprites/appearances/diamond.svg blocks/sprite-model.js blocks/sprite-view.js blocks/sprite-blocks.js blocks/sprite-stage.css blocks/examples/stage-keyboard.codynick blocks/examples/stage-temperature.codynick blocks/examples/stage-joystick.codynick blocks/python-pilot.css blocks/python-pilot.js blocks/python-pilot-config.js blocks/python-color.js blocks/python-bridge.js blocks/python-worker.mjs blocks/codynick.py blocks/python-examples.json; do
+for required in sharing/index.html sharing/gallery.html sharing/editor.js sharing/icons.svg cas/backend/sharing.py VERSION install.sh cas/bootstrap_admin.py admin/index.html blocks/access.js blocks/access.css simulator/world-assets.js simulator/world-assets.css simulator/soil-world.js simulator/soil-world.css cas/update.sh cas/patch_frontend.py cas/backend/app.py cas/frontend/accounts.js cas/frontend/accounts.css blocks/index.html blocks/examples/hello.codynick blocks/examples/sim-dashboard.codynick blocks/examples/mixed.codynick blocks/examples/Real-temperature-Sim-distance.codynick blocks/examples/blink.codynick blocks/examples/temperature.codynick blocks/examples/joystick.codynick blocks/examples/stage-keyboard.codynick blocks/examples/stage-temperature.codynick blocks/examples/stage-joystick.codynick blocks/examples/dashboard-controls.codynick blocks/examples/dashboard-sprite.codynick blocks/stage.html blocks/stage-page.css blocks/stage-link.js dashboard/push-button.css dashboard/inputs.js blocks/examples/dashboard-controls.codynick blocks/examples/dashboard-sprite.codynick blocks/sprite-looks.js blocks/project-archive.js blocks/project-files.js blocks/vendor/jszip.min.js blocks/vendor/JSZIP-LICENSE.md blocks/sprites/appearances/rocket.svg blocks/sprites/appearances/ball.svg blocks/sprites/appearances/bee.svg blocks/sprites/appearances/bird.svg blocks/sprites/appearances/dog.svg blocks/sprites/appearances/athlete.svg blocks/sprites/appearances/cactus.svg blocks/sprites/appearances/apple.svg blocks/sprites/appearances/apartment.svg blocks/sprites/appearances/bike.svg blocks/sprites/appearances/diamond.svg blocks/sprite-model.js blocks/sprite-view.js blocks/sprite-blocks.js blocks/sprite-stage.css blocks/examples/stage-keyboard.codynick blocks/examples/stage-temperature.codynick blocks/examples/stage-joystick.codynick blocks/python-pilot.css blocks/python-pilot.js blocks/python-pilot-config.js blocks/python-color.js blocks/python-bridge.js blocks/python-worker.mjs blocks/codynick.py blocks/python-examples.json; do
  [[ -f $repo/$required ]] || { echo "Incomplete source package: $required" >&2; exit 1; }
 done
 
@@ -105,9 +105,19 @@ raise SystemExit('No enabled HTTPS VirtualHost for '+sys.argv[1]+'; deployment h
 PY
 
 echo '[5/6] Deploying complete website with backup'
-CODYNICK_DOMAIN="$domain" bash "$repo/install.sh"
+deploy_log=$(mktemp /tmp/codynick-deploy-XXXXXXXX.log)
+CODYNICK_DOMAIN="$domain" bash "$repo/install.sh" | tee "$deploy_log"
+website_backup=$(sed -n 's/^Backup: //p' "$deploy_log" | tail -n 1)
+
 echo '[6/6] Installing/updating CAS and private projects'
-CODYNICK_DOMAIN="$domain" bash "$repo/cas/update.sh"
+if ! CODYNICK_DOMAIN="$domain" bash "$repo/cas/update.sh"; then
+ if [[ -n $website_backup && -f $website_backup/rollback.sh ]]; then
+  echo 'Account update failed; restoring the previous website.' >&2
+  bash "$website_backup/rollback.sh"
+ fi
+ exit 1
+fi
+rm -f -- "$deploy_log"
 printf '\nCodyNick %s ready: https://%s/blocks/\n' "$(cat "$repo/VERSION")" "$domain"
 echo 'Close old tabs, reopen the editor and press Ctrl+F5.'
 echo 'Rerun this same setup command to retry or reinstall this package.'

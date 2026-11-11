@@ -1,5 +1,6 @@
 import pathlib,sys,re
 root=pathlib.Path(sys.argv[1])
+version=(root/'VERSION').read_text().strip()
 p=root/'blocks/blocks.js';s=p.read_text()
 if 'CodyAccountEditor' not in s:
  start=s.index('function save(){try{localStorage.setItem(key,')
@@ -17,14 +18,14 @@ load(example('blink'));
 for page in ['blocks/index.html','simulator/index.html','dashboard/index.html']:
  p=root/page;s=p.read_text()
  if '/blocks/accounts.js' not in s:s=s.replace('</head>','<style>body{visibility:hidden}</style><script src="/blocks/accounts.js" defer></script></head>')
- s=re.sub(r'/blocks/accounts\.js(?:\?[^\"]*)?', '/blocks/accounts.js?v=3.20.0', s)
+ s=re.sub(r'/blocks/accounts\.js(?:\?[^\"]*)?', '/blocks/accounts.js?v='+version, s)
  if page.startswith('blocks/'):
   if 'id="headerExamples"' not in s:
    s=s.replace('<button id="toggleSpaces">','<button id="headerExamples" title="Open example projects">Examples</button>\n      <button id="toggleSpaces">')
   s=s.replace('Saved on this device','Private projects in your account').replace('Projects and dashboard layouts are saved locally in your browser.','Sign in to save private projects to your account. Download to keep guest work.').replace('Save named project in this browser','Save private account project').replace('Load a project saved in this browser','Load private account project')
  if page.startswith('blocks/') and '/blocks/accounts.css' not in s:
-  s=s.replace('</head>','<link rel="stylesheet" href="/blocks/accounts.css?v=3.20.0"></head>')
- s=re.sub(r'/blocks/accounts\.css(?:\?[^\"]*)?', '/blocks/accounts.css?v=3.20.0', s)
+  s=s.replace('</head>','<link rel="stylesheet" href="/blocks/accounts.css?v=3.21.0"></head>')
+ s=re.sub(r'/blocks/accounts\.css(?:\?[^\"]*)?', '/blocks/accounts.css?v='+version, s)
  p.write_text(s)
 
 # Apply on both first-time and already-patched installations.

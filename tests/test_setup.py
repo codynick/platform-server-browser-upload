@@ -66,6 +66,8 @@ printf '%s\\n' "'''+name+'''" >> "$FIXTURE_ROOT/deployment"
   html=(self.root/'var/www/code.codynick.com/blocks/index.html').read_text()
   self.assertIn('id="headerExamples"',html)
   self.assertTrue((self.root/'var/www/code.codynick.com/blocks/accounts.js').exists())
+  for asset in ['sharing/index.html','sharing/gallery.html','sharing/editor.js','sharing/icons.svg']:
+   self.assertTrue((self.root/'var/www/code.codynick.com'/asset).is_file(),asset)
   self.assertEqual(len(list((self.root/'root').glob('codynick-portal-backup-*'))),2)
  def test_download_bootstrap_clones_correct_repo_then_updates(self):
   for _ in range(2):
@@ -85,4 +87,14 @@ printf '%s\\n' "'''+name+'''" >> "$FIXTURE_ROOT/deployment"
  def test_invalid_domain_rejected_before_package_install(self):
   self.assertNotEqual(self.run_setup(CODYNICK_DOMAIN='https://code.codynick.com').returncode,0)
   self.assertFalse((self.root/'calls').exists())
+ def test_backend_failure_restores_previous_website(self):
+  marker=self.root/'website-restored'
+  backup=self.root/'portal-backup';backup.mkdir()
+  (backup/'rollback.sh').write_text('#!/bin/bash\ntouch "'+str(marker)+'"\n')
+  (self.bundle/'install.sh').write_text('#!/bin/bash\necho "Backup: '+str(backup)+'"\n')
+  (self.bundle/'cas/update.sh').write_text('#!/bin/bash\nexit 22\n')
+  result=self.run_setup()
+  self.assertNotEqual(result.returncode,0)
+  self.assertTrue(marker.exists(),result.stdout+result.stderr)
+
 if __name__=='__main__':unittest.main(verbosity=2)

@@ -245,6 +245,47 @@ Entries below describe the documented changes; earlier test limitations apply to
 their original releases. Desktop and mobile firmware uploads have since been
 confirmed by the user, as recorded in 3.11.5.
 
+### 3.21.0 — Community publishing and configurable default limits
+
+- Promote the approved p5 trial into the standard Git installation: Community search/filter/pagination, two-field Publish with server-verified SSO names, automatic publication updates, File > My published projects and link copying, read-only code pages opening stopped projects in the standard editor, and report/admin removal.
+- Add persistent Admin default runtime/cooldown settings while preserving custom limits, subscription exemptions and active-run leases. Use button navigation and small local SVG graphics.
+- Keep account/sign-in as the rightmost header control on desktop and mobile, retaining account menu, subscription and admin behavior.
+- Deploy and back up Community assets and the sharing backend through the normal setup/install/CAS updater; retain data and configuration on update/rollback. Validate locally and through release checks; production Linux and physical device acceptance remain manual.
+
+### 3.20.5-patch.5 — File menu and Community navigation
+
+- Move My published projects from the toolbar into File, after Load Project; retain its existing publication management and link-copying behavior.
+- Rename the toolbar and navigation caption to Community and use Community Projects as the browsing-page heading. Retain existing URLs and published links.
+- Supply a cumulative server-only patch for 3.20.4 and p1–p4, including compatibility checks, backup and rollback. Original local source and Git remain unchanged.
+
+### 3.20.5-patch.4 — simple SSO publishing and editable default limits
+
+- Reduce Publish to Title and Description, automatically identify an update or new publication, include both programs in the public gallery, and take designer credit from authenticated SSO identity on the server.
+- Add small SVG graphics and button-style navigation with no underlined links on publication pages, dialogs, menus and Admin.
+- Add Admin default runtime and cooldown controls backed by SQLite, with validation, optimistic concurrency and audit records. Preserve per-user overrides and Unlimited/admin exemptions; active runs retain their original limits.
+- Provide a cumulative server-only patch for 3.20.4 and p1/p2/p3, retaining publication records, protected-file checks, backup and rollback. Original local source and Git remain unchanged.
+
+### 3.20.5-patch.3 — publish directly to the existing editor (server-only trial patch)
+
+- Show Designed by on gallery cards and the publication information page. Replace the separate simulation player with read-only visual Blocks/Python source and an Open in editor button; open the complete project in the standard editor stopped.
+- Rename Share to Publish. Retain a private publication reference in account/project saves and restore owner associations when opening an owned publication. Reuse existing designer, description, source selection, visibility and link when publishing changes; settings remain editable without re-entry.
+- Add My published projects to the toolbar and Copy link controls. Keep public/unlisted visibility, gallery search, reporting and administrator removal.
+- Supply a cumulative local patch for 3.20.4 and the previous two sharing trial patches, including protected-file checks, database backup, removal of the obsolete player, failure recovery and rollback. Original local source and Git remain unchanged.
+
+### 3.20.5-patch.2 — searchable public student gallery (server-only trial patch)
+
+- Add an opt-in public gallery with keyword search across titles, descriptions and chosen display names; include language filters, sorting and 20-project pagination. Unlisted snapshots are excluded from gallery responses.
+- Keep new and existing publications unlisted by default. Require explicit public confirmation; let owners remove gallery listings while retaining share links, or unpublish entirely. Public updates remain explicit snapshots.
+- Add gallery navigation from the landing page, editor, shared viewer and management page. Retain report/admin removal and isolated Blocks/Python playback.
+- Supply a replacement cumulative patch for deployed 3.20.4 with compatibility checks, backup and rollback. No original local source or Git changes; production server validation remains manual.
+
+### 3.20.5-patch.1 — unlisted student sharing (server-only trial patch)
+
+- Publish selected Blocks/Python programs and saved scene/dashboard/sprite state as an explicit unlisted snapshot, with review, revision updates, copying, downloads and unpublishing.
+- Add an isolated simulation player with physical USB and account access disabled, report submission and administrator removal. Public gallery remains deferred.
+- Keep private projects separate; exclude account metadata, console history, runtime leases and credential metadata from snapshots. Students must review code and saved values for embedded personal information or secrets.
+- Add server snapshot ownership/CSRF checks, bounded storage, additive database tables, baseline-checked deployment, backups and rollback. Local source repository and Git are unchanged by this trial package.
+
 ### 3.20.4 — Demo project category
 
 - Add Demo as an inclusive category alongside Hardware and the existing topic categories. Keep the initial example unchanged.

@@ -17,6 +17,7 @@ class Tests(unittest.TestCase):
  def setUp(self):
   with m.database() as db:
    for table in ['login_confirmations','users','sessions','projects','logins','account_access','account_overrides','account_cooldowns','run_cooldowns','access_audit','run_limits']:db.execute('DELETE FROM '+table)
+   db.execute('UPDATE platform_defaults SET seconds=?,cooldown=?,revision=1 WHERE id=1',(m.DEFAULT_RUN_SECONDS,m.DEFAULT_COOLDOWN_SECONDS))
   self.client=m.app.test_client()
  def user(self,client,uid):
   token='token-'+uid;csrf='csrf-'+uid
@@ -134,7 +135,8 @@ class Tests(unittest.TestCase):
 
  def test_configurable_defaults_preserve_saved_runtime(self):
   with m.database() as db:db.execute("INSERT INTO account_access(user_id,seconds) VALUES('saved',7)")
-  with patch.object(m,'DEFAULT_RUN_SECONDS',90),patch.object(m,'DEFAULT_COOLDOWN_SECONDS',4):
+  with m.database() as db:db.execute('UPDATE platform_defaults SET seconds=90,cooldown=4 WHERE id=1')
+  with patch.object(m,'DEFAULT_RUN_SECONDS',999),patch.object(m,'DEFAULT_COOLDOWN_SECONDS',999):
    self.assertEqual(m.access_for('new')['seconds'],90)
    self.assertEqual(m.access_for('saved')['seconds'],7)
    with patch.object(m.time,'time',return_value=1000):

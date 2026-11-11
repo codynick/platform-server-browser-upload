@@ -18,6 +18,9 @@ if [[ -z $domain ]]; then read -rp 'Existing website domain (e.g. ide.codynick.c
 domain=${domain,,}
 root=/var/www/$domain
 [[ -f $root/blocks/blocks.js ]] || { echo "Existing editor not found: $root"; exit 1; }
+for required in backend/app.py backend/sharing.py frontend/accounts.js frontend/accounts.css ../sharing/index.html ../sharing/gallery.html ../sharing/editor.js; do
+ [[ -f $required ]] || { echo "Incomplete account/Community release: $required" >&2; exit 1; }
+done
 # Defaults allow unattended setup; environment overrides customize a new server.
 cas=${CAS_BASE_URL:-https://id.codynick.com/cas}
 validate=${CAS_VALIDATE_URL:-$cas/p3/serviceValidate}
@@ -44,7 +47,7 @@ admin_id=$(python3 bootstrap_admin.py --select)
 apt-get update
 apt-get install -y python3-venv python3-pip apache2 curl
 backup=$(mktemp -d /root/codynick-cas-backup-XXXXXXXX)
-for section in blocks simulator dashboard admin; do
+for section in blocks simulator dashboard admin sharing; do
  if [[ -e "$root/$section" ]]; then cp -a "$root/$section" "$backup/"; fi
 done
 mkdir -p "$backup/apache"
@@ -96,7 +99,7 @@ PYCFG
 chmod 600 /etc/codynick-cas/config.json
 # Read root-only configuration here, not in the unprivileged bootstrap process.
 database=$(python3 -c 'import json; print(json.load(open("/etc/codynick-cas/config.json")).get("DATABASE","/var/lib/codynick-cas/projects.sqlite3"))')
-install -m 644 backend/app.py backend/requirements.txt bootstrap_admin.py /opt/codynick-cas/
+install -m 644 backend/app.py backend/sharing.py backend/requirements.txt bootstrap_admin.py /opt/codynick-cas/
 python3 -m venv /opt/codynick-cas/venv
 /opt/codynick-cas/venv/bin/pip install -r /opt/codynick-cas/requirements.txt
 cat > /opt/codynick-cas/start.py <<'PY'
@@ -125,6 +128,10 @@ WantedBy=multi-user.target
 UNIT
 python3 patch_frontend.py "$root"
 install -m 644 frontend/accounts.js frontend/accounts.css "$root/blocks/"
+install -d -m 755 "$root/sharing"
+cp -a ../sharing/. "$root/sharing/"
+chmod -R u+rwX,go+rX "$root/sharing"
+chown -R root:root "$root/sharing"
 a2enmod proxy proxy_http headers
 python3 - "$domain" <<'PY'
 import pathlib,re,sys
