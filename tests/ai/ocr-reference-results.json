@@ -1,0 +1,50 @@
+[
+  {
+    "name": "label",
+    "run": 0,
+    "words": false,
+    "ms": 82,
+    "confidence": 94,
+    "text": "CODY NICK\nTemperature 24 C\n"
+  },
+  {
+    "name": "label",
+    "run": 1,
+    "words": true,
+    "ms": 35,
+    "confidence": 94,
+    "text": "CODY NICK\nTemperature 24 C\n"
+  },
+  {
+    "name": "paragraph",
+    "run": 0,
+    "words": false,
+    "ms": 87,
+    "confidence": 95,
+    "text": "Read English text on your device.\nImages stay in your browser.\nNo software installation is required.\n"
+  },
+  {
+    "name": "paragraph",
+    "run": 1,
+    "words": true,
+    "ms": 92,
+    "confidence": 95,
+    "text": "Read English text on your device.\nImages stay in your browser.\nNo software installation is required.\n"
+  },
+  {
+    "name": "page",
+    "run": 0,
+    "words": false,
+    "ms": 315,
+    "confidence": 95,
+    "text": "CodyNick demonstration\n\nThis page contains printed English text.\nThe camera captures an image.\n\nThe OCR tool reads the text locally.\n\nYou can copy or download the result.\nProject number 12345\n\nTemperature 24 degrees Celsius\n\nDate 11 November 2026\n"
+  },
+  {
+    "name": "page",
+    "run": 1,
+    "words": true,
+    "ms": 293,
+    "confidence": 95,
+    "text": "CodyNick demonstration\n\nThis page contains printed English text.\nThe camera captures an image.\n\nThe OCR tool reads the text locally.\n\nYou can copy or download the result.\nProject number 12345\n\nTemperature 24 degrees Celsius\n\nDate 11 November 2026\n"
+  }
+]

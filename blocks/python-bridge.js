@@ -5,6 +5,7 @@
   constructor(router,store,signal){this.router=router;this.store=store;this.signal=signal;this.hardwareUsed=false;}
   async request(op,json){
    this.signal.throwIfAborted();const a=this.parse(json);
+   if(op==='ai')return JSON.stringify(await window.CodyAI.command(a.action,a.args||{},this.signal));
    if(op==='dashboard'){return JSON.stringify(this.store.dashboard(a.action==='clicked'?'dash_button_clicked':a.action==='pressed'?'dash_button_pressed':'dash_read',{NAME:String(a.name||'Value')}));}
    if(op==='sprite'){
     if(!window.CodySpriteStage)throw Error('Sprite stage is unavailable. Reload the editor.');
@@ -21,13 +22,14 @@
    const value=await this.router.call(a.block,a.args||{},this.signal,a.target);
    return JSON.stringify(value??null);
   }
-  parse(json){if(typeof json!=='string'||json.length>8192)throw Error('Python request is too large');const a=JSON.parse(json);if(!a||typeof a!=='object'||Array.isArray(a))throw Error('Invalid Python request');return a;}
+  parse(json,limit=8192){if(typeof json!=='string'||json.length>limit)throw Error('Python request is too large');const a=JSON.parse(json);if(!a||typeof a!=='object'||Array.isArray(a))throw Error('Invalid Python request');return a;}
   notify(op,json){
    this.signal.throwIfAborted();if(op!=='dashboard')throw Error('Unsupported Python notification');
-   const a=this.parse(json),v=a.args||{},name=String(v.name||'Value');
+   const a=this.parse(json,240000),v=a.args||{},name=String(v.name||'Value');if(json.length>8192&&(a.action!=='show'||typeof v.value!=='string'||v.value.length>200000))throw Error('Python notification is too large');
    const send=(action,args={})=>this.store.dashboard(action,{NAME:name,SOURCE:'Python',...args});
-   if(['button','toggle','slider','led'].includes(a.action)){send('dash_create_'+(a.action==='toggle'?'switch':a.action),{TITLE:v.title||name,MIN:v.minimum,MAX:v.maximum,STEP:v.step,INITIAL:v.initial});return;}
+   if(['text_input','select','image','table','button','toggle','slider','led'].includes(a.action)){send('dash_create_'+(a.action==='toggle'?'switch':a.action),{TITLE:v.title||name,MIN:v.minimum,MAX:v.maximum,STEP:v.step,INITIAL:v.initial});return;}
    if(['set_led','set_toggle','set_slider'].includes(a.action)){const type={set_led:'led',set_toggle:'switch',set_slider:'slider'}[a.action];if(this.store.read().widgets[name]?.type!==type)throw Error('Wrong widget type: '+name);send('dash_set',{VALUE:v.value});return;}
+   if(a.action==='font'){send('dash_font',{FONT:'Arial',SIZE:v.size,HORIZONTAL:'left',VERTICAL:'top'});return;}if(a.action==='options'){send('dash_options',{OPTIONS:v.options});return;}if(a.action==='title'){send('dash_title',{VALUE:v.title});return;}
    if(a.action==='clear'){send('dash_clear');return;}
    if(a.action==='show'){
     if(!Object.hasOwn(this.store.read().widgets,name))send('dash_create_info',{TITLE:name});

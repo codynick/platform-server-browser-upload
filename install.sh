@@ -12,9 +12,30 @@ for label in "${labels[@]}"; do
 done
 [[ "$domain" != *. && ! "$domain" =~ ^[0-9.]+$ ]] || { echo 'Use a DNS domain name, not an IP address.' >&2; exit 1; }
 target_dir=/var/www/$domain
-for name in sharing/index.html sharing/gallery.html sharing/manage.html sharing/editor.js sharing/editor.css sharing/viewer.js sharing/gallery.js sharing/manage.js sharing/import.js sharing/sharing.css sharing/icons.svg sharing/block-definitions.js sharing/landing.css admin/index.html admin/admin.js admin/admin.css blocks/access.js blocks/access.css blocks/sensor-examples.js simulator/world-assets.js simulator/world-assets.css simulator/soil-world.js simulator/soil-world.css VERSION README.md RELEASE_NOTES.md START_HERE.txt PROJECT_FORMAT.md index.html landing.css blocks/version.js blocks/accounts.js blocks/accounts.css blocks/index.html blocks/editor.css blocks/serial.js blocks/examples/hello.codynick blocks/examples/sim-dashboard.codynick blocks/examples/mixed.codynick blocks/examples/Real-temperature-Sim-distance.codynick blocks/examples/blink.codynick blocks/examples/temperature.codynick blocks/examples/joystick.codynick blocks/examples/stage-keyboard.codynick blocks/examples/stage-temperature.codynick blocks/examples/stage-joystick.codynick blocks/examples/dashboard-controls.codynick blocks/examples/dashboard-sprite.codynick blocks/stage.html blocks/stage-page.css blocks/stage-link.js dashboard/push-button.css dashboard/inputs.js blocks/examples/dashboard-controls.codynick blocks/examples/dashboard-sprite.codynick blocks/sprite-looks.js blocks/project-archive.js blocks/project-files.js blocks/vendor/jszip.min.js blocks/vendor/JSZIP-LICENSE.md blocks/sprites/appearances/rocket.svg blocks/sprites/appearances/ball.svg blocks/sprites/appearances/bee.svg blocks/sprites/appearances/bird.svg blocks/sprites/appearances/dog.svg blocks/sprites/appearances/athlete.svg blocks/sprites/appearances/cactus.svg blocks/sprites/appearances/apple.svg blocks/sprites/appearances/apartment.svg blocks/sprites/appearances/bike.svg blocks/sprites/appearances/diamond.svg blocks/sprite-model.js blocks/sprite-view.js blocks/sprite-blocks.js blocks/sprite-stage.css blocks/examples/stage-keyboard.codynick blocks/examples/stage-temperature.codynick blocks/examples/stage-joystick.codynick blocks/python-pilot.css blocks/python-pilot.js blocks/python-pilot-config.js blocks/python-color.js blocks/python-bridge.js blocks/python-worker.mjs blocks/codynick.py blocks/python-examples.json blocks/firmware.js blocks/firmware/manifest.json blocks/blocks.js blocks/hardware.js blocks/runtime.js blocks/block-specs.js blocks/vendor/blockly/blockly.min.js blocks/stage.css blocks/webserial.css blocks/python-preview.js blocks/project-menu.js blocks/ch340-usb.js blocks/linux-help.js blocks/live-store.js blocks/live-scheduler.js blocks/live-timer-worker.js blocks/live-router.js blocks/dashboard-blocks.js blocks/examples/Real-temperature-Sim-distance.codynick simulator/index.html simulator/app.js simulator/viewport.js dashboard/index.html dashboard/layout.js dashboard/layout-ui.js assets/tool-navigation.css assets/favicon.ico assets/codynick-logo.png; do
+for name in sharing/index.html sharing/gallery.html sharing/manage.html sharing/editor.js sharing/editor.css sharing/viewer.js sharing/gallery.js sharing/manage.js sharing/import.js sharing/sharing.css sharing/icons.svg sharing/block-definitions.js sharing/landing.css admin/index.html admin/admin.js admin/admin.css blocks/access.js blocks/access.css blocks/sensor-examples.js simulator/world-assets.js simulator/world-assets.css simulator/soil-world.js simulator/soil-world.css VERSION README.md RELEASE_NOTES.md START_HERE.txt AI_IMAGE_DETECTION.md PROJECT_FORMAT.md index.html landing.css blocks/version.js blocks/accounts.js blocks/accounts.css blocks/index.html blocks/editor.css blocks/serial.js blocks/examples/hello.codynick blocks/examples/sim-dashboard.codynick blocks/examples/mixed.codynick blocks/examples/Real-temperature-Sim-distance.codynick blocks/examples/blink.codynick blocks/examples/temperature.codynick blocks/examples/joystick.codynick blocks/examples/stage-keyboard.codynick blocks/examples/stage-temperature.codynick blocks/examples/stage-joystick.codynick blocks/examples/dashboard-controls.codynick blocks/examples/dashboard-sprite.codynick blocks/stage.html blocks/stage-page.css blocks/stage-link.js dashboard/push-button.css dashboard/inputs.js blocks/examples/dashboard-controls.codynick blocks/examples/dashboard-sprite.codynick blocks/sprite-looks.js blocks/project-archive.js blocks/project-files.js blocks/vendor/jszip.min.js blocks/vendor/JSZIP-LICENSE.md blocks/sprites/appearances/rocket.svg blocks/sprites/appearances/ball.svg blocks/sprites/appearances/bee.svg blocks/sprites/appearances/bird.svg blocks/sprites/appearances/dog.svg blocks/sprites/appearances/athlete.svg blocks/sprites/appearances/cactus.svg blocks/sprites/appearances/apple.svg blocks/sprites/appearances/apartment.svg blocks/sprites/appearances/bike.svg blocks/sprites/appearances/diamond.svg blocks/sprite-model.js blocks/sprite-view.js blocks/sprite-blocks.js blocks/sprite-stage.css blocks/examples/stage-keyboard.codynick blocks/examples/stage-temperature.codynick blocks/examples/stage-joystick.codynick blocks/python-pilot.css blocks/python-pilot.js blocks/python-pilot-config.js blocks/python-color.js blocks/python-bridge.js blocks/python-worker.mjs blocks/codynick.py blocks/python-examples.json blocks/firmware.js blocks/firmware/manifest.json blocks/blocks.js blocks/hardware.js blocks/runtime.js blocks/block-specs.js blocks/vendor/blockly/blockly.min.js blocks/stage.css blocks/webserial.css blocks/python-preview.js blocks/project-menu.js blocks/ch340-usb.js blocks/linux-help.js blocks/live-store.js blocks/live-scheduler.js blocks/live-timer-worker.js blocks/live-router.js blocks/dashboard-blocks.js blocks/examples/Real-temperature-Sim-distance.codynick simulator/index.html simulator/app.js simulator/viewport.js dashboard/index.html dashboard/layout.js dashboard/layout-ui.js assets/tool-navigation.css assets/favicon.ico assets/codynick-logo.png; do
  [[ -f "$source_dir/$name" ]] || { echo "Missing package file: $name" >&2; exit 1; }
 done
+# Check the LLM weights before taking backups or replacing the live website.
+python3 - "$source_dir/blocks/ai/llm" <<'PYMODEL'
+import hashlib
+import json
+from pathlib import Path
+import sys
+
+root = Path(sys.argv[1])
+files = json.loads((root / "ASSETS.json").read_text())["files"]
+for name, expected in files.items():
+    path = root / name
+    if not path.is_file():
+        raise SystemExit(f"Missing language model asset: {path}")
+    with path.open("rb") as asset:
+        digest = hashlib.sha256()
+        for chunk in iter(lambda: asset.read(1024 * 1024), b""):
+            digest.update(chunk)
+        actual = digest.hexdigest()
+    if actual != expected:
+        raise SystemExit(f"Invalid language model asset: {path}. Fetch Git LFS objects before retrying.")
+PYMODEL
 firmware_file="$(python3 -c 'import json,sys; print(json.load(open(sys.argv[1]))["file"])' "$source_dir/blocks/firmware/manifest.json")"
 [[ "$firmware_file" =~ ^CodyPi\.[a-f0-9]{64}\.hex$ && -f "$source_dir/blocks/firmware/$firmware_file" ]] || { echo 'Missing firmware image.' >&2; exit 1; }
 [[ -d "$target_dir" ]] || { echo "Website directory does not exist: $target_dir" >&2; exit 1; }
@@ -26,7 +47,7 @@ for section in blocks simulator dashboard admin sharing; do cp -a -- "$source_di
 chmod -R u+rwX,go+rX "$staging_dir"
 chown -R root:root "$staging_dir"
 # Preserve the old root page and all obsolete assets from our earlier releases.
-for name in VERSION README.md RELEASE_NOTES.md START_HERE.txt PROJECT_FORMAT.md index.html landing.css app.js style.css hardware.js runtime.js block-specs.js blocks.js; do
+for name in VERSION README.md RELEASE_NOTES.md START_HERE.txt AI_IMAGE_DETECTION.md PROJECT_FORMAT.md index.html landing.css app.js style.css hardware.js runtime.js block-specs.js blocks.js; do
  if [[ -e "$target_dir/$name" || -L "$target_dir/$name" ]]; then cp -a -- "$target_dir/$name" "$backup_dir/$name"; fi
 done
 for section in blocks simulator dashboard admin sharing; do
@@ -43,7 +64,7 @@ for name in tool-navigation.css favicon.ico codynick-logo.png; do
  if [[ -e "$target_dir/assets/$name" ]]; then cp -a -- "$target_dir/assets/$name" "$backup_dir/assets/$name"; fi
  install -m 644 -o root -g root -- "$source_dir/assets/$name" "$target_dir/assets/"
 done
-install -m 644 -o root -g root -- "$source_dir/index.html" "$source_dir/landing.css" "$source_dir/VERSION" "$source_dir/README.md" "$source_dir/RELEASE_NOTES.md" "$source_dir/START_HERE.txt" "$source_dir/PROJECT_FORMAT.md" "$target_dir/"
+install -m 644 -o root -g root -- "$source_dir/index.html" "$source_dir/landing.css" "$source_dir/VERSION" "$source_dir/README.md" "$source_dir/RELEASE_NOTES.md" "$source_dir/START_HERE.txt" "$source_dir/PROJECT_FORMAT.md" "$source_dir/AI_IMAGE_DETECTION.md" "$target_dir/"
 for name in app.js style.css hardware.js runtime.js block-specs.js blocks.js; do rm -f -- "$target_dir/$name"; done
 # Remove only the old root-level Blockly directory, preserving other vendor assets.
 if [[ -e "$target_dir/vendor/blockly" || -L "$target_dir/vendor/blockly" ]]; then

@@ -1,10 +1,18 @@
-CodyNick Platform 3.21.0
+CodyNick 3.21.1-ai.9 — GitHub AI branch
 
-Upgrade the existing server using the normal setup.sh command in README.md.
-Community and Publish are on the toolbar; File > My published projects opens
-publication management. Sign in/account is the rightmost header control.
-Admin Panel includes persistent default runtime and cooldown controls.
+Run on the Debian/Ubuntu server:
 
-Website/account backups and rollback paths are printed during setup.
-Existing private projects, publications, configuration and per-user limits remain.
-This release does not upload or change device firmware during server setup.
+wget -4 -O /tmp/codynick-ai-setup.sh "https://raw.githubusercontent.com/codynick/platform-server-browser-upload/AI/setup.sh?$(date +%s)" && sudo bash /tmp/codynick-ai-setup.sh
+
+Voice: Show Spaces > AI > Speech Recognition > Mode: Voice Commands > Start Listening. Say red, green or off, then pause.
+Example: Examples > AI > AI + Dashboard - Voice Controlled Light.
+First speech use loads about 45 MB; allow microphone access. Use Enable Microphone Audio if requested by your browser.
+
+Transcription: AI > Speech Recognition > Mode: Speech to Text > Start Listening. Stop finishes the last phrase; Copy/Download in Results.
+Example: Examples > AI > AI + Dashboard - English Speech to Text.
+
+TTS: AI > Text to Speech > enter text > choose a local voice > Speak. If no local voice exists, try another browser/device.
+Example: Examples > AI > AI + Dashboard - Local Text to Speech. If blocked, click Enable Speech in AI.
+
+LLM: AI > Text Assistant (LLM) > short question > Generate Answer. First model load is about 370 MB and needs substantial RAM; test a laptop/desktop first.
+Example: Examples > AI > AI + Dashboard - Small Local Text Assistant. Stop / Unload releases the model. Verify answers: this small model can be wrong.

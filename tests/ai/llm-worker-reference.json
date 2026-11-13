@@ -1,0 +1,13 @@
+{
+  "text": "A temperature sensor measures the temperature of a substance or environment.",
+  "loadingMs": 2938.220131,
+  "generationMs": 2299.981556,
+  "totalMs": 5245.949424,
+  "firstTokenMs": 1051.5636170000002,
+  "tokens": 13,
+  "inputTokens": 36,
+  "limited": false,
+  "wallMs": 5247,
+  "rssMB": 1450,
+  "note": "Actual bundled browser WASM with local fetch adapter in Node; not a browser/mobile benchmark."
+}

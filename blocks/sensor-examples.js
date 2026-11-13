@@ -18,10 +18,10 @@
  const results=document.createElement('div');results.className='example-results';library.append(nav,results);select.before(library);
  const path=document.createElement('p');path.setAttribute('aria-live','polite');library.before(path);
  let catalog={},category='All examples',selected='';
- const group=e=>e.title.startsWith('Sensor Test')?'Sensors':e.stage&&e.dashboard?'Combined projects':e.stage?'Sprites':e.dashboard?'Dashboards':'General';
+ const group=e=>e.ai?'AI':e.title.startsWith('Sensor Test')?'Sensors':e.stage&&e.dashboard?'Combined projects':e.stage?'Sprites':e.dashboard?'Dashboards':'General';
  const matches=(name,e)=>name==='All examples'||(name==='Demo'?e.demo:name==='Hardware'?e.hardware:group(e)===name);
  function render(){
-  const categories=['All examples','Demo','General','Sensors','Hardware','Dashboards','Sprites','Combined projects'];nav.replaceChildren();results.replaceChildren();
+  const categories=['All examples','Demo','AI','General','Sensors','Hardware','Dashboards','Sprites','Combined projects'];nav.replaceChildren();results.replaceChildren();
   for(const name of categories){const count=Object.values(catalog).filter(e=>matches(name,e)).length;if(!count)continue;const b=document.createElement('button');b.type='button';b.textContent=name+' ('+count+')';b.setAttribute('aria-pressed',String(name===category));b.onclick=()=>{category=name;render();};nav.append(b);}
   const query=search.value.trim().toLowerCase();let count=0;
   const entries=Object.entries(catalog);if(category==='Demo')entries.sort((a,b)=>(a[1].demoOrder??99)-(b[1].demoOrder??99));

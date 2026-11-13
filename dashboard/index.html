@@ -428,7 +428,7 @@ body {
 .card .led-on{background:#22c55e!important;box-shadow:0 0 24px #22c55e80!important}.card .led-off{background:#ef4444!important;box-shadow:0 0 12px #ef444450}.dash-button.input-held,.dash-button[aria-pressed="true"]{filter:brightness(.75);outline:3px solid #0f766e}.slider-number{width:120px;max-width:95%;padding:6px;border:1px solid #cbd5e1;border-radius:6px}.dash-button,.dash-switch{touch-action:none;user-select:none}
 </style>
 <link rel="icon" type="image/x-icon" href="/assets/favicon.ico"><link rel="stylesheet" href="/assets/tool-navigation.css"><style>body{visibility:hidden}.card .led-on{background:#22c55e!important;box-shadow:0 0 24px #22c55e80!important}.card .led-off{background:#ef4444!important;box-shadow:0 0 12px #ef444450}.dash-button.input-held,.dash-button[aria-pressed="true"]{filter:brightness(.75);outline:3px solid #0f766e}.slider-number{width:120px;max-width:95%;padding:6px;border:1px solid #cbd5e1;border-radius:6px}.dash-button,.dash-switch{touch-action:none;user-select:none}
-</style><script src="/blocks/accounts.js?v=3.20.4" defer></script><link rel="stylesheet" href="push-button.css"></head>
+</style><script src="/blocks/accounts.js?v=3.21.0" defer></script><link rel="stylesheet" href="push-button.css"><link rel="stylesheet" href="/blocks/ai/dashboard.css?v=3.21.1-ai.9"></head>
 <body>
 
 <header class="header tool-page-header">
@@ -447,7 +447,7 @@ body {
     </div>
 </main>
 
-<script src="layout.js"></script><script src="/blocks/live-store.js?v=3.20.4"></script><script src="inputs.js"></script><script>
+<script src="layout.js"></script><script src="/blocks/live-store.js?v=3.21.1-ai.9"></script><script src="inputs.js?v=3.21.1-ai.9"></script><script src="/blocks/ai/dashboard-media.js?v=3.21.1-ai.9"></script><script>
 const localFetch=async(url,options={})=>{try{if(url.includes("action=set"))window.CodyLiveStore.dashboardInput(options.body.get("id"),options.body.get("value"));return {json:async()=>({ok:true,cards:window.CodyLiveStore.cards()})};}catch(error){return {json:async()=>({ok:false,error:error.message})};}};
 const editorLink=document.getElementById('dashboardEditorLink');
 if(editorLink)editorLink.hidden=window.self!==window.top;
@@ -613,6 +613,9 @@ function renderCardBody(card) {
     const min = card.min_value ?? 0;
     const max = card.max_value ?? 100;
 
+    if (type === 'text_input') return `<input class="ai-text-input" data-role="input" maxlength="120" aria-label="${escapeHtml(card.title||card.id)}" value="${escapeHtml(value)}">`;
+    if (type === 'select') return `<select class="ai-select" data-role="input" aria-label="${escapeHtml(card.title||card.id)}">${(card.options||[]).map(o=>`<option value="${escapeHtml(o.value)}" ${o.value===value?'selected':''}>${escapeHtml(o.label)}</option>`).join('')}</select>`;
+    if (type === 'image') return `<div class="ai-image-wrap"><img data-role="ai-image" alt="${escapeHtml(card.title||'AI image')}" hidden><p data-role="ai-image-note">No image available yet.</p></div>`;
     if (type === 'led') {
         return `
             <div class="led-wrap">
@@ -719,7 +722,7 @@ function renderAllCards(cards) {
 
     // If the user is typing in a textarea, keep the browser value as the source of truth.
     // This prevents the backend/device from overwriting the field during the AJAX refresh cycle.
-    if (focusedCardId && focusedType === 'textarea' && focusedRole === 'input') {
+    if (focusedCardId && ['textarea','text_input'].includes(focusedType) && focusedRole === 'input') {
         editingTextareaValues[focusedCardId] = focused.value;
         debounceSet(focusedCardId, focused.value, 100);
     }
@@ -732,7 +735,7 @@ function renderAllCards(cards) {
 
     Object.keys(editingTextareaValues).forEach(id => {
         const editedInput = document.querySelector(`[data-card-id="${CSS.escape(id)}"] [data-role="input"]`);
-        if (editedInput && normalizeType(editedInput.closest('.card')?.dataset?.cardType) === 'textarea') {
+        if (editedInput && ['textarea','text_input'].includes(normalizeType(editedInput.closest('.card')?.dataset?.cardType))) {
             editedInput.value = editingTextareaValues[id];
         }
     });
@@ -741,7 +744,7 @@ function renderAllCards(cards) {
         const replacement = document.querySelector(`[data-card-id="${CSS.escape(focusedCardId)}"] [data-role="${CSS.escape(focusedRole)}"]`);
         if (replacement && (replacement.tagName !== 'BUTTON' || replacement.dataset.layoutAction)) {
             try { replacement.focus({ preventScroll: true }); } catch (e) { replacement.focus(); }
-            if (focusedType === 'textarea' && focusedRole === 'input' && editingTextareaValues[focusedCardId] !== undefined) {
+            if (['textarea','text_input'].includes(focusedType) && focusedRole === 'input' && editingTextareaValues[focusedCardId] !== undefined) {
                 replacement.value = editingTextareaValues[focusedCardId];
             }
             if (selectionStart !== null && typeof replacement.setSelectionRange === 'function') {
@@ -765,6 +768,9 @@ function updateCardValues(card) {
     const min = numeric(card.min_value, 0);
     const max = numeric(card.max_value, 100);
 
+    for(const control of cardEl.querySelectorAll('[data-role=button], [data-role=input], [data-role=number]'))control.disabled=!!card.disabled;
+    if (type === 'text_input' || type === 'select') {const input=cardEl.querySelector('[data-role="input"]');if(input&&document.activeElement!==input)input.value=String(value);}
+    if (type === 'image') window.CodyAIMedia?.render();
     if (type === 'led') {
         const led = cardEl.querySelector('[data-role="led"]');
         const valueEl = cardEl.querySelector('[data-role="value"]');
@@ -1284,6 +1290,11 @@ function drawTable(cardEl, rawValue) {
 
     let rows = [];
     try {
+        const structured=JSON.parse(rawValue||'{}');
+        if(structured&&Array.isArray(structured.columns)&&Array.isArray(structured.rows)){
+            if(structured.columns.length>12||structured.rows.length>1000)throw Error('Table too large');
+            tableWrap.innerHTML=`<table class="data-table"><thead><tr>${structured.columns.map(c=>`<th>${escapeHtml(c)}</th>`).join('')}</tr></thead><tbody>${structured.rows.map(row=>`<tr>${structured.columns.map((_,i)=>`<td>${escapeHtml(tableValueToText(row[i]))}</td>`).join('')}</tr>`).join('')}</tbody></table>`;return;
+        }
         rows = parseTableData(rawValue);
     } catch (e) {
         tableWrap.innerHTML = `<div class="table-error">Invalid table JSON</div>`;
@@ -1334,7 +1345,7 @@ function attachEvents() {
             }
         }
 
-        if(['button','switch','slider'].includes(type))window.CodyDashboardInputs?.attach(cardEl);
+        if(['button','switch','slider','text_input','select'].includes(type))window.CodyDashboardInputs?.attach(cardEl);
     });
 }
 

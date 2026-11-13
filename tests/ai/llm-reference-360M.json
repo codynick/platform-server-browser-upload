@@ -1,0 +1,29 @@
+[
+  {
+    "size": "360M",
+    "prompt": "What does a temperature sensor measure?",
+    "text": "A temperature sensor measures the temperature of a substance or environment.",
+    "streamed": "A temperature sensor measures the temperature of a substance or environment.",
+    "firstTokenMs": 971,
+    "totalMs": 2021,
+    "rssMB": 1486
+  },
+  {
+    "size": "360M",
+    "prompt": "Explain a VLAN in one short sentence.",
+    "text": "A VLAN is a network technology that allows multiple VLANs to share a single physical network.",
+    "streamed": "A VLAN is a network technology that allows multiple VLANs to share a single physical network.",
+    "firstTokenMs": 761,
+    "totalMs": 2458,
+    "rssMB": 1524
+  },
+  {
+    "size": "360M",
+    "prompt": "Summarize this in one sentence: Plants use sunlight, water and carbon dioxide to make food.",
+    "text": "Plants use sunlight, water, and carbon dioxide to make food.",
+    "streamed": "Plants use sunlight, water, and carbon dioxide to make food.",
+    "firstTokenMs": 974,
+    "totalMs": 2105,
+    "rssMB": 1525
+  }
+]

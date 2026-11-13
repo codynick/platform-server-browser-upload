@@ -1,3 +1,72 @@
+### 3.21.1-ai.9 — small local CPU language model
+
+- Publish the cumulative trial on the AI branch with a one-command server update and Git LFS model delivery.
+
+- Add on-demand SmolLM2 360M Instruct (q8) text generation using the shared CPU/WASM runtime, with streamed answers, bounded prompts/output, Stop/unload and metrics.
+- Add six Blocks, Python start/poll/stop and a waiting generate() helper, plus a paired five-widget Small Local Text Assistant example.
+- Compare 135M and 360M CPU exports; retain explicit experimental-model and memory/download limitations. No model reply is executed or sent to cloud inference.
+- Use revision-pinned local model assets, release inactive engines and use streaming installer hashes for large files. Preserve all previous tools and cumulative upgrade/rollback support through ai.8.
+
+### 3.21.1-ai.8 — local system text to speech
+
+- Add Text to Speech with local-only voice selection, speed, Speak/Stop, direct-gesture recovery and status; no remote fallback or bundled voice download.
+- Add five Blocks, Python calls and a paired five-widget Local Text to Speech example with editable text/speed and unavailable-voice handling.
+- Interlock microphone capture with spoken output and cancel owned playback on Stop/tool change. Bound text and native playback timers.
+- Include all earlier AI tools, assets and examples, with cumulative install and exact rollback from base 3.21.0 and trials ai.1 through ai.7.
+
+### 3.21.1-ai.7 — English speech to text
+
+- Add Voice Commands / Speech to Text modes using the same local Vosk model; separate live preview from accumulated completed text, with Copy/Clear/Download.
+- Add four Blocks/Python operations and a paired five-widget English Speech to Text example.
+- Flush the worklet tail and finalize the recognizer on normal Stop; keep immediate cancellation for Stop All AI. Reset active phrase on Clear and bound transcript storage.
+- Include every earlier AI tool/model/example and verified cumulative upgrades/rollback from base 3.21.0 and trials ai.1 through ai.6.
+
+### 3.21.1-ai.6 — local English voice commands
+
+- Add on-demand Vosk CPU/WASM command recognition, microphone selection, Start/Stop, live partial feedback and final exact-match command queues. No audio upload/recording or user installation.
+- Add a compact Voice Commands tool, six Blocks and asynchronous Python calls; include a paired five-widget Voice Controlled Light example.
+- Bound audio backlog; clean up late microphone grants, capture nodes and engine workers on Stop/tool switch. Persistent model cache is best effort.
+- Include every previous AI tool/model/example and cumulative upgrade/rollback from base 3.21.0 and trials ai.1 through ai.5. No backend, firmware or server-header changes.
+
+### 3.21.1-ai.5 — lightweight OCR image enhancement
+
+- Add optional grayscale/contrast preparation, a white crop margin and bounded enlargement of short selected text areas; keep the same English fast model and one recognition pass.
+- Make layout selection visible beside OCR actions. Select a tight crop and Single line for short labels; processing a whole scene still includes background clutter.
+- Add an Enhance option to Blocks and `ai.read_text(..., enhance=True)`; existing calls enable it by default. Word boxes map back through crop, scale and margin to the original image.
+- Retain all previous tools, assets and examples; support cumulative install and exact rollback from 3.21.0 and trials ai.1 through ai.4.
+
+### 3.21.1-ai.4 — compact AI tools and English OCR
+
+- Add local English-fast OCR using Tesseract.js/core 7.0.0, loaded only when needed, with reusable/cancellable worker ownership.
+- Add shared higher-resolution images, OCR region selection, confidence, timing, optional word boxes and plain-text copy/download. Preserve the fast object detector.
+- Introduce Tool + three tabs and a paired five-widget OCR example. Keep all previous tools/examples in the cumulative package.
+- Add memory limits and exact upgrade/rollback from original 3.21.0 and all previous AI trials. No backend, firmware or Apache-header changes.
+- Actual WASM recognition, protocol/DOM/Blockly fixtures and installer tests are recorded. Full rendered-browser/subworker and physical camera/mobile checks remain manual.
+
+### 3.21.1-ai.3 — bounded CPU inference and timing
+
+- Replace the 1,333-pixel upscaling path with explicit, non-upscaling image sizes. Fast 512 / Balanced 640 / Detailed 960; Fast is default.
+- Instrument preprocessing/model inference/postprocessing and click loading/total time. Retain normalized result boxes and prior workbench features.
+- Transfer pixel buffers and dispose temporary tensors. Keep CPU/WASM single-thread compatibility, with no Apache-header, backend or firmware changes.
+- Include all tools and allow cumulative installation/rollback from base and previous AI trials. Reference-image tests confirm lower latency on the build machine; device-wide performance/accuracy is not claimed.
+
+### 3.21.1-ai.2 — cumulative named-image workbench
+
+- Tidy AI controls into responsive sections; retain all detector tools and the original example.
+- Add named capture/upload, camera/source selection, customizable capture label, dashboard preview, annotated results and a three-column table, in paired Blocks/Python.
+- Add reusable dashboard controls and ephemeral image transport; clear bindings/images from saved projects.
+- Extend verified installation/rollback to both original 3.21.0 and prior AI trial. Includes model/runtime; no backend/schema/firmware changes.
+- DOM and software fixtures cover the new flow. Rendered browser, physical camera and mobile acceptance remain manual.
+
+### 3.21.1-ai.1 — browser CPU image detection trial
+
+- Add an AI space with camera/upload, still-image boxes and confidence results.
+- Add matching AI Blocks/Python operations and one complete dashboard example.
+- Bundle Transformers.js 3.8.1, ONNX WASM runtime and quantized YOLOS-tiny; no image transmission or AI server service.
+- Exclude images/results from saved and shared projects. Release camera and worker on Stop/reset.
+- Apply only to verified files from the supplied 3.21.0 snapshot, preserving accounts, Community and firmware. Includes rollback.
+- Automated CPU inference and integration/patch fixture validation are described in AI_IMAGE_DETECTION.md. Physical camera/Android/macOS and reserve-server acceptance remain manual.
+
 ### 3.21.0 — Community publishing and configurable default limits
 
 - Promote the approved p5 trial into the standard Git installation: Community search/filter/pagination, two-field Publish with server-verified SSO names, automatic publication updates, File > My published projects and link copying, read-only code pages opening stopped projects in the standard editor, and report/admin removal.

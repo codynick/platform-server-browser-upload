@@ -1,0 +1,133 @@
+{
+  "note": "One development machine, actual packaged WASM with Node worker adapter; not full browser timings. Small selected crop, single-line layout. No automatic scene text detector. Personal source image omitted. The original tight crop also read correctly without enhancement.",
+  "results": [
+    {
+      "name": "tight",
+      "run": 0,
+      "prepareMs": 104,
+      "recognitionMs": 164,
+      "confidence": 96,
+      "input": [
+        153,
+        26
+      ],
+      "processed": [
+        483,
+        102
+      ],
+      "text": "Touch the Future\n"
+    },
+    {
+      "name": "tight",
+      "run": 1,
+      "prepareMs": 104,
+      "recognitionMs": 36,
+      "confidence": 96,
+      "input": [
+        153,
+        26
+      ],
+      "processed": [
+        483,
+        102
+      ],
+      "text": "Touch the Future\n"
+    },
+    {
+      "name": "label",
+      "run": 0,
+      "prepareMs": 21,
+      "recognitionMs": 67,
+      "confidence": 94,
+      "input": [
+        900,
+        240
+      ],
+      "processed": [
+        924,
+        264
+      ],
+      "text": "CODY NICK\nTemperature 24 C\n"
+    },
+    {
+      "name": "label",
+      "run": 1,
+      "prepareMs": 21,
+      "recognitionMs": 52,
+      "confidence": 94,
+      "input": [
+        900,
+        240
+      ],
+      "processed": [
+        924,
+        264
+      ],
+      "text": "CODY NICK\nTemperature 24 C\n"
+    },
+    {
+      "name": "paragraph",
+      "run": 0,
+      "prepareMs": 14,
+      "recognitionMs": 265,
+      "confidence": 95,
+      "input": [
+        1200,
+        320
+      ],
+      "processed": [
+        1224,
+        344
+      ],
+      "text": "Read English text on your device.\nImages stay in your browser.\nNo software installation is required.\n"
+    },
+    {
+      "name": "paragraph",
+      "run": 1,
+      "prepareMs": 14,
+      "recognitionMs": 154,
+      "confidence": 95,
+      "input": [
+        1200,
+        320
+      ],
+      "processed": [
+        1224,
+        344
+      ],
+      "text": "Read English text on your device.\nImages stay in your browser.\nNo software installation is required.\n"
+    },
+    {
+      "name": "page",
+      "run": 0,
+      "prepareMs": 84,
+      "recognitionMs": 548,
+      "confidence": 95,
+      "input": [
+        1500,
+        1500
+      ],
+      "processed": [
+        1524,
+        1524
+      ],
+      "text": "CodyNick demonstration\n\nThis page contains printed English text.\nThe camera captures an image.\n\nThe OCR tool reads the text locally.\n\nYou can copy or download the result.\nProject number 12345\n\nTemperature 24 degrees Celsius\n\nDate 11 November 2026\n"
+    },
+    {
+      "name": "page",
+      "run": 1,
+      "prepareMs": 84,
+      "recognitionMs": 473,
+      "confidence": 95,
+      "input": [
+        1500,
+        1500
+      ],
+      "processed": [
+        1524,
+        1524
+      ],
+      "text": "CodyNick demonstration\n\nThis page contains printed English text.\nThe camera captures an image.\n\nThe OCR tool reads the text locally.\n\nYou can copy or download the result.\nProject number 12345\n\nTemperature 24 degrees Celsius\n\nDate 11 November 2026\n"
+    }
+  ]
+}

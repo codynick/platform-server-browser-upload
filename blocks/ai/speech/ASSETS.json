@@ -1,0 +1,33 @@
+{
+  "vosk_browser": "0.0.8",
+  "model": "vosk-model-small-en-us-0.15",
+  "model_source": "https://alphacephei.com/vosk/models/vosk-model-small-en-us-0.15.zip",
+  "npm_source": {
+    "shasum": "03b32e0e6a4c2dc5e9062fc0146f0cf58f5f21ea",
+    "tarball": "https://registry.npmjs.org/vosk-browser/-/vosk-browser-0.0.8.tgz",
+    "fileCount": 7,
+    "integrity": "sha512-df9MuChirUGKxP/+4k8tBV6hJOic8IRdJXv64+ET0Ue5CddOzLZINiHOWCka765gBzHJWNtQKgaYakS0FXZIJA==",
+    "signatures": [
+      {
+        "sig": "MEQCIGy5hubWxO6cPzNNTqT2SqTbWXjX2EW/dMgIvj5va4oMAiAZ0NG5hXXn/Ndy8dHPag5AZMfVxw79EcOwskg9Wpl8NQ==",
+        "keyid": "SHA256:jl3bwswu80PjjokCgh0o2w5c2U4LhQAE57gj9cz1kzA"
+      }
+    ],
+    "unpackedSize": 5817459,
+    "npm-signature": "-----BEGIN PGP SIGNATURE-----\r\nVersion: OpenPGP.js v4.10.10\r\nComment: https://openpgpjs.org\r\n\r\nwsFzBAEBCAAGBQJjqMDlACEJED1NWxICdlZqFiEECWMYAoorWMhJKdjhPU1b\r\nEgJ2VmrcRBAAmOdvTRHusMD8OYZm3Tkj2ca0x+eTtTk8gEi+9MGNhjRU5+xA\r\nLn0gAwe28JlQ2y2K1sjEPu5UmnJoGRPpGqBRCFXir1qRfhptzVuv89SUairI\r\nAaLtC22YWIfWx1o9uBkeqmP/Ss9Jtljuwh9M8q6iTxu9JtAUCAQB8c19RnzB\r\nRt0AWvIs+T6FIeTwMnU3vIohsP5G6kvfjlUVC3OL7b2XqK8pHYAvdV3ouEql\r\nAPVzXXSN5pBOz2MyE2mgAwZkroqVgbpiPCJX3FgXtI++YwRMAh0lSgmaVZE9\r\nPqHak2/k3vk1yLdQJzKjiTuQ92RKengbz7mYWPYJy3FPo9C4U0w8fiK6FSgq\r\nuNsNLwCkxgEQVgd46+6poNFpkD1+uoTUVP7KhpC+WVT7JIhTFuzUE+6GTCHO\r\nXVUt7svRrcCtVJFPzDE0kqOBf6lAfGim/PbhT2r6yk5WK1h/ybuTSty6fzbt\r\n62tK+GYh81YPiurskOyqycY8NI+lBpcikeP7TlWxInu2uAs2NsNj7UMk8Amu\r\n3xyz96hQFpLb/FrPonC2CYhHn+ldQMc1N9D7/7+gB/Nrx9bGBI5WroseF5Q9\r\n+kMeSPH4kKR+yzpeyRVHF43mcKaFXX93rciuAMQ18Mq8YiKkM/opDBsj8beY\r\nqTiqHUlcYYFqP1V96MEF05CWd6du8Jdq+Nc=\r\n=Yq1I\r\n-----END PGP SIGNATURE-----\r\n"
+  },
+  "modifications": [
+    "Externalize embedded worker as same-origin static file.",
+    "Terminate owned worker immediately when releasing model.",
+    "Make IndexedDB model caching best effort and stringify load errors."
+  ],
+  "files": {
+    "vosk.js": "94465dfa8021b0f52f18e1667e55641ca0151e77b5153c0aef74ca9f95a537df",
+    "LICENSE-APACHE-2.0.txt": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30",
+    "vosk-worker.js": "0c595644cf33b3f9ee63ed00fcf7b1704357047a12ece4dd87eebefee7a2e88c",
+    "THIRD_PARTY.md": "4342066756771715dfdded8cf2bef3735724701c43a5b8dcb8cfc21d6dea6ed7",
+    "english-small-0.15.tar.gz": "0e8d145bf0f3ae9c6698d3054302016609a16f341c9f9b9aed91c9f1ecfad484",
+    "LICENSE-UUID-MIT.txt": "beaa6b04fb82e41dd2ad679e19e27953afb5999b1abbb455b6564e78ebfeb332"
+  },
+  "model_source_sha256": "30f26242c4eb449f948e42cb302dd7a686cb29a3423a8367f99ff41780942498"
+}

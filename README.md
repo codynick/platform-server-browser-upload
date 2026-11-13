@@ -1,4 +1,6 @@
-# CodyNick Portal 3.20.4
+# CodyNick Portal 3.21.1-ai.9
+
+Cumulative browser AI workbench trial. See [AI_IMAGE_DETECTION.md](AI_IMAGE_DETECTION.md).
 
 CodyNick is a browser-based programming environment with Blocks and Python editors
 for real CodyNick gadgets, simulated gadgets, live dashboards and a sprite stage.
@@ -13,22 +15,18 @@ See [the project table](blocks/examples/ZONE_EXAMPLES.md) for the fifteen zone e
 
 ## One command for installation and upgrades
 
-Run this in an interactive terminal on the Debian/Ubuntu VPS:
+Run this in an interactive terminal on the Debian/Ubuntu server:
 
 ```bash
-wget -4 -O /tmp/codynick-browser-setup.sh "https://raw.githubusercontent.com/codynick/platform-server-browser-upload/main/setup.sh?$(date +%s)" && sudo bash /tmp/codynick-browser-setup.sh
+wget -4 -O /tmp/codynick-ai-setup.sh "https://raw.githubusercontent.com/codynick/platform-server-browser-upload/AI/setup.sh?$(date +%s)" && sudo bash /tmp/codynick-ai-setup.sh
 ```
 
-The installer clones or fast-forwards main, reuses the saved website domain and
-CAS settings, backs up the website and updates the account service. On a first
-installation it asks for the domain/CAS settings. If no admin is configured, it
-also asks for the exact first admin CodyNick ID before website deployment.
-That ID receives admin access only after matching CAS sign-in. Existing admins
-are retained without another prompt. For unattended installation, set
-CODYNICK_ADMIN_ID to the intended ID. Existing private projects remain
-in the database, but older project formats are not converted by this release.
-Download any work you need before replacing it. Close old editor/dashboard/stage
-tabs, reopen /blocks/ and hard-refresh after the upgrade.
+The updater keeps a separate AI checkout at /root/platform-server-browser-upload-ai,
+installs Git LFS, and downloads the language model before deploying the website.
+It reuses the saved domain and CAS configuration and creates a website backup.
+Allow disk space for the checkout, LFS cache, deployed files, and backups.
+Close old tabs and hard-refresh /blocks/ after deployment.
+The developer checks and reference results are in tests/ai.
 
 ## Included in this release
 
@@ -156,18 +154,18 @@ The fixed-callback CAS flow retains its explicit identity confirmation step at
 1. Copy the complete cumulative release contents into the root of your local
    repository. Keep the existing `.git` directory; do not add a nested package
    folder around the source.
-2. Review, commit, and push the release to `main` using your own GitHub account.
+2. Review, commit, and push the release to `AI` using your own GitHub account.
 3. Close all old CodyNick editor, simulator, and dashboard tabs.
 4. Run the same single-line VPS command shown above.
-5. Open the editor at your domain's `/blocks/` path and press **Ctrl+F5**.
+5. Open the editor at your doAI's `/blocks/` path and press **Ctrl+F5**.
 
-Example commands from your local repository, with `main` checked out:
+Example commands from your local repository, with `AI` checked out:
 
 ```bash
 git status
 git add .
 git commit -m "Upgrade CodyNick Portal"
-git push origin main
+git push origin AI
 ```
 
 For a README-only change, stage only that file:
@@ -175,11 +173,11 @@ For a README-only change, stage only that file:
 ```bash
 git add README.md
 git commit -m "Document setup command and working CAS settings"
-git push origin main
+git push origin AI
 ```
 
 An upgrade preserves existing CAS configuration and private project data. The
-VPS Git checkout must be clean and on `main`; setup stops instead of overwriting
+VPS Git checkout must be clean and on `AI`; setup stops instead of overwriting
 uncommitted server-checkout changes. Already-open tabs keep running old scripts
 until closed/reloaded.
 
@@ -239,6 +237,75 @@ The editor checks the bundled CodyPi release when connecting and offers confirme
 See [PYTHON_PILOT.md](PYTHON_PILOT.md) for ZIP installation, testing and rollback instructions.
 
 ## Revision history
+
+### 3.21.1-ai.9 — small local CPU language model
+
+- Publish the cumulative trial on the AI branch with a one-command server update and Git LFS model delivery.
+
+- Add on-demand SmolLM2 360M Instruct (q8) text generation using the shared CPU/WASM runtime, with streamed answers, bounded prompts/output, Stop/unload and metrics.
+- Add six Blocks, Python start/poll/stop and a waiting generate() helper, plus a paired five-widget Small Local Text Assistant example.
+- Compare 135M and 360M CPU exports; retain explicit experimental-model and memory/download limitations. No model reply is executed or sent to cloud inference.
+- Use revision-pinned local model assets, release inactive engines and use streaming installer hashes for large files. Preserve all previous tools and cumulative upgrade/rollback support through ai.8.
+
+### 3.21.1-ai.8 — local system text to speech
+
+- Add Text to Speech with local-only voice selection, speed, Speak/Stop, direct-gesture recovery and status; no remote fallback or bundled voice download.
+- Add five Blocks, Python calls and a paired five-widget Local Text to Speech example with editable text/speed and unavailable-voice handling.
+- Interlock microphone capture with spoken output and cancel owned playback on Stop/tool change. Bound text and native playback timers.
+- Include all earlier AI tools, assets and examples, with cumulative install and exact rollback from base 3.21.0 and trials ai.1 through ai.7.
+
+### 3.21.1-ai.7 — English speech to text
+
+- Add Voice Commands / Speech to Text modes using the same local Vosk model; separate live preview from accumulated completed text, with Copy/Clear/Download.
+- Add four Blocks/Python operations and a paired five-widget English Speech to Text example.
+- Flush the worklet tail and finalize the recognizer on normal Stop; keep immediate cancellation for Stop All AI. Reset active phrase on Clear and bound transcript storage.
+- Include every earlier AI tool/model/example and verified cumulative upgrades/rollback from base 3.21.0 and trials ai.1 through ai.6.
+
+### 3.21.1-ai.6 — local English voice commands
+
+- Add on-demand Vosk CPU/WASM command recognition, microphone selection, Start/Stop, live partial feedback and final exact-match command queues. No audio upload/recording or user installation.
+- Add a compact Voice Commands tool, six Blocks and asynchronous Python calls; include a paired five-widget Voice Controlled Light example.
+- Bound audio backlog; clean up late microphone grants, capture nodes and engine workers on Stop/tool switch. Persistent model cache is best effort.
+- Include every previous AI tool/model/example and cumulative upgrade/rollback from base 3.21.0 and trials ai.1 through ai.5. No backend, firmware or server-header changes.
+
+### 3.21.1-ai.5 — lightweight OCR image enhancement
+
+- Add optional grayscale/contrast preparation, a white crop margin and bounded enlargement of short selected text areas; keep the same English fast model and one recognition pass.
+- Make layout selection visible beside OCR actions. Select a tight crop and Single line for short labels; processing a whole scene still includes background clutter.
+- Add an Enhance option to Blocks and `ai.read_text(..., enhance=True)`; existing calls enable it by default. Word boxes map back through crop, scale and margin to the original image.
+- Retain all previous tools, assets and examples; support cumulative install and exact rollback from 3.21.0 and trials ai.1 through ai.4.
+
+### 3.21.1-ai.4 — lightweight English OCR
+
+- Add lazy, reusable Tesseract.js 7 English-fast OCR, normalized crop support, optional word boxes, timing and copy/download.
+- Replace the long AI panel with a Tool dropdown and Image/Process/Results tabs; share high-resolution source images while retaining bounded fast detection.
+- Add OCR Blocks/Python and a complete five-widget sample. Include every previous tool/model/example in the cumulative installer.
+- Bound named-image memory, release inactive engines, preserve local-only processing, and support exact upgrade/rollback from base or any earlier AI trial.
+- Benchmark scope and real-browser/mobile acceptance limits are documented in AI_IMAGE_DETECTION.md.
+
+
+### 3.21.1-ai.3 — bounded CPU inference and timing
+
+- Fix unintended inference upscaling using explicit image dimensions. Add Fast/Balanced/Detailed modes with 512/640/960-pixel long-edge caps; default Fast.
+- Display loading, preprocessing, inference, finish, total time and actual input shape; include mode/inference time in workbench summaries.
+- Transfer inference pixels without an extra structured-clone copy; release temporary tensors. Retain one-thread WASM compatibility and leave Apache headers unchanged.
+- Cumulative patch supports original 3.21.0 and both previous AI trials, with exact rollback. Lower resolution can change predictions; benchmark scope is documented.
+
+
+### 3.21.1-ai.2 — cumulative named-image workbench
+
+- Reorganize the AI panel into camera, named images, detection and results sections.
+- Add a paired dashboard example with camera selection, editable capture title, named capture/upload, source selection, annotated image and results table.
+- Add reusable text/dropdown/image/table dashboard support, ephemeral image transport and sanitized project snapshots.
+- Include all previous AI model/runtime files; install directly on 3.21.0 or upgrade the previous AI trial, with verified backups/rollback. OCR remains deferred.
+
+
+### 3.21.1-ai.1 — browser CPU image detection trial
+
+- Add AI space, CPU detector, Blocks/Python operations and one paired example.
+- Bundle model/runtime; include verified ZIP patch, backup and rollback.
+- Retain accounts, Community, limits and firmware. See AI_IMAGE_DETECTION.md for validation scope.
+
 
 Keep this history current in every revision, with the newest revision first.
 Entries below describe the documented changes; earlier test limitations apply to

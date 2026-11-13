@@ -15,7 +15,7 @@
   s.workspace.blocks.blocks.forEach(b=>walk(b));
   const temporary=new B.Workspace();try{B.serialization.workspaces.load(s.workspace,temporary);}finally{temporary.dispose();}
   object(s.editor,'editor state');if(s.editor.publication!=null){object(s.editor.publication,'publication reference');if(!/^[A-Za-z0-9_-]{24}$/.test(s.editor.publication.id||''))throw Error('Invalid publication reference.');}object(s.editor.names,'design names');string(s.editor.names.blocks,120,'Blocks design name');string(s.editor.names.python,120,'Python design name');
-  if(!['blocks','python'].includes(s.editor.language)||!['simulator','dashboard','sprites'].includes(s.editor.space)||typeof s.editor.collapsed!=='boolean')throw Error('Invalid selected editor or space.');
+  if(!['blocks','python'].includes(s.editor.language)||!['simulator','dashboard','sprites','ai'].includes(s.editor.space)||typeof s.editor.collapsed!=='boolean')throw Error('Invalid selected editor or space.');
   string(s.editor.help,4000,'example description');string(s.editor.console,60000,'Python console');
   for(const key of ['cursorStart','cursorEnd','scrollTop','scrollLeft'])number(s.editor[key],0,10000000,'editor '+key);
   object(s.state,'saved state');const live=object(s.state.live,'simulation/dashboard state');CodyLiveStore.scene(live.scene);
@@ -24,7 +24,8 @@
   string(live.matrix.text,200,'matrix text');number(live.matrix.speed,0,2,'matrix speed');number(live.matrix.revision,0,1e12,'matrix revision');string(live.seven_segment,50,'seven segment reading');string(live.ultra_segment,50,'UltraSeg reading');
   object(live.widgets,'dashboard widgets');if(Object.keys(live.widgets).length>100)throw Error('Too many dashboard widgets.');
   for(const [id,w] of Object.entries(live.widgets)){
-   object(w,'widget');string(id,120,'widget name');if(w.id!==id||!['info','gauge','graph','led','textarea','button','switch','slider','bar','pie','table'].includes(w.type))throw Error('Invalid dashboard widget.');
+   object(w,'widget');string(id,120,'widget name');if(w.id!==id||!['info','gauge','graph','led','textarea','button','switch','slider','bar','pie','table','text_input','select','image'].includes(w.type))throw Error('Invalid dashboard widget.');
+   if(w.type==='select'){if(!Array.isArray(w.options)||w.options.length>100||w.options.some(o=>!o||typeof o.label!=='string'||o.label.length>200||typeof o.value!=='string'||o.value.length>600)||typeof w.value!=='string'||w.options.length&&!w.options.some(o=>o.value===w.value))throw Error('Invalid dropdown state.');}if(w.type==='image'&&w.value!==''&&!/^ai-media:[a-zA-Z0-9-]+:[a-zA-Z0-9_-]+$/.test(w.value))throw Error('Invalid image reference.');
    string(w.title,1000,'widget title');if(typeof w.value==='string')string(w.value,200000,'widget value');else if(typeof w.value==='number')number(w.value,-1e15,1e15,'widget value');else if(typeof w.value!=='boolean')throw Error('Invalid dashboard value.');
    if(['button','switch','led'].includes(w.type)&&typeof w.value!=='boolean')throw Error('Invalid boolean widget state.');if(w.type==='slider'){number(w.step,.000001,1e9,'slider step');if(w.max_value<=w.min_value||w.step>w.max_value-w.min_value||typeof w.value!=='number'||w.value<w.min_value||w.value>w.max_value)throw Error('Invalid slider state.');}
    number(w.min_value,-1e15,1e15,'widget minimum');number(w.max_value,-1e15,1e15,'widget maximum');if(!Array.isArray(w.history)||w.history.length>1000)throw Error('Invalid graph history.');
@@ -40,11 +41,13 @@
   const workspace=B.serialization.workspaces.save(window.codyWorkspace);workspace.blocks??={languageVersion:0,blocks:[]};delete workspace.codynick_live_scene;delete workspace.codynick_sprite_stage;
   const py=window.CodyPythonPilot?.exportProjectState()||{source:$('pythonSource').value,names:{blocks:$('designName').value,python:''},language:'blocks',help:$('pythonExampleHelp').textContent,console:$('pythonOutput').textContent,cursorStart:0,cursorEnd:0,scrollTop:0,scrollLeft:0};
   const {source,...editorState}=py;editorState.publication=window.CodyPublication?.reference()||null;const state=CodyLiveStore.read(),live={};for(const key of liveFields)live[key]=clone(state[key]);for(const w of Object.values(live.widgets)){delete w.inputAt;delete w.inputOwner;delete w.clicks;if(w.type==='button')w.value=false;}
+  window.CodyAIWorkbench?.sanitizeWidgets(live.widgets);
   let simulatorView=null;try{simulatorView=$('simulatorFrame').contentWindow.CodySimulatorView?.snapshot()||null;}catch{}
   let layout={};try{layout=JSON.parse(localStorage.getItem(layoutKey)||'{}');}catch{}
-  return {format:'codynick-webserial',version:3,projectSchema:'codynick-project/1',applicationVersion:window.CODYNICK_VERSION,workspace,python:source,editor:{...editorState,space:['simulator','dashboard','sprites'].find(n=>$('show-'+n).getAttribute('aria-pressed')==='true')||'simulator',collapsed:$('liveMain').classList.contains('stage-collapsed')},state:{live,sprite:CodySpriteStage.snapshotProject(),layout,simulatorView}};
+  return {format:'codynick-webserial',version:3,projectSchema:'codynick-project/1',applicationVersion:window.CODYNICK_VERSION,workspace,python:source,editor:{...editorState,space:['simulator','dashboard','sprites','ai'].find(n=>$('show-'+n).getAttribute('aria-pressed')==='true')||'simulator',collapsed:$('liveMain').classList.contains('stage-collapsed')},state:{live,sprite:CodySpriteStage.snapshotProject(),layout,simulatorView}};
  }
  async function apply(s){
+  window.CodyAI?.clear();
   editor.load(s.workspace);window.CodyPublication?.restore(s.editor.publication||null,{legacy:!Object.hasOwn(s.editor,'publication')});CodyLiveStore.restoreProject(s.state.live);CodySpriteStage.restoreProject(s.state.sprite);
   const clean={};for(const [id,r] of Object.entries(s.state.layout))Object.defineProperty(clean,id,{value:CodyDashboardLayout.clean(r),enumerable:true});
   localStorage.setItem(layoutKey,JSON.stringify(clean));window.dispatchEvent(new StorageEvent('storage',{key:layoutKey,newValue:JSON.stringify(clean)}));

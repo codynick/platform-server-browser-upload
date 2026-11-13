@@ -20,10 +20,11 @@ elif name=='certbot':
 elif name=='getent' and os.environ.get('FAIL_DNS'):sys.exit(1)
 elif name=='git':
  args=sys.argv[1:]
- if args[0]=='clone':shutil.copytree(os.environ['FIXTURE_BUNDLE'],args[-1]);pathlib.Path(args[-1],'.git').mkdir()
+ if args==['lfs','install','--skip-repo'] or args[2:]==['lfs','pull','--include=blocks/ai/llm/models/**','--exclude=']:pass
+ elif args[0]=='clone':shutil.copytree(os.environ['FIXTURE_BUNDLE'],args[-1]);pathlib.Path(args[-1],'.git').mkdir()
  elif args[2:]==['remote','get-url','origin']:print('https://github.com/codynick/platform-server-browser-upload.git')
- elif args[2:]==['branch','--show-current']:print('main')
- elif args[2:] in (['status','--porcelain'],['pull','--ff-only','origin','main']):pass
+ elif args[2:]==['branch','--show-current']:print('AI')
+ elif args[2:] in (['status','--porcelain'],['pull','--ff-only','origin','AI']):pass
  else:raise RuntimeError('Unexpected git command '+str(args))
 '''
 class SetupTests(unittest.TestCase):
@@ -33,7 +34,7 @@ class SetupTests(unittest.TestCase):
   self.bundle=self.root/'package'
   shutil.copytree(SOURCE,self.bundle,ignore=shutil.ignore_patterns('.git','__pycache__'))
   text=(self.bundle/'setup.sh').read_text()
-  for prefix in ['/etc/codynick','/etc/apache2','/var/www','/root/platform-server-browser-upload']:
+  for prefix in ['/etc/codynick','/etc/apache2','/var/www','/root/platform-server-browser-upload-ai']:
    text=text.replace(prefix,str(self.root/prefix.lstrip('/')))
   (self.bundle/'setup.sh').write_text(text)
   for d in ['etc/apache2/sites-enabled','etc/apache2/sites-available','root','bin']:(self.root/d).mkdir(parents=True,exist_ok=True)
@@ -73,8 +74,9 @@ printf '%s\\n' "'''+name+'''" >> "$FIXTURE_ROOT/deployment"
   for _ in range(2):
    result=self.run_setup(raw=True);self.assertEqual(result.returncode,0,result.stdout+result.stderr)
   calls=(self.root/'calls').read_text()
-  self.assertIn('clone --branch main --single-branch https://github.com/codynick/platform-server-browser-upload.git',calls)
-  self.assertIn('pull --ff-only origin main',calls)
+  self.assertIn('clone --branch AI --single-branch https://github.com/codynick/platform-server-browser-upload.git',calls)
+  self.assertIn('pull --ff-only origin AI',calls)
+  self.assertIn('lfs pull --include=blocks/ai/llm/models/** --exclude=',calls)
  def test_tls_failure_stops_before_deployment_and_retry_works(self):
   result=self.run_setup(FAIL_TLS='1');self.assertNotEqual(result.returncode,0)
   self.assertFalse((self.root/'deployment').exists())

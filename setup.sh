@@ -35,16 +35,20 @@ if [[ -f $source_dir/VERSION && -f $source_dir/install.sh && -f $source_dir/cas/
  repo=$source_dir
  echo "Using the supplied complete package: $repo"
 else
- repo=/root/platform-server-browser-upload
+ repo=/root/platform-server-browser-upload-ai
+ apt-get install -y git-lfs
+ git lfs install --skip-repo
+ export GIT_LFS_SKIP_SMUDGE=1
  if [[ -e $repo ]]; then
   [[ -d $repo/.git ]] || { echo "$repo is not a Git checkout. Use the complete package setup.sh instead." >&2; exit 1; }
   [[ $(git -C "$repo" remote get-url origin) =~ ^https://github.com/codynick/platform-server-browser-upload(\.git)?$ ]] || { echo 'Unexpected repository origin.' >&2; exit 1; }
   [[ -z $(git -C "$repo" status --porcelain) ]] || { echo 'Server checkout has local changes; preserve them before updating.' >&2; exit 1; }
-  [[ $(git -C "$repo" branch --show-current) == main ]] || { echo 'Server checkout must be on main.' >&2; exit 1; }
-  git -C "$repo" pull --ff-only origin main
+  [[ $(git -C "$repo" branch --show-current) == AI ]] || { echo 'Server checkout must be on AI.' >&2; exit 1; }
+  git -C "$repo" pull --ff-only origin AI
  else
-  git clone --branch main --single-branch https://github.com/codynick/platform-server-browser-upload.git "$repo"
+  git clone --branch AI --single-branch https://github.com/codynick/platform-server-browser-upload.git "$repo"
  fi
+ git -C "$repo" lfs pull --include="blocks/ai/llm/models/**" --exclude=""
 fi
 for required in sharing/index.html sharing/gallery.html sharing/editor.js sharing/icons.svg cas/backend/sharing.py VERSION install.sh cas/bootstrap_admin.py admin/index.html blocks/access.js blocks/access.css simulator/world-assets.js simulator/world-assets.css simulator/soil-world.js simulator/soil-world.css cas/update.sh cas/patch_frontend.py cas/backend/app.py cas/frontend/accounts.js cas/frontend/accounts.css blocks/index.html blocks/examples/hello.codynick blocks/examples/sim-dashboard.codynick blocks/examples/mixed.codynick blocks/examples/Real-temperature-Sim-distance.codynick blocks/examples/blink.codynick blocks/examples/temperature.codynick blocks/examples/joystick.codynick blocks/examples/stage-keyboard.codynick blocks/examples/stage-temperature.codynick blocks/examples/stage-joystick.codynick blocks/examples/dashboard-controls.codynick blocks/examples/dashboard-sprite.codynick blocks/stage.html blocks/stage-page.css blocks/stage-link.js dashboard/push-button.css dashboard/inputs.js blocks/examples/dashboard-controls.codynick blocks/examples/dashboard-sprite.codynick blocks/sprite-looks.js blocks/project-archive.js blocks/project-files.js blocks/vendor/jszip.min.js blocks/vendor/JSZIP-LICENSE.md blocks/sprites/appearances/rocket.svg blocks/sprites/appearances/ball.svg blocks/sprites/appearances/bee.svg blocks/sprites/appearances/bird.svg blocks/sprites/appearances/dog.svg blocks/sprites/appearances/athlete.svg blocks/sprites/appearances/cactus.svg blocks/sprites/appearances/apple.svg blocks/sprites/appearances/apartment.svg blocks/sprites/appearances/bike.svg blocks/sprites/appearances/diamond.svg blocks/sprite-model.js blocks/sprite-view.js blocks/sprite-blocks.js blocks/sprite-stage.css blocks/examples/stage-keyboard.codynick blocks/examples/stage-temperature.codynick blocks/examples/stage-joystick.codynick blocks/python-pilot.css blocks/python-pilot.js blocks/python-pilot-config.js blocks/python-color.js blocks/python-bridge.js blocks/python-worker.mjs blocks/codynick.py blocks/python-examples.json; do
  [[ -f $repo/$required ]] || { echo "Incomplete source package: $required" >&2; exit 1; }

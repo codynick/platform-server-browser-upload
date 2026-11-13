@@ -1,7 +1,7 @@
 'use strict';
 class BlockRuntime {
  constructor(hardware,specs,report=()=>{}){this.hw=hardware;this.specs=new Map(specs.map(s=>[s.type,s]));this.report=report;this.vars=new Map();this.controller=null;this.sources=new Set();this.variableSources=new Map();}
- stop(reason='Stopped'){this.controller?.abort(new Error(reason));}
+ stop(reason='Stopped'){this.controller?.abort(new Error(reason));window.CodyAI?.stop();}
  async tick(){window.CodyAccess?.check();this.signal.throwIfAborted();await this.hw.wait(0,this.signal);}
  field(b,n){return b.getFieldValue(n);}
  async input(b,n,fallback=0){const v=b.getInputTargetBlock(n);return v?this.value(v):fallback;}
@@ -10,7 +10,7 @@ class BlockRuntime {
  executable(workspace){const result=[];const visit=b=>{for(;b;b=b.getNextBlock()){if(!b.isEnabled())continue;result.push(b);for(const input of b.inputList||[]){const child=input.connection?.targetBlock();if(child)visit(child);}}};for(const root of workspace.getTopBlocks(true))if(root.isEnabled()&&['cn_event_start','cn_event_loop'].includes(root.type)){result.push(root);visit(root.getInputTargetBlock('DO'));}return result;}
  preflight(workspace){for(const b of this.executable(workspace)){if(!this.specs.has(b.type))continue;try{this.hw.check?.(b.type,{device:this.field(b,'device')},this.field(b,'TARGET')||'HARDWARE');}catch(e){throw Error(b.type+' ['+b.id+']: '+e.message);}}}
  variable(b){return this.field(b,'VAR');}
- async value(b){await this.tick();if(!b||!b.isEnabled())return 0;const f=n=>this.field(b,n),v=(n,d)=>this.input(b,n,d);if(b.type.startsWith('stage_')){this.sources.add('Sprites');return window.CodySpriteBlocks.execute(b,this);}if(this.specs.has(b.type))return this.gadget(b);if(['dash_button_pressed','dash_button_clicked','dash_toggle_value','dash_slider_value'].includes(b.type)){this.sources.add('Dashboard');return this.hw.store.dashboard(b.type,{NAME:f('NAME')});}switch(b.type){
+ async value(b){await this.tick();if(!b||!b.isEnabled())return 0;const f=n=>this.field(b,n),v=(n,d)=>this.input(b,n,d);if(b.type.startsWith('ai_')){this.sources.add('AI');return window.CodyAIBlocks.execute(b,this);}if(b.type.startsWith('stage_')){this.sources.add('Sprites');return window.CodySpriteBlocks.execute(b,this);}if(this.specs.has(b.type))return this.gadget(b);if(['dash_text_value','dash_select_value'].includes(b.type)){this.sources.add('Dashboard');return this.hw.store.dashboard('dash_read',{NAME:f('NAME')});}if(['dash_button_pressed','dash_button_clicked','dash_toggle_value','dash_slider_value'].includes(b.type)){this.sources.add('Dashboard');return this.hw.store.dashboard(b.type,{NAME:f('NAME')});}switch(b.type){
  case 'math_number':return Number(f('NUM'));
  case 'text':return f('TEXT');
  case 'logic_boolean':return f('BOOL')==='TRUE';
@@ -27,7 +27,7 @@ class BlockRuntime {
  case 'cn_timer_value':return (performance.now()-this.timer)/1000;
  default:throw Error('Unsupported value block: '+b.type);
  }throw Error('Invalid block '+b.type);}
- async chain(b){for(;b;b=b.getNextBlock()){await this.tick();if(!b.isEnabled())continue;this.report('block',b.id);if(b.type.startsWith('stage_')){await window.CodySpriteBlocks.execute(b,this);continue;}if(this.specs.has(b.type)){await this.gadget(b);continue;}if(b.type.startsWith('dash_')){this.sources.clear();const a={};for(const f of ['NAME','TYPE','TITLE','COUNT','MIN','MAX','STEP','INITIAL','COLOR','WIDTH','HEIGHT','FONT','SIZE','HORIZONTAL','VERTICAL'])a[f]=this.field(b,f);if(b.getInput('VALUE'))a.VALUE=await this.input(b,'VALUE');a.SOURCE=[...this.sources].join(' + ')||'Program';this.hw.store.dashboard(b.type,a);continue;}const v=(n,d)=>this.input(b,n,d),body=n=>this.chain(b.getInputTargetBlock(n));switch(b.type){
+ async chain(b){for(;b;b=b.getNextBlock()){await this.tick();if(!b.isEnabled())continue;this.report('block',b.id);if(b.type.startsWith('ai_')){await window.CodyAIBlocks.execute(b,this);continue;}if(b.type.startsWith('stage_')){await window.CodySpriteBlocks.execute(b,this);continue;}if(this.specs.has(b.type)){await this.gadget(b);continue;}if(b.type.startsWith('dash_')){this.sources.clear();const a={};for(const f of ['NAME','TYPE','TITLE','COUNT','MIN','MAX','STEP','INITIAL','COLOR','WIDTH','HEIGHT','FONT','SIZE','HORIZONTAL','VERTICAL'])a[f]=this.field(b,f);if(b.getInput('VALUE'))a.VALUE=await this.input(b,'VALUE');if(b.type==='dash_options')a.OPTIONS=String(this.field(b,'OPTIONS')||'').split('|').map(v=>v.trim()).filter(Boolean).map(v=>({label:v,value:v}));a.SOURCE=[...this.sources].join(' + ')||'Program';this.hw.store.dashboard(b.type,a);continue;}const v=(n,d)=>this.input(b,n,d),body=n=>this.chain(b.getInputTargetBlock(n));switch(b.type){
  case 'cn_event_start':case 'cn_event_loop':await body('DO');break;
  case 'cn_wait':{const seconds=Number(await v('SECONDS',1));if(!Number.isFinite(seconds)||seconds<0||seconds>86400)throw Error('Wait must be between 0 and 86400 seconds');await this.hw.wait(seconds*1000,this.signal);break;}
  case 'cn_timer_reset':this.timer=performance.now();break;

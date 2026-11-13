@@ -1,0 +1,8 @@
+{
+  "tesseract_js": "7.0.0",
+  "tesseract_js_core": "7.0.0",
+  "language": "English fast LSTM only",
+  "language_repository": "https://github.com/tesseract-ocr/tessdata_fast",
+  "language_revision": "87416418657359cb625c412a48b6e1d6d41c29bd",
+  "language_source_sha256": "7d4322bd2a7749724879683fc3912cb542f19906c83bcc1a52132556427170b2"
+}

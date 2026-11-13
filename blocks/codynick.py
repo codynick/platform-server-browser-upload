@@ -114,6 +114,15 @@ class _Dashboard:
     def graph(self, name, history=20):
         self._send('graph', name=name, history=history)
 
+    def font(self, name, size=16): self._send('font', name=name, size=size)
+    def text_input(self, name, initial='', title=None): self._send('text_input', name=name, initial=initial, title=title)
+    def select(self, name, options, title=None):
+        self._send('select', name=name, title=title)
+        self.options(name, options)
+    def options(self, name, options): self._send('options', name=name, options=[dict(label=str(o), value=str(o)) if isinstance(o, str) else o for o in options])
+    def image(self, name, title=None): self._send('image', name=name, title=title)
+    def table(self, name, title=None): self._send('table', name=name, title=title)
+    def title(self, name, title): self._send('title', name=name, title=title)
     def button(self, name, title=None): self._send('button', name=name, title=title)
     def toggle(self, name, initial=False, title=None): self._send('toggle', name=name, initial=initial, title=title)
     def slider(self, name, minimum=0, maximum=100, step=1, initial=50, title=None):
@@ -174,3 +183,102 @@ class _Stage:
 
 
 stage = _Stage()
+
+
+class _AI:
+    """Browser CPU AI tools. Images and audio are not automatically saved in projects."""
+    def __init__(self):
+        self._results = []
+        self._ocr = {}
+
+    async def _run(self, operation, **args):
+        return json.loads(await _request('ai', json.dumps(dict(action=operation, args=args))))
+
+    async def prepare_llm(self): return await self._run('llm_prepare')
+    async def start_answer(self, prompt, max_tokens=64):
+        return await self._run('llm_start', prompt=str(prompt), max_tokens=max_tokens)
+    async def stop_llm(self): return await self._run('llm_stop')
+    async def llm_answer(self): return await self._run('llm_answer')
+    async def llm_running(self): return await self._run('llm_running')
+    async def llm_message(self): return await self._run('llm_message')
+    async def llm_status(self): return await self._run('llm_status')
+    async def generate(self, prompt, max_tokens=64):
+        await self.start_answer(prompt, max_tokens=max_tokens)
+        while await self.llm_running():
+            await wait(0.1)
+        state = await self.llm_status()
+        if state.get('phase') in ('error', 'stopped'):
+            raise RuntimeError(state.get('message', 'Generation stopped.'))
+        return state.get('answer', '')
+
+    async def speak(self, text, rate=1, voice='auto'):
+        return await self._run('tts_speak', text=str(text), rate=rate, voice=voice)
+    async def tts_available(self): return await self._run('tts_available')
+    async def stop_speaking(self): return await self._run('tts_stop')
+    async def is_speaking(self): return await self._run('tts_is_speaking')
+    async def tts_message(self): return await self._run('tts_message')
+    async def tts_voices(self): return await self._run('tts_voices')
+    async def tts_status(self): return await self._run('tts_status')
+
+    async def start_transcription(self, microphone='default', clear=False):
+        return await self._run('speech_start_transcription', microphone=microphone, clear=bool(clear))
+    async def transcription_text(self): return await self._run('speech_transcript')
+    async def speech_partial(self): return await self._run('speech_partial')
+    async def clear_transcript(self): return await self._run('speech_clear_transcript')
+
+    async def prepare_speech(self): return await self._run('speech_prepare')
+    async def start_listening(self, commands, microphone='default'):
+        return await self._run('speech_start', commands=commands, microphone=microphone)
+    async def stop_listening(self): return await self._run('speech_stop')
+    async def next_command(self): return await self._run('speech_next')
+    async def speech_text(self): return await self._run('speech_text')
+    async def is_listening(self): return await self._run('speech_listening')
+    async def speech_status(self): return await self._run('speech_status')
+
+    async def prepare_ocr(self): return await self._run('prepare_ocr')
+    async def ocr_sample(self):
+        self._ocr = {}
+        self._results = []
+        return await self._run('ocr_sample')
+    async def show_ocr_image(self, name='Source image'): return await self._run('ocr_show_image', name=name)
+    async def has_image(self): return await self._run('ocr_has_image')
+    async def read_text(self, layout='auto', region=None, words=False, enhance=True):
+        self._ocr = {}
+        self._ocr = await self._run('read_text', layout=layout, region=region, words=bool(words), enhance=bool(enhance))
+        return self._ocr.get('text', '')
+    def ocr_text(self): return self._ocr.get('text', '')
+    def ocr_confidence(self): return self._ocr.get('confidence', 0)
+    def ocr_elapsed(self): return self._ocr.get('recognitionMs', 0) / 1000
+    def ocr_contains(self, needle): return bool(str(needle).strip()) and str(needle).lower() in self.ocr_text().lower()
+    def ocr_results(self): return json.loads(json.dumps(self._ocr))
+    async def workbench_setup(self): return await self._run('workbench_setup')
+    async def workbench_sync(self): return await self._run('workbench_sync')
+    async def workbench_action(self, action): return await self._run('workbench_action', action=action)
+    async def prepare(self): return await self._run('prepare')
+    async def start_camera(self, facing='default'): return await self._run('start_camera', facing=facing)
+    async def stop_camera(self): return await self._run('stop_camera')
+
+    async def take_picture(self):
+        result = await self._run('take_picture')
+        self._results = []
+        self._ocr = {}
+        return result
+
+    async def choose_image(self):
+        # Opens AI space; click Upload Image there to invoke the browser picker.
+        result = await self._run('choose_image')
+        self._results = []
+        self._ocr = {}
+        return result
+
+    async def detect_objects(self, confidence=50):
+        self._results = await self._run('detect_objects', confidence=confidence)
+        return self.results()
+
+    def count(self, label='person'):
+        return sum(d['label'] == label for d in self._results)
+
+    def found(self, label='person'): return self.count(label) > 0
+    def results(self): return json.loads(json.dumps(self._results))
+
+ai = _AI()

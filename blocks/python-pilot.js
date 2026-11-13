@@ -25,7 +25,7 @@
   document.body.classList.toggle('python-active',api.selected);
   $('blocksEditorTab').setAttribute('aria-selected',String(!api.selected));$('pythonEditorTab').setAttribute('aria-selected',String(api.selected));
   $('toolboxWorkspace').hidden=api.selected;$('pythonPanel').hidden=!api.selected;
-  for(const id of ['generalToolboxTab','hardwareToolboxTab','dashboardToolboxTab','spritesToolboxTab'])$(id).hidden=api.selected;
+  for(const id of ['generalToolboxTab','hardwareToolboxTab','dashboardToolboxTab','spritesToolboxTab','aiToolboxTab'])$(id).hidden=api.selected;
   for(const id of fileButtons)$(id).disabled=id==='saveProject'?false:!!window.blockProgramRunning;
   $('pythonInfo').hidden=false;$('saveNamed').hidden=false;$('importPythonSource').hidden=!api.selected;$('exportPythonSource').hidden=!api.selected;$('importPythonSource').disabled=api.running;
   for(const [id,label] of Object.entries({menuUpload:'Upload Project',saveProject:'Download Project',newProject:'New Project'})){
@@ -53,7 +53,7 @@
  async function finish(message,error=false){
   if(finishing)return finishing;if(!api.running)return;
   finishing=(async()=>{
-   api.worker?.terminate();api.worker=null;workerGeneration++;api.controller.abort(Error('Stopped'));window.CodySpriteStage?.release();
+   api.worker?.terminate();api.worker=null;workerGeneration++;api.controller.abort(Error('Stopped'));window.CodySpriteStage?.release();window.CodyAI?.stop();
    status('Stopping Python… Waiting for any active hardware reply.');
    // Preserve serial exclusivity until an outstanding sensor request settles.
    await api.bridge.router.hardware.tail.catch(()=>{});

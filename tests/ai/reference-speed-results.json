@@ -1,0 +1,114 @@
+[
+  {
+    "mode": "fast",
+    "threads": 1,
+    "inputWidth": 512,
+    "inputHeight": 384,
+    "preprocessMs": 88.83882900000003,
+    "inferenceMs": 1044.539114,
+    "postprocessMs": 2.623139000000265,
+    "workerMs": 1136.0010820000002,
+    "labels": [
+      "remote",
+      "remote",
+      "cat",
+      "cat",
+      "couch",
+      "remote"
+    ]
+  },
+  {
+    "mode": "fast",
+    "threads": 1,
+    "inputWidth": 512,
+    "inputHeight": 384,
+    "preprocessMs": 23.034966000000168,
+    "inferenceMs": 629.8933299999999,
+    "postprocessMs": 5.697603000000072,
+    "workerMs": 658.6258990000001,
+    "labels": [
+      "remote",
+      "remote",
+      "cat",
+      "cat",
+      "couch",
+      "remote"
+    ]
+  },
+  {
+    "mode": "balanced",
+    "threads": 1,
+    "inputWidth": 640,
+    "inputHeight": 480,
+    "preprocessMs": 32.982978,
+    "inferenceMs": 1193.1116469999997,
+    "postprocessMs": 4.572830000000067,
+    "workerMs": 1230.6674549999998,
+    "labels": [
+      "remote",
+      "remote",
+      "cat",
+      "bed",
+      "bed",
+      "remote",
+      "cat"
+    ]
+  },
+  {
+    "mode": "balanced",
+    "threads": 1,
+    "inputWidth": 640,
+    "inputHeight": 480,
+    "preprocessMs": 31.458403000000544,
+    "inferenceMs": 1162.1886610000001,
+    "postprocessMs": 0.5696539999999004,
+    "workerMs": 1194.2167180000006,
+    "labels": [
+      "remote",
+      "remote",
+      "cat",
+      "bed",
+      "bed",
+      "remote",
+      "cat"
+    ]
+  },
+  {
+    "mode": "detailed",
+    "threads": 1,
+    "inputWidth": 640,
+    "inputHeight": 480,
+    "preprocessMs": 25.455845999999838,
+    "inferenceMs": 1171.7527639999998,
+    "postprocessMs": 5.301472000000103,
+    "workerMs": 1202.5100819999998,
+    "labels": [
+      "remote",
+      "remote",
+      "cat",
+      "bed",
+      "bed",
+      "remote",
+      "cat"
+    ]
+  },
+  {
+    "mode": "detailed",
+    "threads": 1,
+    "inputWidth": 640,
+    "inputHeight": 480,
+    "preprocessMs": 25.020190000000184,
+    "inferenceMs": 1142.8561950000003,
+    "postprocessMs": 0.34056799999962095,
+    "workerMs": 1168.216953,
+    "labels": [
+      "remote",
+      "remote",
+      "cat",
+      "bed",
+      "bed",
+      "remote",
+      "cat"
+    ]
+  }
+]

@@ -1,0 +1,29 @@
+[
+  {
+    "size": "135M",
+    "prompt": "What does a temperature sensor measure?",
+    "text": "A temperature sensor measures the temperature of a substance by converting its temperature into a measurable quantity. It measures the temperature of a substance by converting its temperature into a temperature difference between two points on a scale.",
+    "streamed": "A temperature sensor measures the temperature of a substance by converting its temperature into a measurable quantity. It measures the temperature of a substance by converting its temperature into a temperature difference between two points on a scale.",
+    "firstTokenMs": 481,
+    "totalMs": 2505,
+    "rssMB": 927
+  },
+  {
+    "size": "135M",
+    "prompt": "Explain a VLAN in one short sentence.",
+    "text": "A VLAN is a virtual network segment that allows multiple devices to share the same physical network interface, such as a switch or a router. It's a way to separate a physical network into separate networks, each with its own set of devices and protocols. VLANs are useful for:\n\n- Ensuring security by",
+    "streamed": "A VLAN is a virtual network segment that allows multiple devices to share the same physical network interface, such as a switch or a router. It's a way to separate a physical network into separate networks, each with its own set of devices and protocols. VLANs are useful for:\n\n- Ensuring security by",
+    "firstTokenMs": 435,
+    "totalMs": 3337,
+    "rssMB": 954
+  },
+  {
+    "size": "135M",
+    "prompt": "Summarize this in one sentence: Plants use sunlight, water and carbon dioxide to make food.",
+    "text": "Plants use sunlight, water, and carbon dioxide to make food.",
+    "streamed": "Plants use sunlight, water, and carbon dioxide to make food.",
+    "firstTokenMs": 445,
+    "totalMs": 977,
+    "rssMB": 954
+  }
+]

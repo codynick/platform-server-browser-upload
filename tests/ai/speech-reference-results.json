@@ -1,0 +1,7 @@
+{
+  "modelLoadMs": 2348,
+  "audioSeconds": 8.308,
+  "inferenceMs": 1438,
+  "text": "one zero zero zero one nine oh two one oh zero one eight zero three",
+  "backend": "packaged browser WASM; Node VM supplies fetch and IndexedDB; not a browser microphone test"
+}

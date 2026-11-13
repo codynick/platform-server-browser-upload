@@ -1,7 +1,7 @@
 {
   "sensor-test-soil-moisture": {
     "title": "Sensor Test: Soil Moisture",
-    "help": "Simulation only. Insert BOTH gold probe tips in the soil. Drag the bare watering can to overlap the pot; it tilts 45 degrees and waters automatically. Move it away to stop. Double-click the can to remove it. Double-click the pot to reset moisture to 0%. Water soaks in gradually; soil type affects soaking, retention and drainage. The bar in the pot bottom strip shows current moisture. The simulated display shows 0–100 moisture; LED 0 is red below 30%, green otherwise. Air is a dry reference (0%), not a calibrated hardware measurement. Choose Blocks or Python, then Run; Stop ends the program. No CJP, Dashboard or Sprites required.",
+    "help": "Simulation only. Insert BOTH gold probe tips in the soil. Drag the bare watering can to overlap the pot; it tilts 45 degrees and waters automatically. Move it away to stop. Double-click the can to remove it. Double-click the pot to reset moisture to 0%. Water soaks in gradually; soil type affects soaking, retention and drainage. The bar in the pot bottom strip shows current moisture. The simulated display shows 0\u2013100 moisture; LED 0 is red below 30%, green otherwise. Air is a dry reference (0%), not a calibrated hardware measurement. Choose Blocks or Python, then Run; Stop ends the program. No CJP, Dashboard or Sprites required.",
     "simulation": [
       "soil",
       "seven"
@@ -27,7 +27,7 @@
   },
   "sensor-test-ultrasonic": {
     "title": "Sensor Test: Ultrasonic",
-    "help": "Simulation only. Move the striped target from anywhere on its body. Aim the ultrasonic marker with the angle control. The seven-segment shows cm; LED 0 is red for a valid echo below 20 cm, green for farther targets, and blue for no echo (0). Target gear changes its size; 1 stage unit = 1 cm. Range 2–400 cm, 30-degree cone. Choose Blocks or Python, then Run; Stop ends the test. No CJP, dashboard or sprite is required.",
+    "help": "Simulation only. Move the striped target from anywhere on its body. Aim the ultrasonic marker with the angle control. The seven-segment shows cm; LED 0 is red for a valid echo below 20 cm, green for farther targets, and blue for no echo (0). Target gear changes its size; 1 stage unit = 1 cm. Range 2\u2013400 cm, 30-degree cone. Choose Blocks or Python, then Run; Stop ends the test. No CJP, dashboard or sprite is required.",
     "simulation": [
       "ultrasonic",
       "seven"
@@ -198,7 +198,7 @@
     "hardware": false
   },
   "sim-dashboard": {
-    "title": "Pretend sensor → dashboard and LED",
+    "title": "Pretend sensor \u2192 dashboard and LED",
     "help": "No CJP required. Adds a simulated temperature sensor. Change its slider in Simulation; view its gauge and graph in Dashboard. Press Stop to finish.",
     "simulation": [
       "temperature"
@@ -207,14 +207,14 @@
     "hardware": false
   },
   "mixed": {
-    "title": "Real temperature → dashboard and pretend LED",
-    "help": "Connect a CJP with a real temperature sensor. Open Dashboard for readings. The LED in Simulation becomes red above 30°C and blue otherwise.",
+    "title": "Real temperature \u2192 dashboard and pretend LED",
+    "help": "Connect a CJP with a real temperature sensor. Open Dashboard for readings. The LED in Simulation becomes red above 30\u00b0C and blue otherwise.",
     "simulation": [],
     "archive": "examples/mixed.codynick",
     "hardware": true
   },
   "cross-displays": {
-    "title": "Real and pretend readings → opposite displays",
+    "title": "Real and pretend readings \u2192 opposite displays",
     "help": "Connect CJP, real temperature sensor, and standalone seven-segment display. Adds a simulated ultrasonic sensor and seven-segment display. Real temperature appears on the simulated display; simulated distance on the real display.",
     "simulation": [
       "ultrasonic",
@@ -231,14 +231,14 @@
     "hardware": true
   },
   "temperature": {
-    "title": "Real temperature → display and dashboard",
+    "title": "Real temperature \u2192 display and dashboard",
     "help": "Connect a CJP, temperature sensor, and standalone seven-segment display. Open Dashboard to see the reading there too.",
     "simulation": [],
     "archive": "examples/temperature.codynick",
     "hardware": true
   },
   "joystick": {
-    "title": "CJP joystick click → real light",
+    "title": "CJP joystick click \u2192 real light",
     "help": "Connect a CJP. Press the joystick button to light RGB LED 0 green; release to turn it off.",
     "simulation": [],
     "archive": "examples/joystick.codynick",
@@ -291,7 +291,7 @@
   "demo-temperature-hw-sim": {
     "title": "Temperature sensor: HW and SIM",
     "hardware": true,
-    "help": "Requires: CJP, real temperature sensor and standalone seven-segment display. The real temperature is shown on the simulated seven-segment; the simulated temperature is shown on the real standalone seven-segment. On each CJP, the four internal square LEDs (12–15) show its own temperature: blue below 18 C, green from 18 to below 25 C, yellow from 25 to below 30 C, red at 30 C and above. Warm the real sensor or change simulated temperature independently. Dashboard gauges show both readings and two history graphs log the latest 200 samples each. Choose Blocks or Python, then Run. Press Stop to finish. Hardware outputs keep their last state after Stop.",
+    "help": "Requires: CJP, real temperature sensor and standalone seven-segment display. The real temperature is shown on the simulated seven-segment; the simulated temperature is shown on the real standalone seven-segment. On each CJP, the four internal square LEDs (12\u201315) show its own temperature: blue below 18 C, green from 18 to below 25 C, yellow from 25 to below 30 C, red at 30 C and above. Warm the real sensor or change simulated temperature independently. Dashboard gauges show both readings and two history graphs log the latest 200 samples each. Choose Blocks or Python, then Run. Press Stop to finish. Hardware outputs keep their last state after Stop.",
     "simulation": [
       "temperature",
       "seven"
@@ -315,5 +315,82 @@
     "archive": "examples/demo-soil-sim-hw.codynick",
     "demo": true,
     "demoOrder": 2
+  },
+  "ai-person-detector": {
+    "title": "AI + Dash - Person Detector",
+    "hardware": false,
+    "help": "No CJP required. Prepare the CPU detector, allow your camera, then press Take Picture on the Dashboard. Switch to AI to see detection boxes. First load is about 32 MB. No image leaves your browser. Stop releases the camera and AI worker. Choose Blocks or Python, then Run. Press Stop to finish.",
+    "simulation": [],
+    "stage": false,
+    "dashboard": true,
+    "archive": "examples/ai-person-detector.codynick",
+    "ai": true,
+    "category": "AI"
+  },
+  "ai-image-workbench": {
+    "title": "AI + Dashboard - Named Image Workbench",
+    "hardware": false,
+    "help": "No CJP required. Run, then use the Dashboard: choose/start a camera, name and capture a photo, or name/upload an existing image. Select Camera capture or Saved image; press Detect Objects separately. Edit Capture button title to rename the capture button. Results include a boxed image, summary and table. Named photos stay in this editor session only. Upload works with no camera. No CJP required. Choose Blocks or Python, then Run. Press Stop to finish.",
+    "simulation": [],
+    "stage": false,
+    "dashboard": true,
+    "archive": "examples/ai-image-workbench.codynick",
+    "ai": true,
+    "category": "AI"
+  },
+  "ai-ocr-reader": {
+    "title": "AI + Dashboard - Read English Text",
+    "hardware": false,
+    "help": "No CJP required. Five widgets only. Run, click Load sample, then Read Text. Or before Run, capture/upload your own image in AI > Image. Recognition runs locally with the English fast model. The selected image, recognized text, confidence and time appear on Dashboard. Stop releases the engines; source images are not saved in project files. Choose Blocks or Python, then Run. Press Stop to finish.",
+    "simulation": [],
+    "stage": false,
+    "dashboard": true,
+    "archive": "examples/ai-ocr-reader.codynick",
+    "ai": true,
+    "category": "AI"
+  },
+  "ai-voice-light": {
+    "title": "AI + Dashboard - Voice Controlled Light",
+    "hardware": false,
+    "help": "No CJP required. Five widgets. Run, click Start listening, allow microphone access, then say red, green or off and pause. Only completed exact matches change the simulated dashboard light. Stop listening releases the microphone; editor Stop also unloads the model. First use loads the English speech model. Audio stays on the user device. If the browser suspends audio, open AI > Speech Recognition and click Enable Microphone Audio. Choose Blocks or Python, then Run. Press Stop to finish.",
+    "simulation": [],
+    "stage": false,
+    "dashboard": true,
+    "archive": "examples/ai-voice-light.codynick",
+    "ai": true,
+    "category": "AI"
+  },
+  "ai-speech-transcription": {
+    "title": "AI + Dashboard - English Speech to Text",
+    "hardware": false,
+    "help": "No CJP required. Five widgets: Start, Stop, Clear, Transcript and Status. Run, click Start, allow microphone access and speak English. Pause between sentences. Completed phrases appear in Transcript. Stop finishes the last phrase and releases the microphone; Start resumes appending. Clear resets the text/current phrase. The small local model does not add punctuation automatically. If audio is suspended, open AI > Speech Recognition and click Enable Microphone Audio. Audio is not recorded or uploaded; transcript displayed on Dashboard can be saved with the project. Choose Blocks or Python, then Run. Press Stop to finish.",
+    "simulation": [],
+    "stage": false,
+    "dashboard": true,
+    "archive": "examples/ai-speech-transcription.codynick",
+    "ai": true,
+    "category": "AI"
+  },
+  "ai-text-to-speech": {
+    "title": "AI + Dashboard - Local Text to Speech",
+    "hardware": false,
+    "help": "No CJP required. Five widgets: Text, Speed, Speak, Stop and Status. Run, edit the short message, set speed and click Speak. Only browser-reported local voices are allowed. No local voice means a clear unavailable message, without remote fallback or a new model. If blocked by the browser, open AI > Text to Speech > Enable Speech and click it. Speak starts playback without waiting; status updates until it finishes. Stop cancels speech. The dashboard text input supports short messages; use AI panel for up to 1,000 characters. Choose Blocks or Python, then Run. Press Stop to finish.",
+    "simulation": [],
+    "stage": false,
+    "dashboard": true,
+    "archive": "examples/ai-text-to-speech.codynick",
+    "ai": true,
+    "category": "AI"
+  },
+  "ai-local-text-assistant": {
+    "title": "AI + Dashboard - Small Local Text Assistant",
+    "hardware": false,
+    "help": "No CJP required. Five widgets: Question, Ask, Stop, Answer and Status. Run and click Ask. First use loads about 370 MB of model data; try a laptop/desktop with enough free memory. The answer streams into Answer. Stop releases the model and keeps partial text. Each question is independent. This small experimental model can make factual errors: verify answers. Text shown on Dashboard can be saved in the project; no question is sent to a server for processing. Choose Blocks or Python, then Run. Press Stop to finish.",
+    "simulation": [],
+    "stage": false,
+    "dashboard": true,
+    "archive": "examples/ai-local-text-assistant.codynick",
+    "ai": true,
+    "category": "AI"
   }
 }

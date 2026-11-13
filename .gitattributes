@@ -1,3 +1,4 @@
 *.sh text eol=lf
 # Firmware hashes cover exact bytes; never normalize HEX line endings.
 *.hex -text -diff
+blocks/ai/llm/models/fe7c7db4c8921c9e3fa1c65cfd296fb3b1b1a8f9/onnx-community/SmolLM2-360M-Instruct-ONNX/onnx/model_quantized.onnx filter=lfs diff=lfs merge=lfs -text

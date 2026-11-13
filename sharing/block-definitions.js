@@ -107,3 +107,5 @@ B.defineBlocksWithJsonArray([
 {type:'cn_forever',message0:'forever %1',args0:[{type:'input_statement',name:'DO'}],previousStatement:null,colour:'#ffab19'},
 {type:'cn_timer_value',message0:'timer (seconds)',output:'Number',colour:'#00838f'},
 {type:'cn_timer_reset',message0:'reset timer',previousStatement:null,nextStatement:null,colour:'#00838f'}]);
+
+window.CodyAIBlocks.definitions();
