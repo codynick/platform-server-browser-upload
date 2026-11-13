@@ -157,7 +157,7 @@ The fixed-callback CAS flow retains its explicit identity confirmation step at
 2. Review, commit, and push the release to `AI` using your own GitHub account.
 3. Close all old CodyNick editor, simulator, and dashboard tabs.
 4. Run the same single-line VPS command shown above.
-5. Open the editor at your doAI's `/blocks/` path and press **Ctrl+F5**.
+5. Open the editor at your domain's `/blocks/` path and press **Ctrl+F5**.
 
 Example commands from your local repository, with `AI` checked out:
 
@@ -185,7 +185,7 @@ until closed/reloaded.
 
 | Item | Location |
 | --- | --- |
-| Repository checkout used by GitHub setup | `/root/platform-server-browser-upload` |
+| Repository checkout used by GitHub setup | `/root/platform-server-browser-upload-ai` |
 | Saved domain | `/etc/codynick/domain` |
 | Website | `/var/www/<your-domain>/` |
 | CAS configuration | `/etc/codynick-cas/config.json` |
