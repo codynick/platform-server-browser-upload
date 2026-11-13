@@ -2,7 +2,7 @@ const fs=require('fs'),path=require('path'),vm=require('vm'),assert=require('ass
 const site=path.resolve(process.argv[2]||'build/testsite'),read=f=>fs.readFileSync(path.join(site,f),'utf8');
 const Runtime=require(path.join(site,'blocks/runtime.js')),Bridge=require(path.join(site,'blocks/python-bridge.js'));
 const ctx={console,setTimeout,clearTimeout,AbortController,URL,performance};ctx.window=ctx;vm.createContext(ctx);vm.runInContext(read('blocks/vendor/blockly/blockly.min.js'),ctx);ctx.BlockRuntime=Runtime;vm.runInContext(read('blocks/ai/classes.js'),ctx);vm.runInContext(read('blocks/ai/blocks.js'),ctx);ctx.CodyAIBlocks.definitions();
-const B=ctx.Blockly;assert.equal(ctx.CodyAIClasses.length,80);assert.equal(ctx.CodyAIBlocks.types.length,41);
+const B=ctx.Blockly;assert.equal(ctx.CodyAIClasses.length,80);assert.equal(ctx.CodyAIBlocks.types.length,47);
 B.defineBlocksWithJsonArray([{type:'cn_event_start',message0:'start %1',args0:[{type:'input_statement',name:'DO'}]}]);
 let calls=[];ctx.CodyAI={command:async(op,args,signal)=>{signal?.throwIfAborted();calls.push([op,args]);return op==='count'?2:op==='found'?true:[];},stop:()=>calls.push(['stop'])};global.window=ctx;
 (async()=>{

@@ -1,3 +1,12 @@
+CodyNick 3.21.1-ai.10: Voice Q&A
+
+Talk → one English question → pause → microphone off → local LLM → local spoken answer.
+Examples > AI > AI + Dashboard - Talk and Hear an AI Answer.
+Five widgets: Talk, Stop, Your Question, AI Answer, Status. Each question is independent.
+Existing local TTS voice required; use AI > Voice Q&A enable-audio buttons if prompted.
+All previous AI tools, models and examples are included. No server inference or user PC install.
+Small LLM answers may be incorrect; first use downloads models and requires time/RAM.
+
 ### 3.21.1-ai.9 — small local CPU language model
 
 - Publish the cumulative trial on the AI branch with a one-command server update and Git LFS model delivery.

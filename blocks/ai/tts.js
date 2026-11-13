@@ -30,7 +30,7 @@
   }catch(e){if(ticket===generation){stop();phase='error';message=e.message;render();core.status(message);}throw e;}
  }
  const commands={tts_available:async()=>{if(supported()&&!localVoices().length)await waitForVoices();return localVoices().length>0;},tts_speak:speak,tts_stop:async()=>stop(),tts_voices:async()=>{if(!localVoices().length)await waitForVoices();return refresh();},tts_is_speaking:async()=>state().speaking,tts_message:async()=>message,tts_status:async()=>state()};
- window.CodyTTS={commands,stop,clear,controls};
+ window.CodyTTS={async retrySpeech(){if(lastArgs)return speak(lastArgs);return false;},commands,stop,clear,controls};
  $('ttsSpeak').onclick=async()=>{try{await CodyAI.command('tts_speak',{text:$('ttsText').value,voice:$('ttsVoice').value,rate:Number($('ttsRate').value)});}catch(e){core.status(e.message);}};
  $('ttsStop').onclick=()=>{if(core.busy)CodyAI.stop();else stop();};$('ttsRefresh').onclick=()=>refresh();$('ttsEnable').onclick=async()=>{if(!lastArgs)return;try{await CodyAI.command('tts_speak',lastArgs);}catch(e){core.status(e.message);}};
  synth?.addEventListener?.('voiceschanged',refresh);render();

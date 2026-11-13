@@ -5,7 +5,7 @@
  function controls(){const locked=core.busy||!!window.blockProgramRunning||!!window.CodyPythonPilot?.running;for(const id of ['ocrSample','ocrPrepare','ocrRead','ocrLayout','ocrShowWords','ocrEnhance'])$(id).disabled=locked;$('ocrRead').disabled=locked||!core.image;$('ocrCopy').disabled=!result?.text;$('ocrDownload').disabled=!result?.text;}
  function releaseEngine(){generation++;host?.terminate();host=null;ready=false;if(pending){pending.reject(Error('Stopped'));pending=null;}}
  function rpc(op,args={}){return new Promise((resolve,reject)=>{
-  if(!host){const w=new Worker(new URL('ai/ocr/host.js?v=3.21.1-ai.9',location.href));host=w;
+  if(!host){const w=new Worker(new URL('ai/ocr/host.js?v=3.21.1-ai.10',location.href));host=w;
    w.onmessage=({data:d})=>{if(host!==w)return;if(d.progress!==undefined){core.status(`OCR: ${d.status||'processing'} · ${d.progress}%`);return;}if(pending?.id===d.id){const p=pending;pending=null;d.error?p.reject(Error(d.error)):p.resolve(d.result);}};
    w.onerror=e=>{const p=pending;pending=null;w.terminate();host=null;ready=false;p?.reject(Error(e.message||'OCR could not load. Check browser support and server files.'));};
   }

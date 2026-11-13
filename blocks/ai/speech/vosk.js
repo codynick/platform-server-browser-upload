@@ -539,7 +539,7 @@
         };
     }
 
-    var WorkerFactory = function(options){ return new Worker(new URL('ai/speech/vosk-worker.js?v=3.21.1-ai.9',location.href),options); };
+    var WorkerFactory = function(options){ return new Worker(new URL('ai/speech/vosk-worker.js?v=3.21.1-ai.10',location.href),options); };
     /* eslint-enable */
 
     var ClientMessage;

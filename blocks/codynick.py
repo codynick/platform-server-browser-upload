@@ -194,6 +194,15 @@ class _AI:
     async def _run(self, operation, **args):
         return json.loads(await _request('ai', json.dumps(dict(action=operation, args=args))))
 
+    async def start_voice_turn(self, microphone='default', voice='auto', max_tokens=64):
+        return await self._run('conversation_talk', microphone=microphone, voice=voice, max_tokens=max_tokens)
+    async def stop_voice_turn(self): return await self._run('conversation_stop')
+    async def voice_active(self): return await self._run('conversation_active')
+    async def voice_question(self): return await self._run('conversation_question')
+    async def voice_answer(self): return await self._run('conversation_answer')
+    async def voice_message(self): return await self._run('conversation_message')
+    async def voice_status(self): return await self._run('conversation_status')
+
     async def prepare_llm(self): return await self._run('llm_prepare')
     async def start_answer(self, prompt, max_tokens=64):
         return await self._run('llm_start', prompt=str(prompt), max_tokens=max_tokens)

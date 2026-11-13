@@ -9,7 +9,7 @@
  function clear(){releaseEngine();answer='';metrics=null;phase='idle';message='Enter a short question. The model loads only when requested.';$('llmPrompt').value='What does a temperature sensor measure?';$('llmTokens').value='64';render();return true;}
  function fail(text){clearTimeout(timer);worker?.terminate();worker=null;ready=false;phase='error';message=String(text||'Language model failed. This device may not have enough available memory.');pendingPrepare?.reject(Error(message));pendingPrepare=null;render();core.status(message);}
  function armTimeout(id){clearTimeout(timer);timer=setTimeout(()=>{if(active===id)fail('Language model stalled. Stop, check the connection/available memory, and try a shorter question.');},180000);}
- function getWorker(){if(worker)return worker;const w=new Worker(new URL('ai/llm/worker.mjs?v=3.21.1-ai.9',location.href),{type:'module'});worker=w;
+ function getWorker(){if(worker)return worker;const w=new Worker(new URL('ai/llm/worker.mjs?v=3.21.1-ai.10',location.href),{type:'module'});worker=w;
   w.onmessage=({data:d})=>{if(worker!==w||d.id!==active)return;
    if(d.error){fail(d.error);return;}if(d.progress!==undefined){armTimeout(d.id);message=`Loading local language model: ${d.progress}% · ${d.file||'model'}`;render();return;}
    if(d.ready){armTimeout(d.id);ready=true;if(phase==='loading')phase=pendingPrepare?'loading':'generating';message=pendingPrepare?'Language model ready.':'Generating a short answer on your CPU…';render();return;}

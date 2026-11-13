@@ -22,7 +22,7 @@
     "Make IndexedDB model caching best effort and stringify load errors."
   ],
   "files": {
-    "vosk.js": "94465dfa8021b0f52f18e1667e55641ca0151e77b5153c0aef74ca9f95a537df",
+    "vosk.js": "7ca4b10e70d5fff66aaf6832ece9afc485dddeabbce58faeb1a259ad7c81deb5",
     "LICENSE-APACHE-2.0.txt": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30",
     "vosk-worker.js": "0c595644cf33b3f9ee63ed00fcf7b1704357047a12ece4dd87eebefee7a2e88c",
     "THIRD_PARTY.md": "4342066756771715dfdded8cf2bef3735724701c43a5b8dcb8cfc21d6dea6ed7",

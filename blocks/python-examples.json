@@ -392,5 +392,16 @@
     "archive": "examples/ai-local-text-assistant.codynick",
     "ai": true,
     "category": "AI"
+  },
+  "ai-voice-question-answer": {
+    "title": "AI + Dashboard - Talk and Hear an AI Answer",
+    "hardware": false,
+    "help": "No CJP required. Five widgets: Talk, Stop, Your Question, AI Answer and Status. Run, click Talk, allow microphone access, ask one short English question, then pause. The microphone turns off before the local LLM generates and speaks its answer. Stop cancels every phase. If needed, open AI > Voice Q&A and click Enable Microphone Audio or Enable Speech. Requires an existing local system voice; no remote fallback. First use loads speech/LLM assets; allow a processing delay and use a laptop/desktop first. Each question is independent and the small LLM can be wrong. Displayed question/answer text can be saved with the project; audio is not recorded or uploaded. Choose Blocks or Python, then Run. Press Stop to finish.",
+    "simulation": [],
+    "stage": false,
+    "dashboard": true,
+    "archive": "examples/ai-voice-question-answer.codynick",
+    "ai": true,
+    "category": "AI"
   }
 }

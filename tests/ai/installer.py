@@ -56,7 +56,7 @@ class Installer(unittest.TestCase):
    if src.is_file():
     dst=self.site/src.relative_to(previous);dst.parent.mkdir(parents=True,exist_ok=True);shutil.copy2(src,dst)
   original=self.snapshot();backup=self.apply()
-  self.assertEqual((self.site/'VERSION').read_text().strip(),'3.21.1-ai.9')
+  self.assertEqual((self.site/'VERSION').read_text().strip(),'3.21.1-ai.10')
   self.assertTrue((self.site/'blocks/ai/workbench.js').is_file())
   with contextlib.redirect_stdout(io.StringIO()):patch.rollback(backup)
   self.assertEqual(original,self.snapshot())
@@ -66,7 +66,7 @@ class Installer(unittest.TestCase):
    if src.is_file():
     dst=self.site/src.relative_to(previous);dst.parent.mkdir(parents=True,exist_ok=True);shutil.copy2(src,dst)
   original=self.snapshot();backup=self.apply()
-  self.assertEqual((self.site/'VERSION').read_text().strip(),'3.21.1-ai.9')
+  self.assertEqual((self.site/'VERSION').read_text().strip(),'3.21.1-ai.10')
   self.assertIn('Speed and detail',(self.site/'blocks/index.html').read_text())
   with contextlib.redirect_stdout(io.StringIO()):patch.rollback(backup)
   self.assertEqual(original,self.snapshot())
@@ -76,7 +76,7 @@ class Installer(unittest.TestCase):
    if src.is_file():
     dst=self.site/src.relative_to(previous);dst.parent.mkdir(parents=True,exist_ok=True);shutil.copy2(src,dst)
   original=self.snapshot();backup=self.apply()
-  self.assertEqual((self.site/'VERSION').read_text().strip(),'3.21.1-ai.9')
+  self.assertEqual((self.site/'VERSION').read_text().strip(),'3.21.1-ai.10')
   self.assertTrue((self.site/'blocks/ai/ocr/host.js').is_file())
   with contextlib.redirect_stdout(io.StringIO()):patch.rollback(backup)
   self.assertEqual(original,self.snapshot())
@@ -86,7 +86,7 @@ class Installer(unittest.TestCase):
    if src.is_file():
     dst=self.site/src.relative_to(previous);dst.parent.mkdir(parents=True,exist_ok=True);shutil.copy2(src,dst)
   original=self.snapshot();backup=self.apply()
-  self.assertEqual((self.site/'VERSION').read_text().strip(),'3.21.1-ai.9')
+  self.assertEqual((self.site/'VERSION').read_text().strip(),'3.21.1-ai.10')
   self.assertTrue((self.site/'blocks/ai/ocr/image.js').is_file())
   with contextlib.redirect_stdout(io.StringIO()):patch.rollback(backup)
   self.assertEqual(original,self.snapshot())
@@ -96,7 +96,7 @@ class Installer(unittest.TestCase):
    if src.is_file():
     dst=self.site/src.relative_to(previous);dst.parent.mkdir(parents=True,exist_ok=True);shutil.copy2(src,dst)
   original=self.snapshot();backup=self.apply()
-  self.assertEqual((self.site/'VERSION').read_text().strip(),'3.21.1-ai.9')
+  self.assertEqual((self.site/'VERSION').read_text().strip(),'3.21.1-ai.10')
   self.assertTrue((self.site/'blocks/ai/speech/english-small-0.15.tar.gz').is_file())
   with contextlib.redirect_stdout(io.StringIO()):patch.rollback(backup)
   self.assertEqual(original,self.snapshot())
@@ -106,7 +106,7 @@ class Installer(unittest.TestCase):
    if src.is_file():
     dst=self.site/src.relative_to(previous);dst.parent.mkdir(parents=True,exist_ok=True);shutil.copy2(src,dst)
   original=self.snapshot();backup=self.apply()
-  self.assertEqual((self.site/'VERSION').read_text().strip(),'3.21.1-ai.9')
+  self.assertEqual((self.site/'VERSION').read_text().strip(),'3.21.1-ai.10')
   self.assertTrue((self.site/'blocks/examples/ai-speech-transcription.codynick').is_file())
   with contextlib.redirect_stdout(io.StringIO()):patch.rollback(backup)
   self.assertEqual(original,self.snapshot())
@@ -116,7 +116,7 @@ class Installer(unittest.TestCase):
    if src.is_file():
     dst=self.site/src.relative_to(previous);dst.parent.mkdir(parents=True,exist_ok=True);shutil.copy2(src,dst)
   original=self.snapshot();backup=self.apply()
-  self.assertEqual((self.site/'VERSION').read_text().strip(),'3.21.1-ai.9')
+  self.assertEqual((self.site/'VERSION').read_text().strip(),'3.21.1-ai.10')
   self.assertTrue((self.site/'blocks/ai/tts.js').is_file())
   with contextlib.redirect_stdout(io.StringIO()):patch.rollback(backup)
   self.assertEqual(original,self.snapshot())
@@ -126,8 +126,19 @@ class Installer(unittest.TestCase):
    if src.is_file():
     dst=self.site/src.relative_to(previous);dst.parent.mkdir(parents=True,exist_ok=True);shutil.copy2(src,dst)
   original=self.snapshot();backup=self.apply()
-  self.assertEqual((self.site/'VERSION').read_text().strip(),'3.21.1-ai.9')
+  self.assertEqual((self.site/'VERSION').read_text().strip(),'3.21.1-ai.10')
   self.assertTrue((self.site/'blocks/ai/llm.js').is_file())
+  with contextlib.redirect_stdout(io.StringIO()):patch.rollback(backup)
+  self.assertEqual(original,self.snapshot())
+ def test_upgrade_llm_keeps_unchanged_models(self):
+  previous=BASE.parents[1]/'build/previous-llm-payload'
+  for src in previous.rglob('*'):
+   if src.is_file():
+    dst=self.site/src.relative_to(previous);dst.parent.mkdir(parents=True,exist_ok=True);shutil.copy2(src,dst)
+  original=self.snapshot();model=next(self.site.glob('blocks/ai/llm/models/**/model_quantized.onnx'));inode=model.stat().st_ino
+  backup=self.apply();state=json.loads((backup/'state.json').read_text())
+  self.assertNotIn(str(model.relative_to(self.site)),state['files']);self.assertEqual(inode,model.stat().st_ino)
+  self.assertLess(sum(p.stat().st_size for p in (backup/'original').rglob('*') if p.is_file()),10*1024*1024)
   with contextlib.redirect_stdout(io.StringIO()):patch.rollback(backup)
   self.assertEqual(original,self.snapshot())
  def test_cas_deployed_pages(self):

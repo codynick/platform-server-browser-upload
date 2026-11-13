@@ -3,3 +3,4 @@
 #aiPanel #speechCommands,#aiPanel #speechHeard{font:inherit;width:100%;padding:9px;border:1px solid #b9cadb;border-radius:7px;resize:vertical;margin-bottom:10px}#aiPanel [data-ai-tool=speech] .ai-button-row{margin-top:12px}#speechCommand{color:#7055bd}
 #aiPanel #ttsText,#aiPanel #ttsSpoken{font:inherit;width:100%;padding:9px;border:1px solid #b9cadb;border-radius:7px;resize:vertical;margin-bottom:10px}#aiPanel [data-ai-tool=tts] .ai-button-row{margin-top:12px}
 #aiPanel #llmPrompt,#aiPanel #llmAnswer{font:inherit;width:100%;padding:10px;border:1px solid #b9cadb;border-radius:7px;resize:vertical;margin-bottom:10px}#aiPanel [data-ai-tool=llm] .ai-button-row{margin-top:12px}
+#aiPanel #conversationQuestion,#aiPanel #conversationAnswer{font:inherit;width:100%;padding:9px;border:1px solid #b9cadb;border-radius:7px;resize:vertical;margin-bottom:10px}

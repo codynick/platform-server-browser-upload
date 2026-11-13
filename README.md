@@ -1,4 +1,4 @@
-# CodyNick Portal 3.21.1-ai.9
+# CodyNick Portal 3.21.1-ai.10
 
 Cumulative browser AI workbench trial. See [AI_IMAGE_DETECTION.md](AI_IMAGE_DETECTION.md).
 
@@ -237,6 +237,11 @@ The editor checks the bundled CodyPi release when connecting and offers confirme
 See [PYTHON_PILOT.md](PYTHON_PILOT.md) for ZIP installation, testing and rollback instructions.
 
 ## Revision history
+
+### 3.21.1-ai.10 — Voice Q&A
+
+- Add a local voice turn that captures one English question, stops the microphone, generates an answer with the local model, and reads it aloud with a local system voice.
+- Add Voice Q&A Blocks and Python APIs and the paired five-widget Talk and Hear an AI Answer example.
 
 ### 3.21.1-ai.9 — small local CPU language model
 
