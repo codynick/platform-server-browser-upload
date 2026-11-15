@@ -5,6 +5,8 @@ for real CodyNick gadgets, simulated gadgets, live dashboards and a sprite stage
 
 Repository: [codynick/platform-server-browser-upload](https://github.com/codynick/platform-server-browser-upload)
 
+For browser AI tools and examples, see the [AI branch](https://github.com/codynick/platform-server-browser-upload/tree/AI#readme) for its installation command.
+
 The searchable example library groups projects into Demo, General, Sensors, Hardware, Dashboards,
 Sprites and Combined projects. A fresh editor loads the first catalog example;
 landing-page cards open their selected example. Every example is an editable
@@ -246,6 +248,8 @@ their original releases. Desktop and mobile firmware uploads have since been
 confirmed by the user, as recorded in 3.11.5.
 
 ### 3.21.0 — Community publishing and configurable default limits
+
+- Link to the AI branch and its installation command.
 
 - Promote the approved p5 trial into the standard Git installation: Community search/filter/pagination, two-field Publish with server-verified SSO names, automatic publication updates, File > My published projects and link copying, read-only code pages opening stopped projects in the standard editor, and report/admin removal.
 - Add persistent Admin default runtime/cooldown settings while preserving custom limits, subscription exemptions and active-run leases. Use button navigation and small local SVG graphics.
