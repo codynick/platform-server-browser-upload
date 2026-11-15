@@ -7,6 +7,8 @@ for real CodyNick gadgets, simulated gadgets, live dashboards and a sprite stage
 
 Repository: [codynick/platform-server-browser-upload](https://github.com/codynick/platform-server-browser-upload)
 
+For the standard CodyNick installation, see the [main branch](https://github.com/codynick/platform-server-browser-upload/tree/main#readme) for its installation command.
+
 The searchable example library groups projects into Demo, General, Sensors, Hardware, Dashboards,
 Sprites and Combined projects. A fresh editor loads the first catalog example;
 landing-page cards open their selected example. Every example is an editable
@@ -239,6 +241,8 @@ See [PYTHON_PILOT.md](PYTHON_PILOT.md) for ZIP installation, testing and rollbac
 ## Revision history
 
 ### 3.21.1-ai.10 — Voice Q&A
+
+- Link to the standard branch and its installation command.
 
 - Add a local voice turn that captures one English question, stops the microphone, generates an answer with the local model, and reads it aloud with a local system voice.
 - Add Voice Q&A Blocks and Python APIs and the paired five-widget Talk and Hear an AI Answer example.
