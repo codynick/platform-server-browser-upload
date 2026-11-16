@@ -1,3 +1,7 @@
+CodyNick 3.21.1-ai.15 — Compact view controls and Alice sample
+
+Move linked view controls beside the editor link, use green Run and red Stop, and replace the Alice OCR sample with the page without the illustration.
+
 CodyNick 3.21.1-ai.14 — Linked views and OCR preview
 
 Add linked Connect and Run controls to all full-page views and display the Alice sample before OCR.

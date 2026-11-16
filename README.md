@@ -1,4 +1,4 @@
-# CodyNick Portal 3.21.1-ai.14
+# CodyNick Portal 3.21.1-ai.15
 
 Cumulative browser AI workbench trial. See [AI_IMAGE_DETECTION.md](AI_IMAGE_DETECTION.md).
 
@@ -239,6 +239,10 @@ The editor checks the bundled CodyPi release when connecting and offers confirme
 See [PYTHON_PILOT.md](PYTHON_PILOT.md) for ZIP installation, testing and rollback instructions.
 
 ## Revision history
+
+### 3.21.1-ai.15 — Compact view controls and Alice sample
+
+- Move linked view controls beside the editor link, use green Run and red Stop, and replace the Alice OCR sample with the page without the illustration.
 
 ### 3.21.1-ai.14 — Linked views and OCR preview
 

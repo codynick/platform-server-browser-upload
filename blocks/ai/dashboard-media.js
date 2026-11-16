@@ -6,7 +6,7 @@
  function receive(m){if(m?.kind==='browse-error'&&m.client===client){alert(m.message);return;}if(m?.kind!=='frame'||!parse(m.ref))return;if(m.data!==null&&(typeof m.data!=='string'||m.data.length>3000000||!/^data:image\/jpeg;base64,[A-Za-z0-9+/=]+$/.test(m.data)))return;cache.set(m.ref,{data:m.data,label:String(m.label||''),at:Date.now()});render();}
  function send(m){try{const host=window.parent!==window?window.parent.CodyAIWorkbench:null;if(host&&host.session===m.owner){void host.receive(m,receive);return;}}catch{}channel?.postMessage(m);}
  if(channel)channel.onmessage=e=>receive(e.data);
- const alice='/blocks/ai/ocr/samples/alice.jpg';
+ const alice='/blocks/ai/ocr/samples/alice.jpg?v=3.21.1-ai.15';
  function render(){for(const card of document.querySelectorAll('.card[data-card-type="image"]')){const w=CodyLiveStore.read().widgets[card.dataset.cardId],m=cache.get(w?.value),img=card.querySelector('[data-role="ai-image"]'),note=card.querySelector('[data-role="ai-image-note"]');if(!img)continue;
    if(parse(w?.value)?.[2]==='ocr-alice'){
     img.hidden=false;if(img.getAttribute('src')!==alice)img.src=alice;

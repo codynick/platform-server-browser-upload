@@ -1,10 +1,22 @@
-.full-page-controls:not([hidden]){display:flex;align-items:center;flex-wrap:wrap;gap:.5rem;padding:.5rem .75rem;color:#172033;background:#f6f9fc;border-bottom:1px solid #d9e1ec}
-.full-page-controls button{border:1px solid #a4b2c2;border-radius:.5rem;background:white;color:#172033;padding:.45rem .75rem;font:600 .9rem system-ui;cursor:pointer}
+.full-page-actions{display:flex;align-items:center;gap:.5rem;flex:0 0 auto;position:relative}
+.tool-page-header .full-page-actions{order:2;margin-inline-start:auto}
+.tool-page-header .full-page-actions .codynick-home-button{margin:0}
+.full-page-controls:not([hidden]){display:flex;align-items:center;gap:.4rem}
+.full-page-controls button{border:1px solid #a4b2c2;border-radius:6px;background:white;color:#172033;min-height:34px;padding:.35rem .65rem;font:600 .85rem system-ui;white-space:nowrap;cursor:pointer}
 .full-page-controls button[aria-pressed=true]{border-color:#0b6772;background:#e2f4f4}
+#fullPageRun{background:#2da44e;border-color:#2da44e;color:white}
+#fullPageRun[aria-pressed=true]{background:#b42335;border-color:#b42335}
+.full-page-controls button:hover:enabled{filter:brightness(.9)}
 .full-page-controls button:disabled{opacity:.6;cursor:default}
 .full-page-controls button:focus-visible{outline:2px solid #087d91;outline-offset:2px}
-.full-page-controls output{font:.85rem system-ui}
-body:has(> .full-page-controls[data-view=simulator]:not([hidden])){display:flex;flex-direction:column}
-body:has(> .full-page-controls[data-view=simulator]:not([hidden]))>header,
-.full-page-controls[data-view=simulator]{flex-shrink:0}
-.full-page-controls[data-view=simulator]:not([hidden])+main{flex:1;min-height:0;height:auto}
+.full-page-controls output:not([hidden]){position:absolute;z-index:20;inset-inline-end:0;top:calc(100% + .4rem);width:min(18rem,85vw);padding:.55rem .7rem;border:1px solid #d9e1ec;border-radius:.5rem;background:white;color:#172033;font:.85rem system-ui;box-shadow:0 4px 14px #17203326}
+body:has(> header .full-page-controls[data-view=simulator]:not([hidden])){display:flex;flex-direction:column}
+body:has(> header .full-page-controls[data-view=simulator]:not([hidden]))>header{flex-shrink:0}
+body:has(> header .full-page-controls[data-view=simulator]:not([hidden]))>main{flex:1;min-height:0;height:auto}
+@media(max-width:740px){.tool-page-header:has(.full-page-controls:not([hidden])) .logo-box{display:none}}
+@media(max-width:460px){
+ .tool-page-header:has(.full-page-controls:not([hidden])) .tool-header-copy{flex-basis:0}
+ .tool-page-header:has(.full-page-controls:not([hidden])) .header-subtitle{display:none}
+ .full-page-actions{gap:.3rem}
+ .full-page-controls button{padding:.3rem .45rem;font-size:.75rem}
+}
