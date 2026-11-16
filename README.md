@@ -1,4 +1,4 @@
-# CodyNick Portal 3.21.1-ai.10
+# CodyNick Portal 3.21.1-ai.14
 
 Cumulative browser AI workbench trial. See [AI_IMAGE_DETECTION.md](AI_IMAGE_DETECTION.md).
 
@@ -239,6 +239,22 @@ The editor checks the bundled CodyPi release when connecting and offers confirme
 See [PYTHON_PILOT.md](PYTHON_PILOT.md) for ZIP installation, testing and rollback instructions.
 
 ## Revision history
+
+### 3.21.1-ai.14 — Linked views and OCR preview
+
+- Add linked Connect and Run controls to all full-page views and display the Alice sample before OCR.
+
+### 3.21.1-ai.13 — Dashboard image picker
+
+- Add a programmable image picker to Dashboard and use it with an illustrated Alice book page in Read English Text.
+
+### 3.21.1-ai.12 — Built-in example publishing
+
+- Add versioned publishing for complete built-in examples in the Advanced menu. Admins can download the active package and restore a prior revision or the bundled example.
+
+### 3.21.1-ai.11 — AI example catalogue
+
+- Clarify the AI example cards, remove a duplicate Text to Speech option, and document how to run all eight examples.
 
 ### 3.21.1-ai.10 — Voice Q&A
 

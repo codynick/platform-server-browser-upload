@@ -1,0 +1,10 @@
+.full-page-controls:not([hidden]){display:flex;align-items:center;flex-wrap:wrap;gap:.5rem;padding:.5rem .75rem;color:#172033;background:#f6f9fc;border-bottom:1px solid #d9e1ec}
+.full-page-controls button{border:1px solid #a4b2c2;border-radius:.5rem;background:white;color:#172033;padding:.45rem .75rem;font:600 .9rem system-ui;cursor:pointer}
+.full-page-controls button[aria-pressed=true]{border-color:#0b6772;background:#e2f4f4}
+.full-page-controls button:disabled{opacity:.6;cursor:default}
+.full-page-controls button:focus-visible{outline:2px solid #087d91;outline-offset:2px}
+.full-page-controls output{font:.85rem system-ui}
+body:has(> .full-page-controls[data-view=simulator]:not([hidden])){display:flex;flex-direction:column}
+body:has(> .full-page-controls[data-view=simulator]:not([hidden]))>header,
+.full-page-controls[data-view=simulator]{flex-shrink:0}
+.full-page-controls[data-view=simulator]:not([hidden])+main{flex:1;min-height:0;height:auto}

@@ -45,8 +45,9 @@
   if(!r.ok){if(d.ready)ready=d.ready;throw Error(d.error||'Try again');}return d;
  }
  const policy={
-  setIdentity(u,a,c){if(user?.user_id!==u?.user_id){epoch++;grant=null;ready=0;}user=u;access=a;csrf=c||'';checked=true;ready=a?.ready??ready;ui();},
-  example(id){example=null;message='';ui();},personal(){example=null;message='';ui();},
+  setIdentity(u,a,c){if(user?.user_id!==u?.user_id){window.CodyExamplePublishing?.clear();epoch++;grant=null;ready=0;}user=u;access=a;csrf=c||'';checked=true;ready=a?.ready??ready;ui();window.CodyExamplePublishing?.refresh();},
+  example(id){example=null;message='';ui();},personal(){example=null;message='';ui();window.CodyExamplePublishing?.clear();},
+  exampleAdminToken:()=>user&&access?.role==='admin'?csrf:null,
   loading(value){loading=value;ui();},
   isExample:()=>!!example,canEdit:()=>!readonly(),refresh:ui,
   async begin(){

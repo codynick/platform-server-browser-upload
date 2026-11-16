@@ -6,6 +6,7 @@
  function releaseAll(){for(const id of [...held.keys()])release(id);}
  function attach(card){if(attached.has(card))return;attached.add(card);const id=card.dataset.cardId,type=card.dataset.cardType;
   const widget=store.read().widgets[id];
+  if(widget?.imagePicker){window.CodyAIMedia?.attachBrowse(card);return;}
   if(widget?.aiUpload){window.CodyAIMedia?.attachUpload(card,widget.aiUpload);return;}
   if(widget?.aiCancel){card.querySelector('[data-role=button]')?.addEventListener('click',()=>window.CodyAIMedia?.cancel(widget.aiCancel));return;}
   if(type==='text_input'||type==='select'){const input=card.querySelector('[data-role=input]');const update=()=>send(id,input.value);input?.addEventListener(type==='text_input'?'input':'change',update);return;}

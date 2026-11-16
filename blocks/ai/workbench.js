@@ -22,7 +22,7 @@
  function configure(){enabled=true;selectionStamp='';const previous=store.read().widgets;const text=(id,fallback)=>previous[id]?.type==='text_input'?String(previous[id].value).slice(0,120):fallback;store.dashboard('dash_clear',{});for(const id of [ids.start,ids.capture,ids.upload,ids.detect,ids.stop])create('button',id);create('text_input',ids.captureTitle,ids.captureTitle,text(ids.captureTitle,'Take Picture'));create('text_input',ids.captureName,ids.captureName,text(ids.captureName,'Photo 1'));create('text_input',ids.uploadName,ids.uploadName,text(ids.uploadName,'Uploaded photo 1'));for(const id of [ids.camera,ids.source,ids.saved])create('select',id);options(ids.source,['Camera capture','Saved image'].map(v=>({label:v,value:v})));create('slider',ids.confidence);store.update(s=>{const w=s.widgets[ids.confidence];w.min_value=1;w.max_value=100;w.step=1;w.value=previous[ids.confidence]?.type==='slider'&&Number.isFinite(previous[ids.confidence].value)?Math.max(1,Math.min(100,previous[ids.confidence].value)):50;});for(const id of [ids.status,ids.summary])create('info',id);for(const id of [ids.preview,ids.image])create('image',id);create('table',ids.table);
   store.update(s=>{s.widgets[ids.camera].aiTransient='camera';s.widgets[ids.saved].aiTransient='collection';s.widgets[ids.upload].aiUpload=session;s.widgets[ids.stop].aiCancel=session;for(const w of Object.values(s.widgets)){w.font_size=16;w.description='AI Image Detection Workbench';}});
   const rows=[[ids.camera,ids.start,ids.stop],[ids.captureTitle,ids.captureName,ids.capture],[ids.uploadName,ids.upload,ids.source],[ids.saved,ids.confidence,ids.detect],[ids.status,ids.summary],[ids.preview,ids.image],[ids.table]];const layout={};let y=0;for(const row of rows){const h=row.includes(ids.image)?3:row.includes(ids.table)?3:row.includes(ids.start)||row.includes(ids.capture)||row.includes(ids.upload)||row.includes(ids.detect)?2:1;const w=Math.floor(12/row.length);row.forEach((id,i)=>layout[id]={x:i*w,y,w,h});y+=h;}
-  let savedLayout=null;try{savedLayout=JSON.parse(localStorage.getItem('codynick-dashboard-layout-v1')||'null');}catch{}if(savedLayout&&Object.keys(layout).every(id=>Object.hasOwn(savedLayout,id))){for(const id of Object.keys(layout))layout[id]=savedLayout[id];}localStorage.setItem('codynick-dashboard-layout-v1',JSON.stringify(layout));window.dispatchEvent(new StorageEvent('storage',{key:'codynick-dashboard-layout-v1',newValue:JSON.stringify(layout)}));
+  let savedLayout=null;try{savedLayout=JSON.parse(localStorage.getItem('codynick-dashboard-layout-v1')||'null');}catch{}if(savedLayout){for(const id of Object.keys(layout)){if(Object.hasOwn(savedLayout,id))layout[id]=savedLayout[id];}}localStorage.setItem('codynick-dashboard-layout-v1',JSON.stringify(layout));window.dispatchEvent(new StorageEvent('storage',{key:'codynick-dashboard-layout-v1',newValue:JSON.stringify(layout)}));
   updateControls();publish();note('Choose a camera and Start Camera, or upload a named image. Capture and detection are separate.');return true;
  }
  function lockControls(disabled){if(!enabled)return;store.update(s=>{for(const id of [ids.camera,ids.start,ids.captureTitle,ids.captureName,ids.capture,ids.uploadName,ids.upload,ids.source,ids.saved,ids.detect,ids.confidence])if(s.widgets[id])s.widgets[id].disabled=disabled;});}
@@ -45,12 +45,58 @@
    if(saveCurrent(name)){store.dashboard('dash_set',{NAME:ids.source,VALUE:'Saved image'});options(ids.saved,[...images.keys()].map(n=>({label:n,value:n})));store.dashboard('dash_set',{NAME:ids.saved,VALUE:name});selectionStamp='';updateControls();note(`Uploaded “${name}”. Press Detect Objects when ready.`);}
   }finally{bitmap.close();}}finally{operation=false;lockControls(false);}
  }
+ const pickedImages=new Map(),decodingImages=new Map();
+ let browseGeneration=0;
+ function clearBrowse(){
+  browseGeneration++;decodingImages.clear();
+  for(const {bitmap} of pickedImages.values())bitmap.close();
+  pickedImages.clear();
+ }
+ function ownsPicker(id,token){
+  const state=store.read();
+  const picker=Object.hasOwn(state.widgets,id)&&state.widgets[id];
+  return !!token&&state.run?.token===token&&picker.browseRun===token&&picker.browseOwner===session&&window.blockProgramRunning;
+ }
+ async function receiveBrowse(message){
+  const {id,token,file:selection}=message;
+  if(typeof id!=='string'||!ownsPicker(id,token))throw Error('Run the program and choose the image again.');
+  const invalid='Choose a JPEG, PNG or WebP image under 12 MB.';
+  if(!selection||selection.size>12*1024*1024||!['image/jpeg','image/png','image/webp'].includes(selection.type))throw Error(invalid);
+  // A picker in the embedded Dashboard supplies a File from another window.
+  let file;
+  try{file=Blob.prototype.slice.call(selection,0,selection.size,selection.type);}catch{throw Error(invalid);}
+  if(decodingImages.size||(!pickedImages.has(id)&&pickedImages.size>=2))throw Error('Wait for the program to handle the previous image selections, then try again.');
+  const generation=browseGeneration,ticket={};
+  decodingImages.set(id,ticket);
+  let bitmap;
+  try{
+   try{bitmap=await createImageBitmap(file);}catch{throw Error('This image could not be decoded. Choose another file.');}
+   if(generation!==browseGeneration||!ownsPicker(id,token))return;
+   if(bitmap.width*bitmap.height>24000000)throw Error('Choose an image under 24 megapixels.');
+   pickedImages.get(id)?.bitmap.close();
+   pickedImages.set(id,{bitmap,token});
+   bitmap=null;
+  }finally{
+   bitmap?.close();
+   if(decodingImages.get(id)===ticket)decodingImages.delete(id);
+  }
+ }
+ function browseSelected(name){
+  const id=String(name),entry=pickedImages.get(id);
+  if(!entry)return false;
+  pickedImages.delete(id);
+  try{
+   if(!ownsPicker(id,entry.token))return false;
+   core.accept(entry.bitmap,entry.bitmap.width,entry.bitmap.height);
+   return true;
+  }finally{entry.bitmap.close();}
+ }
  function media(kind){if(kind==='ocr')return window.CodyOCR?.media()||null;if(kind==='image')return core.image?core.canvas.toDataURL('image/jpeg',.85):null;if(kind==='camera'&&core.video.srcObject&&core.video.videoWidth){const c=document.createElement('canvas');c.width=320;c.height=Math.max(1,Math.round(core.video.videoHeight/core.video.videoWidth*320));c.getContext('2d').drawImage(core.video,0,0,c.width,c.height);return c.toDataURL('image/jpeg',.65);}return null;}
- async function receive(m,reply){if(!m||m.owner!==session)return;if(m.kind==='get'){reply({kind:'frame',ref:ref(m.media),data:media(m.media),label:m.media==='image'?current:'Camera preview'});return;}if(!enabled||!window.blockProgramRunning)return;if(m.kind==='cancel'){(core.cancelCamera||core.releaseCamera)();note('Camera stopped.');return;}if(m.kind==='upload'){try{await loadFile(m.file,field(ids.uploadName));}catch(e){note(e.message);}}}
+ async function receive(m,reply){if(!m||m.owner!==session)return;if(m.kind==='get'){reply({kind:'frame',ref:ref(m.media),data:media(m.media),label:m.media==='image'?current:'Camera preview'});return;}if(m.kind==='browse-image'){try{await receiveBrowse(m);}catch(e){reply({kind:'browse-error',client:m.client,message:e.message});}return;}if(!enabled||!window.blockProgramRunning)return;if(m.kind==='cancel'){(core.cancelCamera||core.releaseCamera)();note('Camera stopped.');return;}if(m.kind==='upload'){try{await loadFile(m.file,field(ids.uploadName));}catch(e){note(e.message);}}}
  if(channel)channel.onmessage=e=>void receive(e.data,m=>channel.postMessage(m));
- function sanitizeWidgets(widgets){for(const w of Object.values(widgets)){delete w.aiUpload;delete w.aiCancel;delete w.disabled;if(w.type==='image')w.value='';if(w.aiTransient==='camera'){w.options=cameras.slice(0,3);w.value='default';}if(w.aiTransient==='collection'){w.options=[];w.value='';}delete w.aiTransient;}}
+ function sanitizeWidgets(widgets){for(const w of Object.values(widgets)){delete w.browseOwner;delete w.browseRun;delete w.aiUpload;delete w.aiCancel;delete w.disabled;if(w.type==='image')w.value='';if(w.aiTransient==='camera'){w.options=cameras.slice(0,3);w.value='default';}if(w.aiTransient==='collection'){w.options=[];w.value='';}delete w.aiTransient;}}
  function clear(){enabled=false;images.clear();current='';latestCapture='';revision++;selectionStamp='';refreshPanel();}
- window.CodyAIWorkbench={commands:{workbench_setup:async()=>configure(),workbench_sync:async()=>{updateControls();return true;},workbench_action:action},saveCurrent,sanitizeWidgets,clear,receive,session,ids,discover,progress(message){if(enabled&&operation)set(ids.status,message);},imageChanged(){current='';refreshPanel();},detected(){const e=images.get(current);if(e){e.results=clone(core.results);e.metrics=clone(core.metrics||null);e.analysed=true;}publish();}};
+ window.CodyAIWorkbench={commands:{workbench_setup:async()=>configure(),workbench_sync:async()=>{updateControls();return true;},workbench_action:action},saveCurrent,sanitizeWidgets,clear,clearBrowse,browseSelected,receive,session,ids,discover,progress(message){if(enabled&&operation)set(ids.status,message);},imageChanged(){current='';refreshPanel();},detected(){const e=images.get(current);if(e){e.results=clone(core.results);e.metrics=clone(core.metrics||null);e.analysed=true;}publish();}};
  $('aiSaveImage').onclick=()=>{try{if(window.blockProgramRunning)throw Error('Stop the program before using manual collection controls.');saveCurrent($('aiImageName').value);}catch(e){note(e.message);}};
  $('aiUseImage').onclick=()=>{try{if(window.blockProgramRunning)throw Error('Use the dashboard source selector while the program is running.');select($('aiSavedImage').value);}catch(e){note(e.message);}};
  $('aiDeleteImage').onclick=()=>{try{if(window.blockProgramRunning)throw Error('Stop the program before removing images.');const name=$('aiSavedImage').value;if(images.has(name)&&confirm(`Remove “${name}”?`)){images.delete(name);if(current===name){current='';core.setImage(null,[]);}revision++;refreshPanel();publish();}}catch(e){note(e.message);}};

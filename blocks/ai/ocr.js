@@ -1,6 +1,6 @@
 'use strict';
 (()=>{
- const $=id=>document.getElementById(id),core=CodyAI._core;let host=null,pending=null,serial=0,ready=false,generation=0,result=null;
+ const $=id=>document.getElementById(id),core=CodyAI._core;let host=null,pending=null,serial=0,ready=false,generation=0,result=null,bookPreview=false;
  const empty=()=>({text:'',confidence:0,words:[]});
  function controls(){const locked=core.busy||!!window.blockProgramRunning||!!window.CodyPythonPilot?.running;for(const id of ['ocrSample','ocrPrepare','ocrRead','ocrLayout','ocrShowWords','ocrEnhance'])$(id).disabled=locked;$('ocrRead').disabled=locked||!core.image;$('ocrCopy').disabled=!result?.text;$('ocrDownload').disabled=!result?.text;}
  function releaseEngine(){generation++;host?.terminate();host=null;ready=false;if(pending){pending.reject(Error('Stopped'));pending=null;}}
@@ -26,9 +26,9 @@
   $('ocrTiming').textContent=`CPU · English fast · ${work.width} × ${work.height} px${enhance?` → ${work.processedWidth} × ${work.processedHeight} enhanced`:""} | Load ${(result.loadingMs/1000).toFixed(2)} s | OCR ${(result.recognitionMs/1000).toFixed(2)} s | Total ${(result.totalMs/1000).toFixed(2)} s`;
   render();window.CodyAITools?.showTab('Results');core.status(result.text?'Text recognition complete.':'No readable text found. Try a sharper photo or a smaller text crop.');return JSON.parse(JSON.stringify(result));
  }
- function imageChanged(){result=null;$('ocrTiming').textContent='OCR timing appears after reading.';render();}
- async function sample(){const ticket=generation,response=await fetch(new URL('ai/ocr/samples/label.png',location.href));if(!response.ok)throw Error('Sample image could not load.');const bitmap=await createImageBitmap(await response.blob());try{if(ticket!==generation)throw Error('Stopped');core.accept(bitmap,bitmap.width,bitmap.height);}finally{bitmap.close();}window.CodyAITools?.showTool('ocr');window.CodyAITools?.showTab('Image');core.status('Sample label ready. Choose Process → Read Text.');return true;}
- function showImage(a){const name=String(a.name||'OCR image');CodyLiveStore.dashboard('dash_create_image',{NAME:name,TITLE:name});CodyLiveStore.dashboard('dash_set',{NAME:name,VALUE:`ai-media:${CodyAIWorkbench.session}:ocr`});return true;}
+ function imageChanged(){result=null;bookPreview=false;$('ocrTiming').textContent='OCR timing appears after reading.';render();}
+ async function sample(args={}){const book=args.sample==='book',file=book?'alice.jpg':'label.png',ticket=generation,response=await fetch(new URL('ai/ocr/samples/'+file,location.href));if(!response.ok)throw Error('Sample image could not load.');const bitmap=await createImageBitmap(await response.blob());try{if(ticket!==generation)throw Error('Stopped');core.accept(bitmap,bitmap.width,bitmap.height);bookPreview=book;}finally{bitmap.close();}window.CodyAITools?.showTool('ocr');window.CodyAITools?.showTab('Image');core.status(book?'Alice book page ready. Choose Read Text.':'Sample label ready. Choose Process → Read Text.');return true;}
+ function showImage(a){const name=String(a.name||'OCR image');CodyLiveStore.dashboard('dash_create_image',{NAME:name,TITLE:name});CodyLiveStore.dashboard('dash_set',{NAME:name,VALUE:`ai-media:${CodyAIWorkbench.session}:${bookPreview?'ocr-alice':'ocr'}`});return true;}
  const commands={prepare_ocr:prepare,ocr_sample:sample,ocr_show_image:async a=>showImage(a),ocr_has_image:async()=>!!core.image,ocr_elapsed:async()=>result?result.recognitionMs/1000:0,read_text:read,ocr_text:async()=>result?.text||'',ocr_confidence:async()=>result?.confidence||0,ocr_contains:async a=>!!String(a.needle||'').trim()&&(result?.text||'').toLowerCase().includes(String(a.needle).toLowerCase())};
  window.CodyOCR={commands,media(){if(!core.image)return null;return (result?$('ocrCanvas'):$('aiSourceCanvas')).toDataURL('image/jpeg',.85);},releaseEngine,stop:releaseEngine,clear(){releaseEngine();imageChanged();},imageChanged,controls};
  $('ocrSample').onclick=async()=>{try{await CodyAI.command('ocr_sample');}catch(e){core.status(e.message);}};

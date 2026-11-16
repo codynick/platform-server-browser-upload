@@ -17,7 +17,7 @@
  ['speech_next','next voice command',[],'String'],
  ['speech_text','last completed speech',[],'String'],
  ['speech_listening','microphone is listening?',[],'Boolean'],
- ['prepare_ocr','prepare English OCR',[]],['ocr_sample','load sample text image',[]],
+ ['prepare_ocr','prepare English OCR',[]],['ocr_sample','load sample text image %1',[{type:'field_dropdown',name:'sample',options:[['label','label'],['Alice book page','book']]}]],
  ['read_text','read English text layout %1 word boxes %2 enhance %3',[{type:'field_dropdown',name:'layout',options:[['auto','auto'],['text block','block'],['single line','line']]},{type:'field_checkbox',name:'words',checked:false},{type:'field_checkbox',name:'enhance',checked:true}]],
  ['ocr_text','recognized text',[],'String'],['ocr_confidence','OCR confidence (%)',[],'Number'],['ocr_elapsed','OCR time (seconds)',[],'Number'],['ocr_has_image','image is ready?',[],'Boolean'],
  ['ocr_contains','recognized text contains %1',[{type:'field_input',name:'needle',text:'CODY'}],'Boolean'],['ocr_show_image','show OCR image on dashboard %1',[{type:'field_input',name:'name',text:'Source image'}]],

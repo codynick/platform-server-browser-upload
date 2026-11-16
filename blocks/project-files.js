@@ -72,11 +72,16 @@
    stopped();if(!id)return;run.disabled=true;locked=true;say('Loading complete example…');
    const metadataResponse=await fetch('python-examples.json',{cache:'no-cache'});if(!metadataResponse.ok)throw Error('Cannot load example catalogue.');
    const entry=(await metadataResponse.json())[id];if(!entry||!/^examples\/[A-Za-z0-9-]+\.codynick$/.test(entry.archive))throw Error('Unknown example archive.');
-   const response=await fetch(entry.archive,{cache:'no-cache'});if(!response.ok)throw Error('Cannot download example: '+entry.title);
+   const apiResponse=await fetch('/api/examples/'+encodeURIComponent(id)+'/package',{cache:'no-store'});
+   const token=apiResponse.ok?apiResponse.headers.get('ETag'):null;
+   const response=apiResponse.status===404?await fetch(entry.archive,{cache:'no-cache'}):apiResponse;
+   if(!response.ok)throw Error('Cannot download example: '+entry.title);
    const project=validate(await CodyProjectArchive.decode(await response.arrayBuffer()));
    const selected=window.CodyPythonPilot?.selected?'python':'blocks';
    if(ask&&!confirm('Load “'+entry.title+'”? This replaces both Blocks and Python programs, dashboard widgets/layout, simulation and sprite settings. Download your current project first to keep it.'))return;
-   project.editor.language=selected;await loadProject(project,id);$('examplesDialog').close();say('Loaded '+entry.title+' · Both programs and scene setup restored. Programs remain stopped.');
+   project.editor.language=selected;await loadProject(project,id);
+   window.CodyExamplePublishing?.loaded(token?{id,title:entry.title,token,version:response.headers.get('X-CodyNick-Example-Version')}:null);
+   $('examplesDialog').close();say('Loaded '+entry.title+' · Both programs and scene setup restored. Programs remain stopped.');return true;
   }catch(e){say('Example could not load: '+e.message);alert('Example could not load: '+e.message);}finally{if(locked)run.disabled=previousDisabled;exampleBusy=false;window.CodyAccess?.loading(false);}
  };
  $('loadExample').onclick=()=>loadExample($('example').value);
@@ -87,5 +92,5 @@
   const requested=new URLSearchParams(location.search).get('example');
   try{const response=await fetch('python-examples.json');if(!response.ok)throw Error('Cannot load examples');const catalog=await response.json();const id=requested||Object.keys(catalog)[0];if(!catalog[id])throw Error('Unknown example');await loadExample(id,false);}catch(e){say(e.message);}
  });
- window.CodyProjectFiles={capture,validate,loadProject,loadExample,read:CodyProjectArchive.decode,download};
+ window.CodyProjectFiles={capture,validate,stopped,loadProject,loadExample,read:CodyProjectArchive.decode,download};
 })();

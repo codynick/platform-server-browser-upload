@@ -429,3 +429,7 @@ init_access()
 # Unlisted publication snapshots (additive schema).
 from sharing import register_sharing
 register_sharing(app, database, authenticated, access_for, ORIGIN)
+
+# Versioned overrides for complete built-in example packages.
+from example_packages import register_example_packages
+register_example_packages(app, database, admin_user, ORIGIN)

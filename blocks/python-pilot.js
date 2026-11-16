@@ -76,7 +76,7 @@
   heartbeat=window.CodyScheduler.every(()=>window.CodyLiveStore.heartbeat(token),800);
   const generation=++workerGeneration;let activeRequests=0;
   try{
-   const worker=new Worker(new URL('python-worker.mjs?v=3.20.4',location.href),{type:'module'});api.worker=worker;
+   const worker=new Worker(new URL('python-worker.mjs?v=3.21.1-ai.13',location.href),{type:'module'});api.worker=worker;
    worker.onerror=event=>{event.preventDefault();void finish('Python worker failed to load. Check the Internet connection and reload the local pilot.',true);};
    worker.onmessage=async event=>{
     if(generation!==workerGeneration||!api.running||finishing)return;

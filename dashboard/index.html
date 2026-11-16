@@ -428,7 +428,7 @@ body {
 .card .led-on{background:#22c55e!important;box-shadow:0 0 24px #22c55e80!important}.card .led-off{background:#ef4444!important;box-shadow:0 0 12px #ef444450}.dash-button.input-held,.dash-button[aria-pressed="true"]{filter:brightness(.75);outline:3px solid #0f766e}.slider-number{width:120px;max-width:95%;padding:6px;border:1px solid #cbd5e1;border-radius:6px}.dash-button,.dash-switch{touch-action:none;user-select:none}
 </style>
 <link rel="icon" type="image/x-icon" href="/assets/favicon.ico"><link rel="stylesheet" href="/assets/tool-navigation.css"><style>body{visibility:hidden}.card .led-on{background:#22c55e!important;box-shadow:0 0 24px #22c55e80!important}.card .led-off{background:#ef4444!important;box-shadow:0 0 12px #ef444450}.dash-button.input-held,.dash-button[aria-pressed="true"]{filter:brightness(.75);outline:3px solid #0f766e}.slider-number{width:120px;max-width:95%;padding:6px;border:1px solid #cbd5e1;border-radius:6px}.dash-button,.dash-switch{touch-action:none;user-select:none}
-</style><script src="/blocks/accounts.js?v=3.21.0" defer></script><link rel="stylesheet" href="push-button.css"><link rel="stylesheet" href="/blocks/ai/dashboard.css?v=3.21.1-ai.10"></head>
+</style><script src="/blocks/accounts.js?v=3.21.0" defer></script><link rel="stylesheet" href="push-button.css"><link rel="stylesheet" href="/blocks/ai/dashboard.css?v=3.21.1-ai.10"><link rel="stylesheet" href="/assets/full-page-controls.css?v=3.21.1-ai.14"><script src="/blocks/ch340-usb.js?v=3.20.4" defer></script><script src="/assets/full-page-controls.js?v=3.21.1-ai.14" defer></script></head>
 <body>
 
 <header class="header tool-page-header">
@@ -438,7 +438,7 @@ body {
         <div class="header-title">CodyNick Live Dashboard</div>
         <div class="header-subtitle">Browser Live session</div>
     </div>
-</header>
+</header><section id="fullPageControls" class="full-page-controls" aria-label="Project controls" hidden><button id="fullPageConnect" type="button" disabled>Connect</button><button id="fullPageRun" type="button" disabled>Run</button><output id="fullPageStatus" aria-live="polite"></output></section>
 
 <main class="container">
     <div class="layout-toolbar"><button id="editLayout" type="button" aria-pressed="false">Edit layout</button><button id="resetLayout" type="button" hidden>Reset layout</button><span id="layoutStatus" role="status" aria-live="polite">Layout locked. Choose Edit layout to move or resize cards.</span></div>
@@ -447,7 +447,7 @@ body {
     </div>
 </main>
 
-<script src="layout.js"></script><script src="/blocks/live-store.js?v=3.21.1-ai.10"></script><script src="inputs.js?v=3.21.1-ai.10"></script><script src="/blocks/ai/dashboard-media.js?v=3.21.1-ai.10"></script><script>
+<script src="layout.js"></script><script src="/blocks/live-store.js?v=3.21.1-ai.13"></script><script src="inputs.js?v=3.21.1-ai.13"></script><script src="/blocks/ai/dashboard-media.js?v=3.21.1-ai.14"></script><script>
 const localFetch=async(url,options={})=>{try{if(url.includes("action=set"))window.CodyLiveStore.dashboardInput(options.body.get("id"),options.body.get("value"));return {json:async()=>({ok:true,cards:window.CodyLiveStore.cards()})};}catch(error){return {json:async()=>({ok:false,error:error.message})};}};
 const editorLink=document.getElementById('dashboardEditorLink');
 if(editorLink)editorLink.hidden=window.self!==window.top;
@@ -804,6 +804,12 @@ function updateCardValues(card) {
         const button = cardEl.querySelector('[data-role="button"]');
         if (button) {
             button.textContent = card.title || 'Button';
+            if(card.imagePicker){
+                button.removeAttribute('aria-pressed');
+                const state=cardEl.querySelector('[data-role=button-state]');
+                if(state)state.hidden=true;
+                return;
+            }
             button.setAttribute('aria-pressed',String(isOn(value)));button.classList.toggle('input-held',isOn(value));const state=cardEl.querySelector('[data-role=button-state]');if(state)state.textContent=isOn(value)?'Pressed':'Released';
         }
     }

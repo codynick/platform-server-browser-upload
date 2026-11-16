@@ -1,4 +1,19 @@
-CodyNick 3.21.1-ai.10 — GitHub AI branch
+CodyNick 3.21.1-ai.14 — Linked views and OCR preview
+
+Add linked Connect and Run controls to all full-page views and display the Alice sample before OCR.
+
+CodyNick 3.21.1-ai.13 — Dashboard image picker
+
+Add a programmable image picker to Dashboard and use it with an illustrated Alice book page in Read English Text.
+
+CodyNick 3.21.1-ai.12 — Built-in example publishing
+
+Add versioned publishing for complete built-in examples in the Advanced menu. Admins can download the active package and restore a prior revision or the bundled example.
+
+CodyNick 3.21.1-ai.11 — GitHub AI branch
+
+Clarify the AI example cards, remove a duplicate Text to Speech option, and document how to run all eight examples.
+See blocks/examples/README.md for the quick start.
 
 Run on the Debian/Ubuntu server:
 

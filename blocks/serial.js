@@ -53,13 +53,14 @@ async function stopReader(){
  if(reader){try{await reader.cancel();}catch{}}
  if(readTask){try{await readTask;}catch{}}readTask=null;rx='';
 }
-$('connect').onclick=async()=>{
+const choosePort=usb=>usb?window.Ch340UsbPort.requestPort():navigator.serial.requestPort();
+async function toggleConnection(pick=choosePort,confirmFirmware=message=>window.confirm(message)){
  if(busy)return;
  if(port){busy=true;controls();try{await disconnect();notice('Disconnected. You can reconnect at any time.');}finally{busy=false;controls();}return;}
  busy=true;controls();
  try{
   const usb=useUsb();log('Connecting using '+(usb?'WebUSB CH340 1A86:7523':'Web Serial'));
-  const p=usb?await window.Ch340UsbPort.requestPort():await navigator.serial.requestPort();
+  const p=await pick(usb);
   try{await p.open({baudRate:115200});}catch(e){if(!usb)window.CjpLinuxHelp?.openFailure();throw e;}
   port=p;$('status').textContent='Checking firmware…';
   let identity=await identify(p);
@@ -67,7 +68,7 @@ $('connect').onclick=async()=>{
   const installed=firmwareVersion(identity);
   if(!installed||window.CjpFirmware.compare(installed,release.version)<0){
    const message=installed?'CJP firmware '+installed+' is installed. Update to '+release.version+'?':'The selected device did not report a CJP firmware version. Install CodyPi '+release.version+'? Confirm that you selected your CJP Arduino Uno.';
-   if(!window.confirm(message+'\n\nThis replaces the program on the selected board. Keep USB connected until verification finishes.'))throw Error('Firmware installation declined. Hardware is unavailable; simulation remains available.');
+   if(!confirmFirmware(message+'\n\nThis replaces the program on the selected board. Keep USB connected until verification finishes.'))throw Error('Firmware installation declined. Hardware is unavailable; simulation remains available.');
    firmwareProgress('Downloading firmware');$('firmwareProgressHint').textContent='Keep the CJP connected. Please leave this tab open.';
    const image=await window.CjpFirmware.download(release,percent=>firmwareProgress('Downloading firmware',percent));
    firmwareProgress('Starting Uno bootloader');
@@ -83,14 +84,15 @@ $('connect').onclick=async()=>{
   }
   ready=true;$('status').textContent='Connected';$('device').textContent=identity.replace('CN@@','')+' · '+(p.transportName||'Web Serial');notice('CJP firmware '+release.version+' is ready.');log('Device firmware confirmed.');firmwareFinished('CodyPi '+release.version+' installed and verified.');
  }catch(e){firmwareFinished(e.message,true);await disconnect();log('Connection error: '+e.name+': '+e.message);notice(connectionError(e)+' Click Connect to retry.');}finally{busy=false;controls();}
-};
+}
+$('connect').onclick=()=>toggleConnection();
 $('clearLog').onclick=()=>{$('log').textContent='';};
 if(!window.isSecureContext)notice('HTTPS is required. Open https://'+window.location.host+'/blocks/.');else if(!supported())notice('USB connectivity is unavailable. Open the site directly in Chrome.');
 if('serial'in navigator)navigator.serial.addEventListener('disconnect',event=>{if(event.target===port||event.port===port){notice('USB device unplugged.');if(!busy)disconnect();}});
 if(navigator.usb)navigator.usb.addEventListener('disconnect',event=>{if(port?.device===event.device){notice('CJP USB device unplugged.');if(!busy)disconnect();}});
 controls();
 
-window.CJP={get connected(){return ready;},get occupied(){return busy;},send,log,preview:()=>{},controls,notice,
+window.CJP={get connected(){return ready;},get occupied(){return busy;},toggleConnection,send,log,preview:()=>{},controls,notice,
   raw:async text=>{if(!ready||!port)throw Error('Connect CJP first.');const w=port.writable.getWriter();try{await w.write(encoder.encode(text));log('TX '+text);}finally{w.releaseLock();}},
   fault:()=>{ready=false;controls();notice('Serial reply timed out. Disconnect and reconnect before retrying.');}
 };

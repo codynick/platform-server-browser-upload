@@ -23,7 +23,7 @@ self.onmessage=async event=>{
   const {loadPyodide}=await import('https://cdn.jsdelivr.net/pyodide/v314.0.7/full/pyodide.mjs');
   const py=await loadPyodide({stdout:output,stderr:output,stdin:()=>{throw Error('input() is not supported in this pilot. Use a variable instead.');}});
   py.registerJsModule('_codynick_bridge',{request,notify});
-  const response=await fetch('./codynick.py');if(!response.ok)throw Error('Cannot load the CodyNick Python library.');
+  const response=await fetch('./codynick.py',{cache:'no-cache'});if(!response.ok)throw Error('Cannot load the CodyNick Python library.');
   py.FS.writeFile('/home/pyodide/codynick.py',await response.text());
   await new Promise(resolve=>{execute=resolve;postMessage({type:'ready'});});
   postMessage({type:'phase',text:'Python running…'});

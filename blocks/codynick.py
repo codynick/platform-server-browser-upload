@@ -123,6 +123,18 @@ class _Dashboard:
     def image(self, name, title=None): self._send('image', name=name, title=title)
     def table(self, name, title=None): self._send('table', name=name, title=title)
     def title(self, name, title): self._send('title', name=name, title=title)
+    def browse_image(self, name, title=None):
+        """Create a Dashboard picker for JPEG, PNG and WebP photos."""
+        self._send('browse', name=name, title=title)
+
+    async def image_selected(self, name):
+        """Consume one selection and make it the current browser AI image."""
+        selected = json.loads(await _request('dashboard', json.dumps(dict(action='image_selected', name=name))))
+        if selected:
+            ai._results = []
+            ai._ocr = {}
+        return selected
+
     def button(self, name, title=None): self._send('button', name=name, title=title)
     def toggle(self, name, initial=False, title=None): self._send('toggle', name=name, initial=initial, title=title)
     def slider(self, name, minimum=0, maximum=100, step=1, initial=50, title=None):
@@ -245,10 +257,10 @@ class _AI:
     async def speech_status(self): return await self._run('speech_status')
 
     async def prepare_ocr(self): return await self._run('prepare_ocr')
-    async def ocr_sample(self):
+    async def ocr_sample(self, sample='label'):
         self._ocr = {}
         self._results = []
-        return await self._run('ocr_sample')
+        return await self._run('ocr_sample', sample=sample)
     async def show_ocr_image(self, name='Source image'): return await self._run('ocr_show_image', name=name)
     async def has_image(self): return await self._run('ocr_has_image')
     async def read_text(self, layout='auto', region=None, words=False, enhance=True):

@@ -28,9 +28,13 @@ const DashboardBlocks = (() => {
   for(const [kind,label] of [['toggle','toggle'],['slider','slider'],['led','LED']])specs.push({type:'dash_'+kind+'_set',message0:'set '+label+' %1 to %2',args0:[name,{type:'input_value',name:'VALUE',check:kind==='slider'?'Number':'Boolean'}]});
   for(const kind of ['text_input','select','image','table'])specs.push({type:'dash_create_'+kind,message0:'create '+kind.replace('_',' ')+' %1 title %2',args0:[name,{type:'field_input',name:'TITLE',text:kind}]});
   specs.push({type:'dash_text_value',message0:'text input value %1',args0:[name],output:'String'},{type:'dash_select_value',message0:'dropdown value %1',args0:[name],output:'String'},{type:'dash_options',message0:'dropdown %1 choices (separate with |) %2',args0:[name,{type:'field_input',name:'OPTIONS',text:'First | Second'}]},{type:'dash_title',message0:'set widget %1 title to %2',args0:[name,{type:'input_value',name:'VALUE'}]});
+  specs.push(
+    {type:'dash_create_browse',message0:'create image picker %1 title %2',args0:[{...name,text:'Browse image'},{type:'field_input',name:'TITLE',text:'Browse image'}]},
+    {type:'dash_browse_selected',message0:'new image selected from %1?',args0:[{...name,text:'Browse image'}],output:'Boolean'}
+  );
   const folders = [
     ['Text and choices','#7055bd',['dash_create_text_input','dash_text_value','dash_create_select','dash_select_value','dash_options','dash_title']],
-    ['Images and tables','#147d92',['dash_create_image','dash_create_table','dash_set']],
+    ['Images and tables','#147d92',['dash_create_browse','dash_browse_selected','dash_create_image','dash_create_table','dash_set']],
     ['Inputs','#d17b12',['dash_create_button','dash_button_pressed','dash_button_clicked','dash_create_switch','dash_toggle_value','dash_toggle_set','dash_create_slider','dash_slider_value','dash_slider_set']],
     ['LED','#29854a',['dash_create_led','dash_led_set']],
     ['Setup','#546e7a',['dash_clear','dash_appearance','dash_font']],
@@ -128,4 +132,4 @@ def _dashboard_append(name, value):
   return {definitions,category,categories,statement,initialization};
 })();
 
-window.BlockRuntime?.types.push('dash_create_text_input','dash_create_select','dash_create_image','dash_create_table','dash_text_value','dash_select_value','dash_options','dash_title');
+window.BlockRuntime?.types.push('dash_create_text_input','dash_create_select','dash_create_image','dash_create_table','dash_text_value','dash_select_value','dash_options','dash_title','dash_create_browse','dash_browse_selected');

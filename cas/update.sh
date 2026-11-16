@@ -18,7 +18,7 @@ if [[ -z $domain ]]; then read -rp 'Existing website domain (e.g. ide.codynick.c
 domain=${domain,,}
 root=/var/www/$domain
 [[ -f $root/blocks/blocks.js ]] || { echo "Existing editor not found: $root"; exit 1; }
-for required in backend/app.py backend/sharing.py frontend/accounts.js frontend/accounts.css ../sharing/index.html ../sharing/gallery.html ../sharing/editor.js; do
+for required in backend/app.py backend/sharing.py backend/example_packages.py frontend/accounts.js frontend/accounts.css ../sharing/index.html ../sharing/gallery.html ../sharing/editor.js; do
  [[ -f $required ]] || { echo "Incomplete account/Community release: $required" >&2; exit 1; }
 done
 # Defaults allow unattended setup; environment overrides customize a new server.
@@ -99,7 +99,7 @@ PYCFG
 chmod 600 /etc/codynick-cas/config.json
 # Read root-only configuration here, not in the unprivileged bootstrap process.
 database=$(python3 -c 'import json; print(json.load(open("/etc/codynick-cas/config.json")).get("DATABASE","/var/lib/codynick-cas/projects.sqlite3"))')
-install -m 644 backend/app.py backend/sharing.py backend/requirements.txt bootstrap_admin.py /opt/codynick-cas/
+install -m 644 backend/app.py backend/sharing.py backend/example_packages.py backend/requirements.txt bootstrap_admin.py /opt/codynick-cas/
 python3 -m venv /opt/codynick-cas/venv
 /opt/codynick-cas/venv/bin/pip install -r /opt/codynick-cas/requirements.txt
 cat > /opt/codynick-cas/start.py <<'PY'
@@ -178,6 +178,7 @@ systemctl enable --now codynick-cas
 systemctl restart codynick-cas
 systemctl reload apache2
 curl --fail --silent --retry 10 --retry-connrefused --retry-delay 1 http://127.0.0.1:8791/api/me
+curl --fail --silent --show-error --output /dev/null http://127.0.0.1:8791/api/examples/hello/package
 # The service has initialized its additive access tables. Run as its owner.
 if [[ -n $admin_id ]]; then
  (cd /opt/codynick-cas && runuser -u codynick-cas -- /opt/codynick-cas/venv/bin/python /opt/codynick-cas/bootstrap_admin.py --database "$database" --apply --admin-id="$admin_id")
