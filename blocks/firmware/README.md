@@ -16,9 +16,9 @@ The uploader checks the bootloader-reported ATmega328P signature before writing.
 
 Test desktop Chrome Web Serial and Android Chrome CH340 WebUSB separately:
 
-- Matching 1.19.6 connects without prompting or uploading.
+- Matching 1.19.7 connects without prompting or uploading.
 - Older firmware offers update; declining prevents hardware use but permits simulation.
-- A different sketch / no identity offers installation and subsequently identifies 1.19.6.
+- A different sketch / no identity offers installation and subsequently identifies 1.19.7.
 - Wrong port, denied permission, unsupported MCU, and occupied port produce actionable errors.
 - Unplug during upload/readback, reconnect, and retry successfully.
 - Confirm USB upload, full readback, post-reset identity, and normal gadget operation on both transports.
@@ -27,3 +27,20 @@ Test desktop Chrome Web Serial and Android Chrome CH340 WebUSB separately:
 Software tests use a simulated bootloader. Physical USB timing, reset behavior, and recovery still require real CJP testing.
 
 Protocol references: https://github.com/Optiboot/optiboot/wiki/HowOptibootWorks and https://github.com/arduino/ArduinoCore-avr/blob/master/bootloaders/optiboot/stk500.h
+
+## 1.19.7: character text
+
+Source is included at `source/CodyPi/CodyPi.ino`. Build for `arduino:avr:uno`
+with Arduino AVR core 1.8.8 and the CodyNick Arduino library. The unchanged
+1.19.6 source rebuilt to the exact deployed machine code before this change.
+The new build uses 28,466 flash bytes and 1,435 static RAM bytes.
+
+`CN@@7TXT@@<NN><four characters>____` is a separate 20-byte text command.
+Devices 00 and 02 invoke `write_to_sevensegment_Text_V2`; the original numeric
+`CN@@7SEG@@` handler and formatter are unchanged. The browser truncates strings
+to four printable ASCII characters and pads short strings with spaces.
+
+Local compilation, protocol, simulator and mocked-upload tests passed. Physical
+CJP/display/USB and Android validation have not been performed. Website rollback
+does not downgrade an already-updated board; the older website's existing policy
+blocks newer board firmware.

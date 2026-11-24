@@ -60,6 +60,9 @@ class _SevenSegment:
     async def show(self, value, device='STANDALONE'):
         await _call(self.target, 'cn_seven_segment_display', device=device, value=value)
 
+    async def show_text(self, text, device='STANDALONE'):
+        await _call(self.target, 'cn_seven_segment_display_value', device=device, value=str(text))
+
 
 class _Matrix:
     def __init__(self, target):

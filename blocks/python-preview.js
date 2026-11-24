@@ -274,6 +274,7 @@ function generatePython() {
     'from CodyNick import *',
     usesStage ? 'from SpriteStage import SpriteStage' : '',
     '',
+    allBlocks.some(b=>b.type==='cn_seven_segment_display_value') ? "def __cn_seven_reading(cody, device, value):\n    if not isinstance(value, str):\n        return Seven_Segment.display(cody, device, value)\n    index = {'STANDALONE': 0, 'ULTRASEG': 2, '0': 0, '2': 2}.get(str(device).upper())\n    if index is None:\n        raise ValueError('Display device must be 0 or 2')\n    text = value[:4]\n    if any(ord(c) < 32 or ord(c) > 126 for c in text):\n        raise ValueError('Display text must use printable ASCII characters')\n    if cody is not None and cody.ensure_connected():\n        cody.ser.send_line('CN@@7TXT@@%02d%s____' % (index, text.ljust(4)), add_newline=False)\n        time.sleep(0.06)\n" : '',
     '_codynick_timer_start = time.monotonic()',
     usesStage ? SpritePrototype.initialization() : '',
     usesHardware ? ExecutionTarget.initialization(gadgetBlocks) : 'cody = None',

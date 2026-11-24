@@ -1,3 +1,18 @@
+CodyNick 3.21.1-ai.18 — Seven-segment text
+
+After upgrading, hard-refresh the editor. For hardware text, reconnect the CJP
+and accept the firmware update to 1.19.7. Simulation works without a board.
+
+Restore seven-segment character strings through an editable text shadow and string variables, add a distinct CN@@7TXT@@ command and CodyPi 1.19.7 firmware using write_to_sevensegment_Text_V2, retain numeric-block formatting and all cumulative hardware-input changes, and render character glyphs in simulation. Physical hardware validation remains pending.
+
+CodyNick 3.21.1-ai.17 — Hardware numeric sockets
+
+Add number-or-variable sockets for RGB LED indices/coordinates, LED Matrix pixel coordinates, Sound durations, and seven-segment display numbers. Give the seven-segment show reading block a directly editable number shadow. Rename RGB Matrix to RGB LED. Retain the previous RGB LED variable patch and migrate old project fields on load.
+
+CodyNick 3.21.1-ai.16 — RGB LED numeric socket
+
+RGB matrix LED number accepts a typed number, numeric variable or calculation; existing JSON project LED fields migrate without changing their values. Color selection and 0–15 validation are retained.
+
 CodyNick 3.21.1-ai.15 — Compact view controls and Alice sample
 
 Move linked view controls beside the editor link, use green Run and red Stop, and replace the Alice OCR sample with the page without the illustration.

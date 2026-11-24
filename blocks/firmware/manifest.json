@@ -1,6 +1,6 @@
 {
-  "version": "1.19.6",
+  "version": "1.19.7",
   "board": "arduino-uno",
-  "file": "CodyPi.c0c876e8544c016989eeea0b51868416c72f2ae5ea326754cdd35e2a99825357.hex",
-  "sha256": "c0c876e8544c016989eeea0b51868416c72f2ae5ea326754cdd35e2a99825357"
+  "file": "CodyPi.a201ae9fd796c165cdb8a468cc807f23ea4fdd03d751526b7de5036cec7778af.hex",
+  "sha256": "a201ae9fd796c165cdb8a468cc807f23ea4fdd03d751526b7de5036cec7778af"
 }

@@ -20,7 +20,8 @@ class LiveRouter {
  command(frame){this.store.update(s=>{
  if(frame.startsWith('CN@@RGB@@'))s.leds[Number(frame.slice(9,11))]=frame.slice(11,18);
  else if(frame.startsWith('CN@@RGBCLR@@'))s.leds.fill('#000000');
- else if(frame.startsWith('CN@@7SEG@@')){const text=frame.slice(12,18).trim();s[Number(frame.slice(10,12))===2?'ultra_segment':'seven_segment']=text;}
+ else if(frame.startsWith('CN@@7TXT@@')){const key=Number(frame.slice(10,12))===2?'ultra_segment':'seven_segment';s[key]=frame.slice(12,16);s[key+'_text']=true;}
+ else if(frame.startsWith('CN@@7SEG@@')){const key=Number(frame.slice(10,12))===2?'ultra_segment':'seven_segment';s[key]=frame.slice(12,18).trim();s[key+'_text']=false;}
  else if(frame.startsWith('CN@@LCLR@@')){s.matrix={mode:'pixels',pixels:Array(64).fill(0),text:'',speed:1,revision:s.matrix.revision+1};}
  else if(frame.startsWith('CN@@LPX@@')){if(s.matrix.mode!=='pixels')s.matrix.pixels=Array(64).fill(0);s.matrix.pixels[Number(frame[10])*8+Number(frame[9])]=Number(frame[11]);s.matrix.mode='pixels';s.matrix.revision++;}
  else if(frame.startsWith('CN@@LTXT@@')){s.matrix.mode='text';s.matrix.speed=Number(frame[10]);s.matrix.text=frame.slice(13,13+Number(frame.slice(11,13)));s.matrix.revision++;}

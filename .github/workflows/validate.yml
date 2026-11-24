@@ -27,7 +27,13 @@ jobs:
           node blocks/tests/project-archive.cjs
           node blocks/tests/ui.cjs
           node blocks/tests/serial.cjs
+          node blocks/tests/hardware-inputs.cjs
+          node blocks/tests/seven-text.cjs
+          node blocks/tests/firmware.cjs
       - name: Browser test dependencies
         run: npm install --no-save playwright@1.57.0 && npx playwright install --with-deps chromium
       - name: Header, sign-in and account menus
         run: node blocks/browser-tests/release-header.cjs
+
+      - name: Hardware input typing, variable drop and text simulator
+        run: node blocks/browser-tests/hardware-inputs.cjs

@@ -1,3 +1,29 @@
+
+// Convert legacy inline number fields to replaceable numeric shadows on JSON import.
+(() => {
+ const B=window.Blockly,slots={"cn_rgb_matrix_set": ["led"], "cn_rgb_matrix_set_xy": ["x", "y"], "cn_led_matrix_set_pixel": ["x", "y"], "cn_led_matrix_on": ["x", "y"], "cn_led_matrix_off": ["x", "y"], "cn_sound_play": ["duration_ms"], "cn_sound_play_until_done": ["duration_ms"], "cn_seven_segment_display": ["value"]},defaults={"cn_led_matrix_set_pixel": {"x": 0.0, "y": 0.0}, "cn_led_matrix_on": {"x": 0.0, "y": 0.0}, "cn_led_matrix_off": {"x": 0.0, "y": 0.0}, "cn_rgb_matrix_set": {"led": 0.0}, "cn_rgb_matrix_set_xy": {"x": 0.0, "y": 0.0}, "cn_sound_play": {"duration_ms": 500.0}, "cn_sound_play_until_done": {"duration_ms": 500.0}, "cn_seven_segment_display": {"value": 123.0}};
+ function migrate(value){
+  if(!value||typeof value!=='object')return;
+  if(value.type==='cn_seven_segment_display_value'){
+   value.inputs=value.inputs||{};
+   const old=value.inputs.value,hasField=value.fields&&Object.hasOwn(value.fields,'value');
+   if(!old?.block&&!old?.shadow)value.inputs.value={shadow:{type:'text',fields:{TEXT:hasField?String(value.fields.value):'feed'}}};
+   else if(!old.block&&old.shadow?.type==='math_number')old.shadow={type:'text',fields:{TEXT:String(old.shadow.fields?.NUM??0)}};
+   if(hasField)delete value.fields.value;
+  }
+  for(const name of slots[value.type]||[]){
+   value.inputs=value.inputs||{};
+   const hasField=value.fields&&Object.hasOwn(value.fields,name);
+   if(!value.inputs[name]?.block&&!value.inputs[name]?.shadow)value.inputs[name]={shadow:{type:'math_number',fields:{NUM:hasField?Number(value.fields[name]):defaults[value.type][name]}}};
+   if(hasField)delete value.fields[name];
+  }
+  for(const child of Object.values(value))migrate(child);
+ }
+ for(const [owner,key] of [[B.serialization.workspaces,'load'],[B.serialization.blocks,'append']]){
+  const original=owner[key];
+  owner[key]=function(state,...args){const copy=JSON.parse(JSON.stringify(state));migrate(copy);return original.call(this,copy,...args);};
+ }
+})();
 'use strict';
 const B=window.Blockly,specs=window.HARDWARE_SPECS;
 const Blockly=B;

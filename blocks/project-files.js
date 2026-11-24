@@ -1,7 +1,7 @@
 'use strict';
 (() => {
  const $=id=>document.getElementById(id),clone=v=>JSON.parse(JSON.stringify(v)),B=window.Blockly,editor=window.CodyAccountEditor;
- const layoutKey='codynick-dashboard-layout-v1',liveFields=['scene','leds','matrix','seven_segment','ultra_segment','widgets'];let busy=false;
+ const layoutKey='codynick-dashboard-layout-v1',liveFields=['scene','leds','matrix','seven_segment','ultra_segment','seven_segment_text','ultra_segment_text','widgets'];let busy=false;
  const object=(v,name)=>{if(!v||typeof v!=='object'||Array.isArray(v))throw Error('Invalid '+name);return v;};
  const number=(v,lo,hi,name)=>{if(typeof v!=='number'||!Number.isFinite(v)||v<lo||v>hi)throw Error('Invalid '+name);return v;};
  const string=(v,max,name)=>{if(typeof v!=='string'||v.length>max)throw Error('Invalid '+name);return v;};
@@ -21,7 +21,7 @@
   object(s.state,'saved state');const live=object(s.state.live,'simulation/dashboard state');CodyLiveStore.scene(live.scene);
   if(!Array.isArray(live.leds)||live.leds.length!==16||live.leds.some(v=>typeof v!=='string'||!/^#[0-9a-f]{6}$/i.test(v)))throw Error('Invalid simulated LED state.');
   object(live.matrix,'matrix state');if(!Array.isArray(live.matrix.pixels)||live.matrix.pixels.length!==64||live.matrix.pixels.some(v=>v!==0&&v!==1)||!['pixels','text'].includes(live.matrix.mode))throw Error('Invalid LED matrix state.');
-  string(live.matrix.text,200,'matrix text');number(live.matrix.speed,0,2,'matrix speed');number(live.matrix.revision,0,1e12,'matrix revision');string(live.seven_segment,50,'seven segment reading');string(live.ultra_segment,50,'UltraSeg reading');
+  string(live.matrix.text,200,'matrix text');number(live.matrix.speed,0,2,'matrix speed');number(live.matrix.revision,0,1e12,'matrix revision');for(const key of ['seven_segment_text','ultra_segment_text'])if(live[key]!=null&&typeof live[key]!=='boolean')throw Error('Invalid display text mode');string(live.seven_segment,50,'seven segment reading');string(live.ultra_segment,50,'UltraSeg reading');
   object(live.widgets,'dashboard widgets');if(Object.keys(live.widgets).length>100)throw Error('Too many dashboard widgets.');
   for(const [id,w] of Object.entries(live.widgets)){
    object(w,'widget');string(id,120,'widget name');if(w.id!==id||!['info','gauge','graph','led','textarea','button','switch','slider','bar','pie','table','text_input','select','image'].includes(w.type))throw Error('Invalid dashboard widget.');

@@ -41,6 +41,7 @@ for (const id of order) {
   el.title = `LED ${id}`; el.dataset.led = id; $('leds').append(el); leds.set(id, el);
 }
 const digitMap = {0:'abcdef',1:'bc',2:'abdeg',3:'abcdg',4:'bcfg',5:'acdfg',6:'acdefg',7:'abc',8:'abcdefg',9:'abcdfg','-':'g',' ':''};
+Object.assign(digitMap,{"A": "abcefg", "B": "cdefg", "C": "adef", "D": "bcdeg", "E": "adefg", "F": "aefg", "G": "acdef", "H": "bcefg", "I": "bc", "J": "bcd", "K": "bcefg", "L": "def", "M": "", "N": "ceg", "O": "abcdef", "P": "abefg", "Q": "abcfg", "R": "eg", "S": "acdfg", "T": "defg", "U": "bcdef", "V": "bcdef", "W": "", "X": "bcefg", "Y": "bcdfg", "Z": "abdeg"});
 const digits = [];
 for (let i=0; i<4; i++) {
   const digit = document.createElement('div'); digit.className='digit';
@@ -49,15 +50,15 @@ for (let i=0; i<4; i++) {
   }
   $('sevenDigits').append(digit); digits.push(digit);
 }
-function displayNumber(text) {
+function displayNumber(text,rawText=false) {
   const values=[];
   for (const ch of text) {
-    if (ch==='.' && values.length) values[values.length-1].dot=true;
+    if (!rawText && ch==='.' && values.length) values[values.length-1].dot=true;
     else values.push({char:ch,dot:false});
   }
   while(values.length<4) values.unshift({char:' ',dot:false});
   values.slice(0,4).forEach((value,index)=>{
-    const enabled=(digitMap[value.char] || '')+(value.dot?'p':'');
+    const enabled=(digitMap[rawText?value.char.toUpperCase():value.char] ?? (rawText?'g':''))+(value.dot?'p':'');
     for(const segment of digits[index].children) segment.classList.toggle('on',enabled.includes(segment.classList[1]));
   });
   $('sevenDigits').setAttribute('aria-label','Seven-segment display: '+(text || 'blank'));
@@ -273,7 +274,7 @@ async function poll() {
     $('wifiState').textContent=state.wifi.wifi===3?'Connected':'Disconnected';$('iotState').textContent=state.wifi.iot===1?'Connected':'Disconnected';
     $('wifiSSID').textContent=state.wifi.ssid||'Not configured';
     $('cloudValues').textContent=state.wifi.slots.map(slot=>`${slot.type}[${slot.index}] = ${slot.value}`).join('\n')||'No values';
-    displayNumber(state.seven_segment || '');$('ultraSegmentValue').textContent=state.ultra_segment||'Blank';
+    displayNumber(state.seven_segment || '',!!state.seven_segment_text);$('ultraSegmentValue').textContent=state.ultra_segment||'Blank';
     if(!state.scene.gadgets.seven) $('displayValue').textContent='Not added';
     state.leds.forEach((color,id) => {const el=leds.get(id); el.style.background=color; el.style.boxShadow=color === '#000000' ? 'none' : `0 0 12px ${color}`; el.style.color=color === '#000000' ? '#9ba89f' : '#101b15';});
     if (!state.connected) {stopTone(); $('note').textContent='Silent';}

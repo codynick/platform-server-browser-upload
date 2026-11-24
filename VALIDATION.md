@@ -1,3 +1,49 @@
+# Validation for 3.21.1-ai.18
+
+3.21.1-ai.18 local validation
+
+Firmware:
+- Rebuilt 1.19.6 from the available CodyPi source and CodyNick library.
+  Decoded machine code matches the deployed firmware byte-for-byte (28176 bytes).
+- Arduino Uno build of new 1.19.7 succeeds: flash 28466/32256, static RAM 1435/2048.
+- New text handler forwards four printable bytes to write_to_sevensegment_Text_V2
+  using device 0 or 2; numeric handler remains unchanged.
+- Shipped HEX parsed by the real uploader, with checksum/address bounds verified.
+- Existing mocked bootloader tests pass for full upload/readback, wrong MCU,
+  corrupted readback, unplug, delayed probes, startup noise and retry limits.
+
+Blocks/runtime/Python:
+- Directly editable text shadow, string and numeric variables, legacy empty and
+  numeric-shadow migration, preserved connected numeric blocks and JSON roundtrip.
+- Exact 20-byte text packets for feed, short/blank strings, long-string truncation,
+  both device indices and literal spaces/underscores.
+- Non-ASCII text and unsupported device rejection; numeric display still rejects feed.
+- Simulation text mode, numeric-mode reset and project-state restoration.
+- Live Python show_text and unchanged numeric show operations.
+- Generated Python preview helper executed against a mocked original client.
+- Existing UI, routing, portable-project archive and serial regression suites pass.
+
+Rendered Chrome:
+- Direct keyboard entry of feed in the text box.
+- Mouse drag of a variable onto the text box.
+- Runtime string-variable execution updates the real simulator iframe.
+- F, E, E, d segment patterns match the original supplied SevSeg mapping.
+
+Installer:
+- .15 diagnostic, .16-fix2, and .17 bases tested with LF and CRLF.
+- Complete installed-file checksum validation, idempotent repeat, and byte-exact rollback.
+- New firmware file removed on rollback while old files are restored.
+- Modified base rejected before writes.
+- Auto detection ignores adjacent prior patch backups and rejects zero/multiple live sites.
+- Installer fix1 preserves customized simulator HTML, relative script URLs,
+  other query parameters and CRLF. Reapplication is a no-op, rollback is exact,
+  and missing/duplicate required scripts reject before any writes.
+
+Physical board, real display, real USB upload, Android hardware and production
+server deployment have not been tested. The firmware source and build are supplied
+for review. Website rollback does not downgrade a board flashed to newer firmware.
+
+
 # Validation for 3.20.4
 
 - Browser Demo regression executes real Blockly programs with a mocked CJP transport. Checks cross-wired temperature displays, all four LED bands including exact 18/25/30 boundaries on both sources, two separate dashboard histories, moisture on both displays, below-25% C3 alarm/silence at 25%, absence of real soil reads, and joystick motion in all four directions.

@@ -1,4 +1,8 @@
-# CodyNick Portal 3.21.1-ai.15
+# CodyNick Portal 3.21.1-ai.18
+
+Cumulative hardware block update: number/variable sockets, RGB LED naming, and
+seven-segment character text. Hardware text requires CodyPi 1.19.7; reconnect
+the CJP and accept its firmware update. Simulation requires no firmware update.
 
 Cumulative browser AI workbench trial. See [AI_IMAGE_DETECTION.md](AI_IMAGE_DETECTION.md).
 
@@ -239,6 +243,23 @@ The editor checks the bundled CodyPi release when connecting and offers confirme
 See [PYTHON_PILOT.md](PYTHON_PILOT.md) for ZIP installation, testing and rollback instructions.
 
 ## Revision history
+
+### 3.21.1-ai.18 — Seven-segment text
+
+- Restore seven-segment character strings through an editable text shadow and string variables, add a distinct CN@@7TXT@@ command and CodyPi 1.19.7 firmware using write_to_sevensegment_Text_V2, retain numeric-block formatting and all cumulative hardware-input changes, and render character glyphs in simulation. Physical hardware validation remains pending.
+
+
+### 3.21.1-ai.17 — Hardware numeric sockets
+
+- Add number-or-variable sockets for RGB LED indices/coordinates, LED Matrix pixel coordinates, Sound durations, and seven-segment display numbers. Give the seven-segment show reading block a directly editable number shadow. Rename RGB Matrix to RGB LED. Retain the previous RGB LED variable patch and migrate old project fields on load.
+- Local automated checks only; physical hardware and production deployment were not tested.
+
+
+### 3.21.1-ai.16 — RGB LED numeric socket
+
+- RGB matrix LED number accepts a typed number, numeric variable or calculation; existing JSON project LED fields migrate without changing their values. Color selection and 0–15 validation are retained.
+- Local automated validation only; physical hardware and production deployment were not tested.
+
 
 ### 3.21.1-ai.15 — Compact view controls and Alice sample
 
