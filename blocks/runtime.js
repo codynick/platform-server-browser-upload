@@ -11,6 +11,7 @@ class BlockRuntime {
  preflight(workspace){for(const b of this.executable(workspace)){if(!this.specs.has(b.type))continue;try{this.hw.check?.(b.type,{device:this.field(b,'device')},this.field(b,'TARGET')||'HARDWARE');}catch(e){throw Error(b.type+' ['+b.id+']: '+e.message);}}}
  variable(b){return this.field(b,'VAR');}
  async value(b){await this.tick();if(!b||!b.isEnabled())return 0;const f=n=>this.field(b,n),v=(n,d)=>this.input(b,n,d);if(b.type.startsWith('ai_')){this.sources.add('AI');return window.CodyAIBlocks.execute(b,this);}if(b.type.startsWith('stage_')){this.sources.add('Sprites');return window.CodySpriteBlocks.execute(b,this);}if(this.specs.has(b.type))return this.gadget(b);if(b.type==='dash_browse_selected'){this.sources.add('Dashboard');return !!window.CodyAIWorkbench?.browseSelected?.(f('NAME'));}if(['dash_text_value','dash_select_value'].includes(b.type)){this.sources.add('Dashboard');return this.hw.store.dashboard('dash_read',{NAME:f('NAME')});}if(['dash_button_pressed','dash_button_clicked','dash_toggle_value','dash_slider_value'].includes(b.type)){this.sources.add('Dashboard');return this.hw.store.dashboard(b.type,{NAME:f('NAME')});}switch(b.type){
+ case 'cn_scalar_value':return window.CodyEditorInputs.parseScalar(f('VALUE'));
  case 'math_number':return Number(f('NUM'));
  case 'text':return f('TEXT');
  case 'logic_boolean':return f('BOOL')==='TRUE';

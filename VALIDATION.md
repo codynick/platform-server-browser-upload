@@ -1,3 +1,12 @@
+# Validation for 3.21.1-ai.22
+
+- RGB color-code and percentage frame/mapping/bounds tests, direct number and variable sockets, Hardware/Simulation routing and existing regression suites pass locally.
+- Real Chrome checks cover typed variable values, scoped pointer-following chain duplication, cancellation, undo/redo, connected mouths and shared-project loading; all nine RGB inputs accept direct numbers and variable drops.
+- Real Chrome confirms one icon on each statement/event header in the editor, toolbox and shared viewer, with plain inline values, real PNG transparency and no decorative fields in project serialization.
+- Installer/CAS apt command contracts cover the 600-second dpkg lock timeout. Deployment assertions cover icon preflight, deployment and rollback asset lists; shell syntax and existing account-install patch checks pass.
+- Earlier cumulative local patch installer fixtures cover .15 through .21, line endings, customized pages, backup exclusion and exact rollback.
+- Physical hardware, real USB/Android, a full Linux service deployment and production-server deployment were not performed locally.
+
 # Validation for 3.21.1-ai.18
 
 3.21.1-ai.18 local validation

@@ -1,4 +1,7 @@
-# CodyNick Portal 3.21.1-ai.18
+# CodyNick Portal 3.21.1-ai.22
+
+This release includes branded block headers, RGB numeric colors/percentages,
+direct variable value entry, and pointer-following chain duplication.
 
 Cumulative hardware block update: number/variable sockets, RGB LED naming, and
 seven-segment character text. Hardware text requires CodyPi 1.19.7; reconnect
@@ -26,6 +29,11 @@ Run this in an interactive terminal on the Debian/Ubuntu server:
 ```bash
 wget -4 -O /tmp/codynick-ai-setup.sh "https://raw.githubusercontent.com/codynick/platform-server-browser-upload/AI/setup.sh?$(date +%s)" && sudo bash /tmp/codynick-ai-setup.sh
 ```
+
+Package installation waits up to 10 minutes for the dpkg frontend lock when
+Ubuntu unattended upgrades are using it. If that wait expires, let the other
+package operation finish and rerun the same command. No separate workaround
+configuration is required.
 
 The updater keeps a separate AI checkout at /root/platform-server-browser-upload-ai,
 installs Git LFS, and downloads the language model before deploying the website.
@@ -243,6 +251,30 @@ The editor checks the bundled CodyPi release when connecting and offers confirme
 See [PYTHON_PILOT.md](PYTHON_PILOT.md) for ZIP installation, testing and rollback instructions.
 
 ## Revision history
+
+### 3.21.1-ai.22 — Branded block headers
+
+- Package installs in both setup stages wait up to 600 seconds for the dpkg frontend lock, reducing rollbacks caused by unattended Ubuntu upgrades. The full installer preflights, deploys, backs up and restores the block icon asset.
+
+- Place the supplied transparent CodyNick icon at the left of statement and event block headers, including toolbox and shared read-only views. Keep inline values, reporters, number/text inputs and shadows plain. Retain all .21 and earlier cumulative changes.
+
+
+### 3.21.1-ai.21 — RGB percentage labels
+
+- Format the RGB percentage block as RGB LED [n] color Red [R]%, Green [G]%, Blue [B]% target [t]. Retain the numeric/variable sockets, Hardware/Simulation selector, and every earlier cumulative change.
+
+
+### 3.21.1-ai.20 — RGB LED numeric colors
+
+- Add RGB LED blocks for indexed color codes, x/y color codes and RGB percentages. All numeric sockets accept direct numbers, variables or calculations, and all three blocks include Hardware/Simulation selection. Preserve 7Segment Display naming, typed variable assignments and pointer-following chain duplication from .19, plus all earlier cumulative changes. Color codes: 0 red, 1 cyan, 2 blue, 3 yellow, 4 magenta, 5 green, 6 orange, 7 white. Firmware remains 1.19.7.
+- Local software validation only; physical hardware and production deployment were not tested.
+
+
+### 3.21.1-ai.19 — Variable entry and chain duplication
+
+- Rename Seven Segment to 7Segment Display. Add directly editable number/text values to variable assignments, replaceable with variables or expressions. Duplicate copies the selected block and its following statement chain with nested contents, floats under the pointer until placement, and cancels with Escape while preserving enclosing/preceding blocks. Retain all earlier hardware inputs and seven-segment text support.
+- Local automated validation only; physical hardware and production deployment were not tested.
+
 
 ### 3.21.1-ai.18 — Seven-segment text
 

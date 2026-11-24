@@ -10,6 +10,14 @@ class CjpHardware {
  device(v,kind){const map={CJP:5,STANDALONE:0,ULTRASEG:kind==='seven'?2:1};return map[v]??Number(v);}
  async call(type,a,signal){const send=s=>this.send(s,signal),read=(s,p)=>this.request(s,p,signal);switch(type){
  case 'cn_log':this.t.log('PROGRAM '+a.message);return;
+ case 'cn_rgb_led_code':case 'cn_rgb_led_xy_code':{
+ const colors=['#FF0000','#00FFFF','#0000FF','#FFFF00','#FF00FF','#00FF00','#FF8000','#FFFFFF'];
+ const color=colors[this.integer(a.code,0,7,'Color code')];
+ return type==='cn_rgb_led_xy_code'?this.call('cn_rgb_matrix_set_xy',{x:a.x,y:a.y,color},signal):this.call('cn_rgb_matrix_set',{led:a.led,color},signal);}
+ case 'cn_rgb_led_percent':{
+ const channel=(value,name)=>Math.round(this.number(value,0,100,name+' percent')*255/100).toString(16).padStart(2,'0');
+ const color=('#'+channel(a.red,'Red')+channel(a.green,'Green')+channel(a.blue,'Blue')).toUpperCase();
+ return this.call('cn_rgb_matrix_set',{led:a.led,color},signal);}
  case 'cn_rgb_matrix_set':case 'cn_rgb_matrix_set_xy':{const i=type.endsWith('_xy')?[[0,1,2,3],[7,6,5,4],[8,9,10,11],[15,14,13,12]][this.integer(a.y,0,3,'Y')][this.integer(a.x,0,3,'X')]:this.integer(a.led,0,15,'LED');const color=String(a.color).toUpperCase();if(!/^#[0-9A-F]{6}$/.test(color))throw Error('Color must be #RRGGBB');await send('CN@@RGB@@'+String(i).padStart(2,'0')+color);this.t.preview(i,color);return;}
  case 'cn_rgb_matrix_clear':await send('CN@@RGBCLR@@');for(let i=0;i<16;i++)this.t.preview(i,'#000000');return;
  case 'cn_led_matrix_clear':return send('CN@@LCLR@@');

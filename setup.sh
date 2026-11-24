@@ -26,8 +26,8 @@ chmod 600 "$saved_domain"
 webroot=/var/www/$domain
 printf 'Installing/updating CodyNick for %s\n' "$domain"
 echo '[1/6] Installing server dependencies'
-apt-get update
-apt-get install -y git ca-certificates apache2 certbot python3-certbot-apache python3-venv python3-pip curl
+apt-get -o DPkg::Lock::Timeout=600 update
+apt-get -o DPkg::Lock::Timeout=600 install -y git ca-certificates apache2 certbot python3-certbot-apache python3-venv python3-pip curl
 
 echo '[2/6] Selecting complete source package'
 # A full ZIP installs its own source. A raw setup.sh download fetches GitHub.
@@ -36,7 +36,7 @@ if [[ -f $source_dir/VERSION && -f $source_dir/install.sh && -f $source_dir/cas/
  echo "Using the supplied complete package: $repo"
 else
  repo=/root/platform-server-browser-upload-ai
- apt-get install -y git-lfs
+ apt-get -o DPkg::Lock::Timeout=600 install -y git-lfs
  git lfs install --skip-repo
  export GIT_LFS_SKIP_SMUDGE=1
  if [[ -e $repo ]]; then
@@ -50,7 +50,7 @@ else
  fi
  git -C "$repo" lfs pull --include="blocks/ai/llm/models/**" --exclude=""
 fi
-for required in cas/backend/example_packages.py assets/full-page-controls.js assets/full-page-controls.css blocks/example-publishing.js blocks/ai/ocr/samples/alice.jpg sharing/index.html sharing/gallery.html sharing/editor.js sharing/icons.svg cas/backend/sharing.py VERSION install.sh cas/bootstrap_admin.py admin/index.html blocks/access.js blocks/access.css simulator/world-assets.js simulator/world-assets.css simulator/soil-world.js simulator/soil-world.css cas/update.sh cas/patch_frontend.py cas/backend/app.py cas/frontend/accounts.js cas/frontend/accounts.css blocks/index.html blocks/examples/hello.codynick blocks/examples/sim-dashboard.codynick blocks/examples/mixed.codynick blocks/examples/Real-temperature-Sim-distance.codynick blocks/examples/blink.codynick blocks/examples/temperature.codynick blocks/examples/joystick.codynick blocks/examples/stage-keyboard.codynick blocks/examples/stage-temperature.codynick blocks/examples/stage-joystick.codynick blocks/examples/dashboard-controls.codynick blocks/examples/dashboard-sprite.codynick blocks/stage.html blocks/stage-page.css blocks/stage-link.js dashboard/push-button.css dashboard/inputs.js blocks/examples/dashboard-controls.codynick blocks/examples/dashboard-sprite.codynick blocks/sprite-looks.js blocks/project-archive.js blocks/project-files.js blocks/vendor/jszip.min.js blocks/vendor/JSZIP-LICENSE.md blocks/sprites/appearances/rocket.svg blocks/sprites/appearances/ball.svg blocks/sprites/appearances/bee.svg blocks/sprites/appearances/bird.svg blocks/sprites/appearances/dog.svg blocks/sprites/appearances/athlete.svg blocks/sprites/appearances/cactus.svg blocks/sprites/appearances/apple.svg blocks/sprites/appearances/apartment.svg blocks/sprites/appearances/bike.svg blocks/sprites/appearances/diamond.svg blocks/sprite-model.js blocks/sprite-view.js blocks/sprite-blocks.js blocks/sprite-stage.css blocks/examples/stage-keyboard.codynick blocks/examples/stage-temperature.codynick blocks/examples/stage-joystick.codynick blocks/python-pilot.css blocks/python-pilot.js blocks/python-pilot-config.js blocks/python-color.js blocks/python-bridge.js blocks/python-worker.mjs blocks/codynick.py blocks/python-examples.json; do
+for required in cas/backend/example_packages.py assets/full-page-controls.js assets/full-page-controls.css blocks/example-publishing.js blocks/ai/ocr/samples/alice.jpg sharing/index.html sharing/gallery.html sharing/editor.js sharing/icons.svg cas/backend/sharing.py VERSION install.sh cas/bootstrap_admin.py admin/index.html blocks/access.js blocks/access.css simulator/world-assets.js simulator/world-assets.css simulator/soil-world.js simulator/soil-world.css cas/update.sh cas/patch_frontend.py cas/backend/app.py cas/frontend/accounts.js cas/frontend/accounts.css blocks/index.html blocks/examples/hello.codynick blocks/examples/sim-dashboard.codynick blocks/examples/mixed.codynick blocks/examples/Real-temperature-Sim-distance.codynick blocks/examples/blink.codynick blocks/examples/temperature.codynick blocks/examples/joystick.codynick blocks/examples/stage-keyboard.codynick blocks/examples/stage-temperature.codynick blocks/examples/stage-joystick.codynick blocks/examples/dashboard-controls.codynick blocks/examples/dashboard-sprite.codynick blocks/stage.html blocks/stage-page.css blocks/stage-link.js dashboard/push-button.css dashboard/inputs.js blocks/examples/dashboard-controls.codynick blocks/examples/dashboard-sprite.codynick blocks/sprite-looks.js blocks/project-archive.js blocks/project-files.js blocks/vendor/jszip.min.js blocks/vendor/JSZIP-LICENSE.md blocks/sprites/appearances/rocket.svg blocks/sprites/appearances/ball.svg blocks/sprites/appearances/bee.svg blocks/sprites/appearances/bird.svg blocks/sprites/appearances/dog.svg blocks/sprites/appearances/athlete.svg blocks/sprites/appearances/cactus.svg blocks/sprites/appearances/apple.svg blocks/sprites/appearances/apartment.svg blocks/sprites/appearances/bike.svg blocks/sprites/appearances/diamond.svg blocks/sprite-model.js blocks/sprite-view.js blocks/sprite-blocks.js blocks/sprite-stage.css blocks/examples/stage-keyboard.codynick blocks/examples/stage-temperature.codynick blocks/examples/stage-joystick.codynick blocks/python-pilot.css blocks/python-pilot.js blocks/python-pilot-config.js blocks/python-color.js blocks/python-bridge.js blocks/python-worker.mjs blocks/codynick.py blocks/python-examples.json blocks/editor-interactions.js blocks/block-icons.js assets/codynick-block-icon.png; do
  [[ -f $repo/$required ]] || { echo "Incomplete source package: $required" >&2; exit 1; }
 done
 

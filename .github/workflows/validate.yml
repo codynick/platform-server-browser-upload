@@ -29,6 +29,8 @@ jobs:
           node blocks/tests/serial.cjs
           node blocks/tests/hardware-inputs.cjs
           node blocks/tests/seven-text.cjs
+          node blocks/tests/editor-values.cjs
+          node blocks/tests/rgb-colors.cjs
           node blocks/tests/firmware.cjs
       - name: Browser test dependencies
         run: npm install --no-save playwright@1.57.0 && npx playwright install --with-deps chromium
@@ -37,3 +39,9 @@ jobs:
 
       - name: Hardware input typing, variable drop and text simulator
         run: node blocks/browser-tests/hardware-inputs.cjs
+
+      - name: Typed values, chain duplication, RGB inputs and icon rendering
+        run: |
+          node blocks/browser-tests/editor-behavior.cjs
+          node blocks/browser-tests/rgb-options.cjs
+          node blocks/browser-tests/block-icons.cjs

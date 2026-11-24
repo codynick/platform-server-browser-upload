@@ -67,7 +67,7 @@ printf '%s\\n' "'''+name+'''" >> "$FIXTURE_ROOT/deployment"
   html=(self.root/'var/www/code.codynick.com/blocks/index.html').read_text()
   self.assertIn('id="headerExamples"',html)
   self.assertTrue((self.root/'var/www/code.codynick.com/blocks/accounts.js').exists())
-  for asset in ['sharing/index.html','sharing/gallery.html','sharing/editor.js','sharing/icons.svg']:
+  for asset in ['sharing/index.html','sharing/gallery.html','sharing/editor.js','sharing/icons.svg','blocks/editor-interactions.js','blocks/block-icons.js','assets/codynick-block-icon.png']:
    self.assertTrue((self.root/'var/www/code.codynick.com'/asset).is_file(),asset)
   self.assertEqual(len(list((self.root/'root').glob('codynick-portal-backup-*'))),2)
  def test_download_bootstrap_clones_correct_repo_then_updates(self):

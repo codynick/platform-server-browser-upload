@@ -44,8 +44,8 @@ fi
 # Prompt before backups or deployment when no admin is configured.
 admin_id=$(python3 bootstrap_admin.py --select)
 
-apt-get update
-apt-get install -y python3-venv python3-pip apache2 curl
+apt-get -o DPkg::Lock::Timeout=600 update
+apt-get -o DPkg::Lock::Timeout=600 install -y python3-venv python3-pip apache2 curl
 backup=$(mktemp -d /root/codynick-cas-backup-XXXXXXXX)
 for section in blocks simulator dashboard admin sharing; do
  if [[ -e "$root/$section" ]]; then cp -a "$root/$section" "$backup/"; fi
