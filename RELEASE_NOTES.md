@@ -1,3 +1,19 @@
+CodyNick 3.21.1-ai.26 — Restore Light Sensor photo
+
+Restore the supplied Light Sensor photo and the marked sensing point on the gadget image. Hand lights automatically aim at that point. Keep the simplified controls below the image: intensity label, numeric box and measured-intensity progress bar only.
+
+CodyNick 3.21.1-ai.25 — Compact Light sensor window
+
+Simplify the Light sensor window to its intensity label, numeric box and measured-intensity progress bar. Remove the photo, slider, sensing/ambient controls and help text. Preserve automatic hand-light sensing, saved worlds and manual numeric entry when sensing is inactive.
+
+CodyNick 3.21.1-ai.24 — Light sensor photo and hand-light world
+
+Use the supplied Light Sensor photo and add a body-draggable hand-light asset. Proximity raises the simulated percentage, distance lowers it, with automatic aim, on/off, ambient light and manual-control fallback. Keep the model active without the simulator panel and save flashlight state with projects. Retain all earlier cumulative features. Firmware remains 1.19.8.
+
+CodyNick 3.21.1-ai.23 — Light intensity sensor
+
+Add a Light sensor percentage block with Hardware/Simulation routing, a 0–100% simulation gadget and Python light.read(). Hardware uses the supplied Light Sensor library at logical device 1 / I2C address 103 and requires CodyPi 1.19.8. Sensor errors are reported rather than converted to percentages. Retain every earlier cumulative editor/RGB/display/icon change. Physical validation remains pending.
+
 CodyNick 3.21.1-ai.22 — Branded block headers
 
 Package installs in both setup stages wait up to 600 seconds for the dpkg frontend lock, reducing rollbacks caused by unattended Ubuntu upgrades. The full installer preflights, deploys, backs up and restores the block icon asset.

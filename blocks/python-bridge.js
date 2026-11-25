@@ -1,6 +1,6 @@
 'use strict';
 (() => {
- const allowed=new Set(['cn_temperature_read','cn_soil_read','cn_motion_detect','cn_rfid_readuid','cn_ultrasonic_read','cn_joystick_states','cn_joystick_position','cn_joystick_click','cn_rgb_matrix_set','cn_rgb_matrix_clear','cn_led_matrix_clear','cn_led_matrix_display_text','cn_led_matrix_set_pixel','cn_seven_segment_display','cn_seven_segment_display_value','cn_sound_play_until_done']);
+ const allowed=new Set(['cn_light_read','cn_temperature_read','cn_soil_read','cn_motion_detect','cn_rfid_readuid','cn_ultrasonic_read','cn_joystick_states','cn_joystick_position','cn_joystick_click','cn_rgb_matrix_set','cn_rgb_matrix_clear','cn_led_matrix_clear','cn_led_matrix_display_text','cn_led_matrix_set_pixel','cn_seven_segment_display','cn_seven_segment_display_value','cn_sound_play_until_done']);
  class PythonBridge {
   constructor(router,store,signal){this.router=router;this.store=store;this.signal=signal;this.hardwareUsed=false;}
   async request(op,json){

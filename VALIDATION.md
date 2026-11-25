@@ -1,3 +1,68 @@
+# Validation for 3.21.1-ai.26
+
+3.21.1-ai.26 local validation
+- Chrome confirms restored sensor photo and marked sensing point.
+- Below the photo: only one intensity label, numeric box and progress bar.
+- Real mouse dragging toward the photo raises measurement 34.6% to 97.1%.
+- Keyboard movement, on/off, manual input, read-only measured value, saved
+  scene restore, hidden-panel sensing and manual restoration on removal pass.
+- .25 and Git-base installer checks: LF/CRLF upgrade, idempotence, rollback,
+  new-file cleanup, source rejection and customized HTML preservation pass.
+- Website auto-detection ignores backups and rejects zero/multiple live sites.
+- Cumulative source hashes retained for .15 through .25; ZIP hashes checked.
+- Firmware unchanged at 1.19.8; no physical hardware testing performed.
+
+Firmware and Light Sensor implementation validation from .23:
+
+3.21.1-ai.23 local validation
+
+Firmware:
+- Compiled CodyPi 1.19.8 for Arduino Uno with the supplied Light Sensor header.
+- Header is bundled unchanged; device 1 reads I2C address 103.
+- Initial library-cache warmup is handled; invalid/missing readings produce ERR.
+- New image uses 29238 flash bytes and 1463 static RAM bytes, within Uno limits.
+- The real uploader parses the shipped HEX and validates record checksums/bounds.
+- Existing mocked bootloader upload/readback, delayed probes, noise, wrong MCU,
+  corruption and unplug regression tests pass with the new firmware image.
+
+Block/runtime:
+- Number output, Hardware/Simulation selector and project target roundtrip.
+- Hardware responses 0, 0.1, 25, 50, 99.9 and 100 return exact numeric values.
+- ERR/-1, empty/malformed, non-finite and out-of-range replies reject.
+- Disconnected Simulation reads without serial writes; missing gadget and
+  disconnected Hardware are rejected by the existing preflight path.
+- Simulation range validation, legacy default, scene restore and saved positions.
+- Sensor values connect to variable assignments and retain Simulation provenance.
+- Python bridge whitelist and live hardware/simulation.light.read APIs pass.
+- Generated Python preview helper was executed against mocked serial input;
+  valid/error responses and timeout restoration pass.
+
+Rendered Chrome:
+- Light block has both target choices and loads as a numeric reporter.
+- Actual simulator picker adds the Light sensor, decimal control and meter;
+  slider bounds 0/100 and 73.4% reading synchronize with the runtime.
+- The test removes the static picker button to exercise the older/customized
+  HTML fallback insertion path from app.js.
+- Sensor workspace reload and read-only shared viewer loading pass.
+
+Cumulative checks:
+- Existing UI, live routing, hardware numeric inputs, seven-segment text,
+  portable archives and serial suites pass against the cumulative source.
+- Existing icons, typed variable values, duplicate behavior and RGB options are retained.
+
+Installer fixtures:
+- .15 through .22 patch and Git bases, both LF and CRLF.
+- Full output hashes, repeat application, exact rollback and new-file cleanup.
+- Modified source rejected before writes.
+- Customized editor/simulator/sharing HTML, account asset versions, relative URLs
+  and other query parameters survive updates. New required script caches refresh.
+- Missing/duplicate scripts reject; old backup directories are excluded from --auto.
+- Zero or multiple live websites stop without writes.
+
+Physical gadget, real USB upload, Android and production-server deployment were
+not tested. Compiling and simulated transport tests do not establish physical acceptance.
+
+
 # Validation for 3.21.1-ai.22
 
 - RGB color-code and percentage frame/mapping/bounds tests, direct number and variable sockets, Hardware/Simulation routing and existing regression suites pass locally.

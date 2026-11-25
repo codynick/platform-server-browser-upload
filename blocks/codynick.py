@@ -88,6 +88,7 @@ class _Sound:
 
 class _Target:
     def __init__(self, target):
+        self.light = _Sensor(target, 'cn_light_read')
         self.temperature = _Sensor(target, 'cn_temperature_read')
         self.soil = _Sensor(target, 'cn_soil_read')
         self.motion = _Sensor(target, 'cn_motion_detect')

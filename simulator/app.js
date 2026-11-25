@@ -9,6 +9,8 @@ mainPanelUrl.hash = '';
 $('mainPanel').hidden=window.self!==window.top;
 $('mainPanel').href = mainPanelUrl.href;$('mainPanel').target='_top';
 const newGadgets={
+  light:{title:'Light sensor',body:"<div class=\"photo-device light-device\"><svg class=\"light-sensor-photo\" viewBox=\"95 255 899 435\" aria-label=\"CodyNick Light Sensor\"><image href=\"/simulator/light-sensor-photo.png?v=3.21.1-ai.26\" width=\"1181\" height=\"1181\"/></svg><div class=\"sensor-controls\"><label for=\"lightValue\">Light intensity (%)</label><input id=\"lightValue\" type=\"number\" min=\"0\" max=\"100\" step=\"0.1\" value=\"50\"><progress id=\"lightMeter\" max=\"100\" value=\"50\" aria-label=\"Measured light intensity\"></progress></div></div>"},
+
   motion:{title:'PIR motion sensor',body:'<div class="sensor-controls"><label><input id="motionValue" type="checkbox"> Motion detected</label></div>'},
   rfid:{title:'RFID reader',body:'<div class="sensor-controls"><label>UID (8 hex characters)<input id="rfidValue" maxlength="8" value="00000000"></label></div>'},
   ultraseg:{title:'UltraSeg',body:'<div class="sensor-controls"><label>Distance (cm)<input id="ultraDistanceValue" type="number" min="2" max="400" step="0.1" value="50"></label><p>Display: <strong id="ultraSegmentValue">Blank</strong></p></div>'},
@@ -17,6 +19,12 @@ const newGadgets={
   soil:{title:'Soil-moisture sensor',body:'<div class="photo-device"><img class="soil-photo" src="/simulator/soil.png" alt="Soil-moisture sensor"><div class="sensor-controls"><label for="soilValue">Soil moisture (%)</label><input id="soilValue" type="number" min="0" max="100" step="1" value="50"><input id="soilSlider" type="range" min="0" max="100" step="1" value="50" aria-label="Simulated soil reading"></div></div>'},
   wifi:{title:'Wi-Fi / IoT',body:'<div class="photo-device wifi-device"><img src="/simulator/wifi.png" alt="Wi-Fi and IoT gadget"><p class="sim-label">SIMULATED NETWORK</p><div class="network-controls"><label><input id="wifiLink" type="checkbox" checked> Wi-Fi available</label><label><input id="cloudLink" type="checkbox" checked> Cloud available</label></div><dl class="wifi-status"><dt>Wi-Fi</dt><dd id="wifiState">Disconnected</dd><dt>IoT</dt><dd id="iotState">Disconnected</dd><dt>SSID</dt><dd id="wifiSSID">Not configured</dd></dl><div class="cloud-editor"><label>Type<select id="cloudType"><option value="0">Int</option><option value="1">Float</option><option value="2">Bool</option><option value="3">String</option></select></label><label>Index<input id="cloudIndex" type="number" min="0" max="3" value="0"></label><label class="cloud-value">Value<input id="cloudValue" maxlength="40" value="0"></label><button id="cloudApply">Set value</button></div><pre id="cloudValues" aria-label="Simulated cloud variables"></pre></div>'}
 };
+// Older/customized deployed HTML may not yet contain the new picker entry.
+if(!document.querySelector('[data-add="light"]')){
+ const button=document.createElement('button');button.className='tool';button.draggable=false;button.dataset.add='light';button.title='Add Light sensor';
+ button.innerHTML="<svg width=\"64\" height=\"42\" viewBox=\"95 255 899 435\" aria-hidden=\"true\"><image href=\"/simulator/light-sensor-photo.png?v=3.21.1-ai.26\" width=\"1181\" height=\"1181\"/></svg><span>Light sensor</span><b aria-hidden=\"true\">+</b>";
+ document.querySelector('#gadgetPicker .toolbox')?.append(button);
+}
 function gadgetHeader(kind,title){return `<div class="gadget-header"><button class="gadget-remove" data-remove="${kind}" title="Remove ${title}" aria-label="Remove ${title}">×</button><button class="handle" aria-label="Move ${title}" title="Drag to move ${title}"><span class="gadget-title">${title}</span><span class="drag-grip" aria-hidden="true">✥</span></button></div>`;}
 for(const [kind,data] of Object.entries(newGadgets)) {
   const item=document.createElement('section');item.className='stage-item';item.id='gadget-'+kind;item.dataset.kind=kind;item.hidden=true;
@@ -103,7 +111,7 @@ function releaseInputs(){input('');if(scene?.gadgets.joystick)input('','joystick
 window.addEventListener('blur',releaseInputs);
 document.addEventListener('visibilitychange', () => {if (document.hidden)releaseInputs();});
 const labels={cjp:'CodyJoy Pro',seven:'Seven-segment',temperature:'Temperature sensor',matrix:'LED matrix',...Object.fromEntries(Object.entries(newGadgets).map(([key,value])=>[key,value.title]))};
-const defaults={motion:{x:400,y:640},rfid:{x:700,y:640},ultraseg:{x:700,y:40},seven:{x:440,y:40},temperature:{x:440,y:360},matrix:{x:760,y:360},joystick:{x:40,y:640},ultrasonic:{x:400,y:720},soil:{x:740,y:720},wifi:{x:1050,y:760}};
+const defaults={light:{x:1040,y:480},motion:{x:400,y:640},rfid:{x:700,y:640},ultraseg:{x:700,y:40},seven:{x:440,y:40},temperature:{x:440,y:360},matrix:{x:760,y:360},joystick:{x:40,y:640},ultrasonic:{x:400,y:720},soil:{x:740,y:720},wifi:{x:1050,y:760}};
 let scene=null, selected='cjp', dragging=null, pending=0, pythonConnected=false, z=1, temperatureTimer, stageZoom=1, initialFit=false;
 let camera={scale:1,x:0,y:0},panning=null,viewTouched=false;
 const viewport=$('stageViewport'),V=window.CodySimulatorViewport;
@@ -136,11 +144,12 @@ function renderScene(value) {
   if(![$('temperatureValue'),$('temperatureSlider')].includes(document.activeElement)) {
     $('temperatureValue').value=scene.temperature; $('temperatureSlider').value=scene.temperature;
   }
-  for(const [prefix,key] of [['distance','distance'],['soil','soil']]) {
+  for(const [prefix,key] of [['distance','distance'],['soil','soil'],['light','light']]) {
     if(![$(prefix+'Value'),$(prefix+'Slider')].includes(document.activeElement)) {
-      $(prefix+'Value').value=value[key];$(prefix+'Slider').value=value[key];
+      $(prefix+'Value').value=value[key];if($(prefix+'Slider'))$(prefix+'Slider').value=value[key];
     }
   }
+  $('lightMeter').value=scene.light;
   $('motionValue').checked=scene.motion;if(document.activeElement!==$('rfidValue'))$('rfidValue').value=scene.rfid;if(document.activeElement!==$('ultraDistanceValue'))$('ultraDistanceValue').value=scene.ultraDistance;
   $('wifiLink').checked=scene.wifi_link;$('cloudLink').checked=scene.cloud_link;
   select(selected);
@@ -208,14 +217,14 @@ function setTemperature(event) {
   clearTimeout(temperatureTimer); temperatureTimer=setTimeout(()=>{temperatureTimer=null;saveScene();},150);
 }
 $('temperatureValue').oninput=$('temperatureSlider').oninput=setTemperature;
-for(const [prefix,key,min,max] of [['distance','distance',2,400],['soil','soil',0,100]]) {
+for(const [prefix,key,min,max] of [['distance','distance',2,400],['soil','soil',0,100],['light','light',0,100]]) {
   const update=event=>{
     const value=Number(event.target.value);
     if(!scene||event.target.value===''||!Number.isFinite(value)||value<min||value>max)return;
-    scene[key]=Math.round(value*10)/10;$(prefix+'Value').value=scene[key];$(prefix+'Slider').value=scene[key];
+    scene[key]=Math.round(value*10)/10;if(key==='light')$('lightMeter').value=scene[key];$(prefix+'Value').value=scene[key];if($(prefix+'Slider'))$(prefix+'Slider').value=scene[key];
     clearTimeout(temperatureTimer);temperatureTimer=setTimeout(()=>{temperatureTimer=null;saveScene();},150);
   };
-  $(prefix+'Value').oninput=$(prefix+'Slider').oninput=update;
+  $(prefix+'Value').oninput=update;if($(prefix+'Slider'))$(prefix+'Slider').oninput=update;
 }
 for(const [id,key] of [['wifiLink','wifi_link'],['cloudLink','cloud_link']]) $(id).onchange=()=>{if(scene){scene[key]=$(id).checked;saveScene();}};
 $('cloudApply').onclick=async()=>{
@@ -293,3 +302,7 @@ async function poll() {
   setTimeout(poll, 50);
 }
 poll();
+
+// Load the light asset UI on customized/older simulator HTML as well.
+if(!document.getElementById('lightWorldStyles')){const link=document.createElement('link');link.id='lightWorldStyles';link.rel='stylesheet';link.href='/simulator/light-world.css?v=3.21.1-ai.26';document.head.append(link);}
+if(!document.getElementById('lightWorldScript')){const script=document.createElement('script');script.id='lightWorldScript';script.src='/simulator/light-world.js?v=3.21.1-ai.26';document.head.append(script);}
