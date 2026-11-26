@@ -1,3 +1,31 @@
+// Relative classroom air model, not a calibrated room or weather simulation.
+(() => {
+ 'use strict';
+ const n=(v,lo,hi,name)=>{v=Number(v);if(!Number.isFinite(v)||v<lo||v>hi)throw Error('Invalid '+name);return v;};
+ const defaults=(temperature=22,humidity=50)=>({enabled:false,ambientTemperature:22,ambientHumidity:50,manualTemperature:temperature,manualHumidity:humidity,at:Date.now(),assets:[]});
+ function clean(w){
+  if(!w||typeof w.enabled!=='boolean'||!Array.isArray(w.assets)||w.assets.length>20)throw Error('Invalid air environment');
+  const ids=new Set();return {enabled:w.enabled,ambientTemperature:n(w.ambientTemperature,-20,50,'ambient temperature'),ambientHumidity:n(w.ambientHumidity,0,100,'ambient humidity'),manualTemperature:n(w.manualTemperature,-55,125,'manual air temperature'),manualHumidity:n(w.manualHumidity,0,100,'manual humidity'),at:n(w.at,0,1e15,'air timestamp'),assets:w.assets.map(a=>{
+   if(!a||!['mist','heater'].includes(a.kind)||typeof a.id!=='string'||!/^[a-zA-Z0-9_-]{1,80}$/.test(a.id)||ids.has(a.id)||typeof a.on!=='boolean')throw Error('Invalid air asset');ids.add(a.id);
+   return {id:a.id,kind:a.kind,x:n(a.x,0,1400,'air asset X'),y:n(a.y,0,1500,'air asset Y'),on:a.on,power:n(a.power,0,100,'air asset power'),sprayUntil:n(a.sprayUntil??0,0,1e15,'spray deadline')};
+  })};
+ }
+ const sensorOrigin=p=>({x:p.x+212,y:p.y+203});
+ const emitter=a=>({x:a.x+90,y:a.y+75});
+ function advance(scene,now=Date.now()){
+  if(!scene.airWorld)return scene;const w=scene.airWorld=clean(scene.airWorld),dt=Math.max(0,(now-w.at)/1000);w.at=now;
+  if(!w.enabled){scene.airTemperature=w.manualTemperature;scene.airHumidity=w.manualHumidity;return scene;}
+  const p=scene.gadgets.air&&sensorOrigin(scene.gadgets.air);let heat=0,mist=0;
+  if(p)for(const a of w.assets){const e=emitter(a),gain=(a.power/100)/(1+(Math.hypot(e.x-p.x,e.y-p.y)/180)**2);if(a.kind==='heater'&&a.on)heat+=gain;if(a.kind==='mist'&&a.sprayUntil>now)mist+=gain;}
+  const targetT=Math.min(75,w.ambientTemperature+35*heat),oldT=scene.airTemperature??22;
+  scene.airTemperature=oldT+(targetT-oldT)*(1-Math.exp(-dt/6));
+  const targetH=Math.min(100,Math.max(0,w.ambientHumidity*Math.exp(-.045*(scene.airTemperature-w.ambientTemperature))+60*mist));
+  scene.airHumidity=(scene.airHumidity??50)+(targetH-(scene.airHumidity??50))*(1-Math.exp(-dt/4));
+  return scene;
+ }
+ window.CodyAirWorld={defaults,clean,advance,sensorOrigin,emitter};
+})();
+
 // Classroom proximity model. Values are relative percentages, not calibrated lux.
 (() => {
  'use strict';
@@ -106,17 +134,17 @@ const previous=window.CodyThermalWorld.advance;window.CodyThermalWorld.advance=(
 (()=>{
  if(window.CodyLiveStore)return;
  const key='codynick-live-state-v1';
- const defaults=()=>({scene:{gadgets:{cjp:{x:40,y:40}},temperature:21.1,distance:50,soil:50,light:50,wifi_link:true,cloud_link:true,motion:false,rfid:'00000000',ultraDistance:50},leds:Array(16).fill('#000000'),matrix:{text:'',speed:1,pixels:Array(64).fill(0),mode:'pixels',revision:0},seven_segment:'',ultra_segment:'',seven_segment_text:false,ultra_segment_text:false,states:[],joystick_states:[],inputAt:0,joyAt:0,notes:[],sequence:0,widgets:{},run:null,wifi:{wifi:0,iot:0,ssid:'',slots:[]}});
+ const defaults=()=>({scene:{gadgets:{cjp:{x:40,y:40}},temperature:21.1,distance:50,soil:50,light:50,airTemperature:22,airHumidity:50,wifi_link:true,cloud_link:true,motion:false,rfid:'00000000',ultraDistance:50},leds:Array(16).fill('#000000'),matrix:{text:'',speed:1,pixels:Array(64).fill(0),mode:'pixels',revision:0},seven_segment:'',ultra_segment:'',seven_segment_text:false,ultra_segment_text:false,states:[],joystick_states:[],inputAt:0,joyAt:0,notes:[],sequence:0,widgets:{},run:null,wifi:{wifi:0,iot:0,ssid:'',slots:[]}});
  let memory=defaults();
  let updates;
  const changed=()=>window.dispatchEvent(new Event('codynick-live-change'));
  try{updates=new BroadcastChannel('codynick-live-updates-v1');updates.onmessage=()=>changed();}catch{}
  window.addEventListener('storage',event=>{if(event.key===key||event.key===null)changed();});
 
- function read(){try{const s=JSON.parse(localStorage.getItem(key)||'null');if(s&&s.scene?.gadgets&&s.widgets){memory={...defaults(),...s,scene:{...defaults().scene,...s.scene}};}else{memory=defaults();}}catch{}const result=structuredClone(memory);CodyThermalWorld.advance(result.scene);CodyLightWorld.advance(result.scene);for(const w of Object.values(result.widgets))if(w.type==='button'&&Date.now()-(w.inputAt||0)>1200){w.value=false;w.inputOwner='';}return result;}
+ function read(){try{const s=JSON.parse(localStorage.getItem(key)||'null');if(s&&s.scene?.gadgets&&s.widgets){memory={...defaults(),...s,scene:{...defaults().scene,...s.scene}};}else{memory=defaults();}}catch{}const result=structuredClone(memory);CodyThermalWorld.advance(result.scene);CodyLightWorld.advance(result.scene);CodyAirWorld.advance(result.scene);for(const w of Object.values(result.widgets))if(w.type==='button'&&Date.now()-(w.inputAt||0)>1200){w.value=false;w.inputOwner='';}return result;}
  function update(fn){const s=read();const result=fn(s);memory=s;localStorage.setItem(key,JSON.stringify(s));changed();updates?.postMessage('changed');return result;}
  const finite=(n,label)=>{n=Number(n);if(!Number.isFinite(n))throw Error(label+' must be a finite number');return n;};
- function scene(clean){const d=defaults().scene;const known=['cjp','seven','temperature','matrix','joystick','ultrasonic','soil','wifi','motion','rfid','ultraseg','light'];if(!clean?.gadgets||!clean.gadgets.cjp)throw Error('Simulation must contain CodyJoy Pro.');const out={...d,...clean,gadgets:{}};for(const [kind,p] of Object.entries(clean.gadgets)){if(!known.includes(kind))throw Error('Unsupported simulated gadget: '+kind);out.gadgets[kind]={x:Math.max(0,Math.min(1400,finite(p.x,'X'))),y:Math.max(0,Math.min(1500,finite(p.y,'Y')))};}for(const [n,lo,hi]of [['temperature',-55,125],['distance',0,400],['soil',0,100],['light',0,100],['ultraDistance',2,400]]){out[n]=finite(out[n],n);if(out[n]<lo||out[n]>hi)throw Error('Invalid simulated '+n);}if(clean.illumination!=null)out.illumination=CodyLightWorld.clean(clean.illumination);else delete out.illumination;if(clean.world!=null)out.world=CodyThermalWorld.clean(clean.world);else delete out.world;if(clean.garden!=null)out.garden=CodySoilWorld.clean(clean.garden);else delete out.garden;out.motion=!!out.motion;out.rfid=String(out.rfid).toUpperCase();if(!/^[0-9A-F]{8}$/.test(out.rfid))throw Error('RFID must have 8 hexadecimal characters');return out;}
+ function scene(clean){const d=defaults().scene;const known=['cjp','seven','temperature','matrix','joystick','ultrasonic','soil','wifi','motion','rfid','ultraseg','light','air'];if(!clean?.gadgets||!clean.gadgets.cjp)throw Error('Simulation must contain CodyJoy Pro.');const out={...d,...clean,gadgets:{}};for(const [kind,p] of Object.entries(clean.gadgets)){if(!known.includes(kind))throw Error('Unsupported simulated gadget: '+kind);out.gadgets[kind]={x:Math.max(0,Math.min(1400,finite(p.x,'X'))),y:Math.max(0,Math.min(1500,finite(p.y,'Y')))};}for(const [n,lo,hi]of [['temperature',-55,125],['distance',0,400],['soil',0,100],['light',0,100],['airTemperature',-55,125],['airHumidity',0,100],['ultraDistance',2,400]]){out[n]=finite(out[n],n);if(out[n]<lo||out[n]>hi)throw Error('Invalid simulated '+n);}if(clean.airWorld!=null)out.airWorld=CodyAirWorld.clean(clean.airWorld);else delete out.airWorld;if(clean.illumination!=null)out.illumination=CodyLightWorld.clean(clean.illumination);else delete out.illumination;if(clean.world!=null)out.world=CodyThermalWorld.clean(clean.world);else delete out.world;if(clean.garden!=null)out.garden=CodySoilWorld.clean(clean.garden);else delete out.garden;out.motion=!!out.motion;out.rfid=String(out.rfid).toUpperCase();if(!/^[0-9A-F]{8}$/.test(out.rfid))throw Error('RFID must have 8 hexadecimal characters');return out;}
  function simState(){const s=read();const now=Date.now();return {...s,now:now/1000,connected:!!s.run&&now-s.run.at<3500,states:now-s.inputAt<1000?s.states:[],joystick_states:now-s.joyAt<1000?s.joystick_states:[],error:''};}
  function simCommand(c){return update(s=>{switch(c.action){case 'scene':s.scene=scene(c.scene);break;case 'input':{const states=c.states;if(!Array.isArray(states)||states.some(v=>!['UP','DOWN','LEFT','RIGHT','CLICK'].includes(v)))throw Error('Invalid joystick input');if(c.device==='joystick'){s.joystick_states=states;s.joyAt=Date.now();}else{s.states=states;s.inputAt=Date.now();}break;}case 'wifi_slot':{const type=String(c.type),index=Number(c.index);if(!['0','1','2','3'].includes(type)||!Number.isInteger(index)||index<0||index>3)throw Error('Invalid cloud slot');const slots=s.wifi.slots.filter(v=>v.type!==type||v.index!==index);slots.push({type,index,value:c.value});s.wifi.slots=slots;break;}default:throw Error('Unknown simulator action');}return {ok:true};});}
  function widget(s,name){if(!Object.hasOwn(s.widgets,name))throw Error('Create dashboard widget "'+name+'" before using it.');return s.widgets[name];}

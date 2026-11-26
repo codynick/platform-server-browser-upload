@@ -17,6 +17,7 @@
   if(s.scene.world?.probe&&s.scene.gadgets.temperature&&window.CodyThermalWorld.hasCups(s.scene.world))add(s.scene.world.probe.x-25,s.scene.world.probe.y-145,50,150);
   if(s.scene.garden?.enabled&&s.scene.gadgets.soil)add(s.scene.garden.probe.x-24,s.scene.garden.probe.y-140,48,150);
   for(const a of world(s).flashlights)add(Math.max(0,a.x-50),Math.max(0,a.y-50),280,280);
+  for(const a of s.scene.airWorld?.assets||[])add(a.x,a.y,200,220);
   const vp=el('stageViewport');if(!Number.isFinite(bounds.left))return;
   window.CodySimulatorView.restore({camera:window.CodySimulatorViewport.fit(bounds,vp.clientWidth,vp.clientHeight),selected:s.scene.gadgets.light?'light':'cjp'});
  }

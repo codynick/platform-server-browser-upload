@@ -1,6 +1,7 @@
 #include <Arduino.h>
 #include <stdlib.h>
 #include <Wire.h>
+#include "CodyAirReader.h"
 #include "I2A_Light_Sensor_v1.h"
 #include <avr/wdt.h>
 // #include "CodyNick/I2A_display_v2.h"
@@ -17,7 +18,7 @@
 #include <I2A_WiFi_IoT_v2.h>
 
 // ---------- Version ----------
-const char CODYPI_VERSION[] = "1.19.8"; //2000ms delay commented in setup()::check Joystick functionality
+const char CODYPI_VERSION[] = "1.19.9"; //2000ms delay commented in setup()::check Joystick functionality
 
 // ---------- Config ----------
 const uint8_t PKT_LEN   = 20; // 4 bytes header + 16 bytes payload
@@ -215,6 +216,16 @@ void handleSerialPackets() {
             }
             if (printable) write_to_sevensegment_Text_V2(text, rxBuf[11]-'0');
           }
+          continue;
+        }
+
+        // Air Temp/Hum shares a validated four-byte reading at I2C 98.
+        if (memcmp(rxBuf, "CN@@AIRT@@", 10) == 0 || memcmp(rxBuf, "CN@@AIRH@@", 10) == 0) {
+          const bool humidityRequest = memcmp(rxBuf, "CN@@AIRH@@", 10) == 0;
+          float temperature, humidity; char value[11];
+          if (readAirTH(temperature, humidity)) dtostrf(humidityRequest ? humidity : temperature, 1, 1, value);
+          else strcpy(value, "ERR");
+          writeFixedTextResponse(humidityRequest ? "CN@@AIRH@@" : "CN@@AIRT@@", 10, value, 10);
           continue;
         }
 

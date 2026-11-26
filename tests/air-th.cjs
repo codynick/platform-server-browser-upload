@@ -1,0 +1,34 @@
+const vm=require('vm'),fs=require('fs'),path=require('path'),assert=require('assert/strict');
+const root=path.join(__dirname,'../blocks');const target=new EventTarget(),els={},sent=[],alerts=[];const element=()=>({children:[],style:{},textContent:'',hidden:false,value:'',files:[],append(b){this.children.push(b)},close(){this.open=false;},setAttribute(){},classList:{add(){},remove(){}}});
+const ctx={console,setTimeout,clearTimeout,setInterval,clearInterval,structuredClone,performance,AbortController,Event,CustomEvent,TextEncoder,TextDecoder,Blob,URL,queueMicrotask,confirm:()=>true,alert:message=>alerts.push(message),requestAnimationFrame:f=>f(),localStorage:{data:new Map(),getItem(k){return this.data.get(k)||null},setItem(k,v){this.data.set(k,v)}},document:{getElementById:id=>els[id]??=element(),createElement:element}};ctx.window=ctx;ctx.addEventListener=target.addEventListener.bind(target);ctx.removeEventListener=target.removeEventListener.bind(target);ctx.dispatchEvent=target.dispatchEvent.bind(target);vm.createContext(ctx);
+
+ctx.document.createElementNS=(ns,name)=>({nodeType:1,nodeName:name,children:[],attrs:{},setAttribute(k,v){this.attrs[k]=String(v)},getAttribute(k){return this.attrs[k]},appendChild(c){this.children.push(c);return c},cloneNode(){return this},hasChildNodes(){return !!this.children.length},hasAttributes(){return !!Object.keys(this.attrs).length}});
+ctx.document.createTextNode=text=>({nodeType:3,textContent:text});
+vm.runInContext(fs.readFileSync(path.join(root,'vendor/blockly/blockly.min.js'),'utf8'),ctx);ctx.Blockly.inject=()=>new ctx.Blockly.Workspace();ctx.Blockly.svgResize=()=>{};ctx.CJP={connected:true,controls(){},notice(){},preview(){},log(){},send:async s=>{assert(s.length<=20);sent.push(s);},raw:async()=>{},fault(){}};
+ctx.document.addEventListener=target.addEventListener.bind(target);ctx.document.removeEventListener=target.removeEventListener.bind(target);
+for(const f of ['hardware.js','runtime.js','block-specs.js','editor-interactions.js','live-store.js','live-router.js','dashboard-blocks.js','blocks.js'])vm.runInContext(fs.readFileSync(path.join(root,f),'utf8'),ctx,{filename:f});ctx.codyWorkspace.highlightBlock=()=>{};
+
+
+
+
+(async()=>{
+const assert=require('assert/strict'),M=ctx.CodyAirWorld,scene=ctx.CodyLiveStore.defaults().scene;
+assert.equal(scene.airTemperature,22);assert.equal(scene.airHumidity,50);scene.gadgets.air={x:100,y:100};scene.airWorld=M.defaults(22,50);scene.airWorld.enabled=true;scene.airWorld.at=0;const point=M.sensorOrigin(scene.gadgets.air);
+const heater={id:'heater',kind:'heater',x:point.x-90,y:point.y-75,on:true,power:100,sprayUntil:0};scene.airWorld.assets=[heater];M.advance(scene,10000);assert(scene.airTemperature>45);assert(scene.airHumidity<35);
+const heated=scene.airTemperature,dry=scene.airHumidity;scene.airWorld.assets[0].on=false;M.advance(scene,30000);assert(scene.airTemperature<heated);assert(scene.airHumidity>dry);
+scene.airTemperature=22;scene.airHumidity=50;scene.airWorld.at=30000;scene.airWorld.assets=[{...heater,id:'mist',kind:'mist',sprayUntil:50000}];M.advance(scene,40000);assert(scene.airHumidity>90);const humid=scene.airHumidity;M.advance(scene,70000);assert(scene.airHumidity<humid);
+const level=distance=>{const s=structuredClone(scene);s.airTemperature=22;s.airHumidity=50;s.airWorld.at=0;s.airWorld.assets=[{...heater,on:true,x:point.x+distance-90}];M.advance(s,6000);return s.airTemperature;};assert(level(10)>level(300));assert(level(300)>level(900));
+scene.airWorld.enabled=false;M.advance(scene,71000);assert.equal(scene.airTemperature,22);assert.equal(scene.airHumidity,50);
+assert.throws(()=>M.clean({...scene.airWorld,ambientHumidity:101}));assert.throws(()=>M.clean({...scene.airWorld,assets:[heater,heater]}));assert.throws(()=>M.clean({...scene.airWorld,assets:[{...heater,kind:'bad'}]}));
+ctx.CodyLiveStore.simCommand({action:'scene',scene});ctx.CodyLiveStore.restoreProject(JSON.parse(JSON.stringify(ctx.CodyLiveStore.read())));assert(ctx.CodyLiveStore.read().scene.gadgets.air);assert.equal(ctx.CodyLiveStore.read().scene.airWorld.assets.length,1);
+const hw=new ctx.CjpHardware(ctx.CJP),router=new ctx.LiveRouter(hw,ctx.CodyLiveStore),signal=new AbortController().signal;ctx.CJP.connected=false;assert.equal(await router.call('cn_air_temperature',{},signal,'SIMULATION'),22);assert.equal(await router.call('cn_air_humidity',{},signal,'SIMULATION'),50);assert.equal(sent.length,0);
+ctx.CJP.connected=true;
+for(const [type,prefix,values]of [['cn_air_temperature','CN@@AIRT@@',[-55,-2.5,0,22.3,125]],['cn_air_humidity','CN@@AIRH@@',[0,12.3,50,100]]]){
+ for(const value of values){ctx.CJP.send=async frame=>{assert.equal(frame.length,10);assert(frame.startsWith(prefix));queueMicrotask(()=>ctx.dispatchEvent(new CustomEvent('cjp-line',{detail:prefix+String(value).padEnd(10,'_')})));};assert.equal(await router.call(type,{},signal,'HARDWARE'),value);}
+ for(const value of ['ERR','NaN','Infinity','abc','',type==='cn_air_humidity'?'-1':'126']){ctx.CJP.send=async()=>queueMicrotask(()=>ctx.dispatchEvent(new CustomEvent('cjp-line',{detail:prefix+value.padEnd(10,'_')})));await assert.rejects(()=>router.call(type,{},signal,'HARDWARE'));}
+}
+for(const type of ['cn_air_temperature','cn_air_humidity']){const spec=ctx.HARDWARE_SPECS.find(x=>x.type===type);assert.equal(spec.output,'Number');const w=new ctx.Blockly.Workspace(),b=w.newBlock(type);b.setFieldValue('SIMULATION','TARGET');const copy=new ctx.Blockly.Workspace();ctx.Blockly.serialization.workspaces.load(ctx.Blockly.serialization.workspaces.save(w),copy);assert.equal(copy.getTopBlocks()[0].getFieldValue('TARGET'),'SIMULATION');w.dispose();copy.dispose();}
+vm.runInContext(fs.readFileSync(path.join(root,'python-bridge.js'),'utf8'),ctx);const bridge=new ctx.CodyPythonBridge(router,ctx.CodyLiveStore,signal);assert.equal(await bridge.request('gadget',JSON.stringify({block:'cn_air_humidity',target:'SIMULATION',args:{}})),'50');
+const ws=ctx.codyWorkspace;ws.clear();const start=ws.newBlock('cn_event_start');let previous=null;for(const [name,type]of [['airT','cn_air_temperature'],['airH','cn_air_humidity']]){const variable=ws.getVariableMap().createVariable(name),set=ws.newBlock('variables_set'),read=ws.newBlock(type);set.setFieldValue(variable.getId(),'VAR');read.setFieldValue('HARDWARE','TARGET');set.getInput('VALUE').connection.connect(read.outputConnection);if(previous)previous.nextConnection.connect(set.previousConnection);else start.getInput('DO').connection.connect(set.previousConnection);previous=set;}vm.runInContext(fs.readFileSync(path.join(root,'python-preview.js'),'utf8'),ctx);assert(ctx.generatePython().includes('def __cn_air_read'));
+console.log('PASS: coupled heater/mist/proximity/recovery/manual/bounds, state roundtrip, hidden simulation, independent hardware numeric/error frames, block targets and Python bridge');
+})().catch(e=>{console.error(e);process.exitCode=1});

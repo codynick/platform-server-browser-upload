@@ -1,12 +1,18 @@
-# CodyNick Portal 3.21.1-ai.26
+# CodyNick Portal 3.21.1-ai.28
 
-This release adds a Light Sensor intensity block for Hardware and Simulation.
+Air Temp/Hum now provides temperature and humidity blocks, with mist spray and
+heater simulation assets. Hardware requires bundled CodyPi firmware 1.19.9.
+
+Five new projects are available in Examples > Demo, each with Simulation and
+Hardware versions and matching Blocks/Python. See blocks/examples/WELCOME_DEMOS.md.
+
+This release also includes a Light Sensor intensity block for Hardware and Simulation.
 The simulator uses the supplied gadget photo and draggable hand lights: moving
 a light toward the marked sensing point increases the measured percentage.
 Below the photo are the intensity label, numeric box and progress bar.
 All earlier editor, RGB LED, display and branded-block improvements are retained.
 
-Hardware light readings require CodyPi 1.19.8, bundled with this release.
+Hardware light and Air Temp/Hum readings use CodyPi 1.19.9, bundled with this release.
 Reconnect the CJP and accept its firmware update. Simulation needs no board.
 
 Cumulative hardware block update: number/variable sockets, RGB LED naming, and
@@ -257,6 +263,16 @@ The editor checks the bundled CodyPi release when connecting and offers confirme
 See [PYTHON_PILOT.md](PYTHON_PILOT.md) for ZIP installation, testing and rollback instructions.
 
 ## Revision history
+
+### 3.21.1-ai.28 — Air Temp/Hum with mist and heater
+
+- Add Air Temp/Hum numeric temperature and relative-humidity reporters with Hardware/Simulation routing and Python hardware.air/simulation.air APIs. Include the supplied probe cutout, draggable water mist spray and heater, gradual coupled environmental behavior, ambient/manual settings and saved state. CodyPi 1.19.9 reads and validates the shared four-byte I2C 98 payload with caching and timeout handling. Retain all five paired Demo projects and every prior cumulative feature. Physical sensor validation remains pending.
+
+
+### 3.21.1-ai.27 — Five welcome projects in Demo
+
+- Add Joy Pixel Walker, Mood Light Composer, Speed Switch, Countdown Signal and Pattern Memory to Examples > Demo. Each has matching editable Blocks/Python programs and separate Simulation/Hardware entries. Retain all earlier demos and cumulative Light Sensor, RGB LED, display and editor features. Pattern Memory uses a numeric base-4 sequence, grows to six steps, detects wrong answers and enforces a ten-second answer timeout. No new runtime blocks or firmware are required.
+
 
 ### 3.21.1-ai.26 — Restore Light Sensor photo
 

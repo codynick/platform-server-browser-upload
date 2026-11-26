@@ -9,6 +9,7 @@ mainPanelUrl.hash = '';
 $('mainPanel').hidden=window.self!==window.top;
 $('mainPanel').href = mainPanelUrl.href;$('mainPanel').target='_top';
 const newGadgets={
+  air:{title:'Air Temp/Hum',body:"<div class=\"photo-device air-device\"><img src=\"/simulator/air-th-probe.png?v=3.21.1-ai.28\" alt=\"Air Temp/Hum probe\"><div class=\"sensor-controls\"><label for=\"airTemperatureValue\">Air temperature (\u00b0C)</label><input id=\"airTemperatureValue\" type=\"number\" min=\"-55\" max=\"125\" step=\"0.1\" value=\"22\"><meter id=\"airTemperatureMeter\" min=\"-55\" max=\"125\" value=\"22\" aria-label=\"Measured air temperature\"></meter><label for=\"airHumidityValue\">Air humidity (%)</label><input id=\"airHumidityValue\" type=\"number\" min=\"0\" max=\"100\" step=\"0.1\" value=\"50\"><progress id=\"airHumidityMeter\" max=\"100\" value=\"50\" aria-label=\"Measured air humidity\"></progress></div></div>"},
   light:{title:'Light sensor',body:"<div class=\"photo-device light-device\"><svg class=\"light-sensor-photo\" viewBox=\"95 255 899 435\" aria-label=\"CodyNick Light Sensor\"><image href=\"/simulator/light-sensor-photo.png?v=3.21.1-ai.26\" width=\"1181\" height=\"1181\"/></svg><div class=\"sensor-controls\"><label for=\"lightValue\">Light intensity (%)</label><input id=\"lightValue\" type=\"number\" min=\"0\" max=\"100\" step=\"0.1\" value=\"50\"><progress id=\"lightMeter\" max=\"100\" value=\"50\" aria-label=\"Measured light intensity\"></progress></div></div>"},
 
   motion:{title:'PIR motion sensor',body:'<div class="sensor-controls"><label><input id="motionValue" type="checkbox"> Motion detected</label></div>'},
@@ -25,6 +26,7 @@ if(!document.querySelector('[data-add="light"]')){
  button.innerHTML="<svg width=\"64\" height=\"42\" viewBox=\"95 255 899 435\" aria-hidden=\"true\"><image href=\"/simulator/light-sensor-photo.png?v=3.21.1-ai.26\" width=\"1181\" height=\"1181\"/></svg><span>Light sensor</span><b aria-hidden=\"true\">+</b>";
  document.querySelector('#gadgetPicker .toolbox')?.append(button);
 }
+if(!document.querySelector('[data-add="air"]')){const button=document.createElement('button');button.className='tool';button.dataset.add='air';button.innerHTML='<img src="/simulator/air-th-probe.png?v=3.21.1-ai.28" width="64" height="50" alt=""><span>Air Temp/Hum</span><b aria-hidden="true">+</b>';document.querySelector('#gadgetPicker .toolbox')?.append(button);}
 function gadgetHeader(kind,title){return `<div class="gadget-header"><button class="gadget-remove" data-remove="${kind}" title="Remove ${title}" aria-label="Remove ${title}">×</button><button class="handle" aria-label="Move ${title}" title="Drag to move ${title}"><span class="gadget-title">${title}</span><span class="drag-grip" aria-hidden="true">✥</span></button></div>`;}
 for(const [kind,data] of Object.entries(newGadgets)) {
   const item=document.createElement('section');item.className='stage-item';item.id='gadget-'+kind;item.dataset.kind=kind;item.hidden=true;
@@ -111,7 +113,7 @@ function releaseInputs(){input('');if(scene?.gadgets.joystick)input('','joystick
 window.addEventListener('blur',releaseInputs);
 document.addEventListener('visibilitychange', () => {if (document.hidden)releaseInputs();});
 const labels={cjp:'CodyJoy Pro',seven:'Seven-segment',temperature:'Temperature sensor',matrix:'LED matrix',...Object.fromEntries(Object.entries(newGadgets).map(([key,value])=>[key,value.title]))};
-const defaults={light:{x:1040,y:480},motion:{x:400,y:640},rfid:{x:700,y:640},ultraseg:{x:700,y:40},seven:{x:440,y:40},temperature:{x:440,y:360},matrix:{x:760,y:360},joystick:{x:40,y:640},ultrasonic:{x:400,y:720},soil:{x:740,y:720},wifi:{x:1050,y:760}};
+const defaults={air:{x:800,y:400},light:{x:1040,y:480},motion:{x:400,y:640},rfid:{x:700,y:640},ultraseg:{x:700,y:40},seven:{x:440,y:40},temperature:{x:440,y:360},matrix:{x:760,y:360},joystick:{x:40,y:640},ultrasonic:{x:400,y:720},soil:{x:740,y:720},wifi:{x:1050,y:760}};
 let scene=null, selected='cjp', dragging=null, pending=0, pythonConnected=false, z=1, temperatureTimer, stageZoom=1, initialFit=false;
 let camera={scale:1,x:0,y:0},panning=null,viewTouched=false;
 const viewport=$('stageViewport'),V=window.CodySimulatorViewport;
@@ -305,4 +307,7 @@ poll();
 
 // Load the light asset UI on customized/older simulator HTML as well.
 if(!document.getElementById('lightWorldStyles')){const link=document.createElement('link');link.id='lightWorldStyles';link.rel='stylesheet';link.href='/simulator/light-world.css?v=3.21.1-ai.26';document.head.append(link);}
-if(!document.getElementById('lightWorldScript')){const script=document.createElement('script');script.id='lightWorldScript';script.src='/simulator/light-world.js?v=3.21.1-ai.26';document.head.append(script);}
+if(!document.getElementById('lightWorldScript')){const script=document.createElement('script');script.id='lightWorldScript';script.src='/simulator/light-world.js?v=3.21.1-ai.28';document.head.append(script);}
+
+if(!document.getElementById("airWorldStyles")){const e=document.createElement("link");e.id="airWorldStyles";e.rel="stylesheet";e.href="/simulator/air-world.css?v=3.21.1-ai.28";document.head.append(e);}
+if(!document.getElementById("airWorldScript")){const e=document.createElement("script");e.id="airWorldScript";e.src="/simulator/air-world.js?v=3.21.1-ai.28";document.head.append(e);}

@@ -1,3 +1,86 @@
+# Validation for 3.21.1-ai.28
+
+CodyNick 3.21.1-ai.28 cumulative local validation
+
+Firmware:
+- Built CodyPi 1.19.9 for Arduino Uno using the installed AVR 7.3.0 toolchain,
+  recompiling the sketch and linking the unchanged Arduino/CodyNick objects.
+- Flash: 29,976 / 32,256 bytes; static RAM: 1,499 / 2,048 bytes.
+- Validated HEX through the actual uploader's parser and mocked bootloader:
+  upload/readback, fragmented responses, wrong MCU, corruption, unplug,
+  delayed probes, startup noise, retries and no writes on failed sync pass.
+- Safe reader uses address 98, humidity-first bytes, signed temperature,
+  tenths scale, complete-packet/range validation, one-second shared cache and
+  supported Wire timeout. Supplied header retained byte-for-byte as reference.
+
+Runtime/model:
+- Numeric reporters, Hardware/Simulation target roundtrip and variable sockets.
+- Hardware tests cover negative/zero/positive temperatures and humidity bounds;
+  ERR, non-finite/malformed and out-of-range replies reject.
+- Coupled heating/drying, mist/humidifying, source proximity, recovery,
+  manual values, malformed-world rejection and JSON/project restore pass.
+- Simulation works without a board or visible simulator and stays independent
+  of Hardware replies. Python bridge accepts both new reporters.
+- Public Python hardware.air/simulation.air temperature/humidity APIs pass.
+- Actual generated Python preview helper executes against mocked serial:
+  fixed 20-byte request frames, signed values, errors and restored timeout.
+
+Rendered Chrome:
+- Supplied probe cutout loads; picker adds Air Temp/Hum and both assets.
+- Actual pointer hold-to-spray increases humidity and release stops emission.
+- Actual heater drag, on/off, warming/recovery, ambient/settings dialog,
+  manual fallback, complete project restore, hidden sensing and removal pass.
+- Demo library still has all 13 entries; ten welcome variants load stopped
+  with Blocks/Python and saved state; actual simulated joystick moves pixel.
+- No JavaScript page errors or unexpected alert dialogs.
+
+Installer:
+- .27 patch and current .26 Git fixtures pass LF/CRLF upgrades, idempotence,
+  exact rollback/new-file cleanup, modified-source rejection and customized
+  HTML preservation including unrelated URL queries and fragments.
+- Required module cache URLs update; source/payload hashes validated before
+  writes. Backup folders excluded; zero/multiple live roots stop safely.
+- All Demo archive file hashes and final ZIP integrity verified.
+
+Physical sensor/board and production server testing was not performed.
+The cumulative .28 source was applied to the local repository; portable Air Temp/Hum and Demo regression suites, existing demo tests, installer shell syntax and package-lock checks pass. Browser checks were repeated against the repository files.
+
+# Validation for 3.21.1-ai.27
+
+CodyNick 3.21.1-ai.27 local validation
+
+Archive/data:
+- All ten new .codynick ZIPs have valid manifests and SHA256 file checksums.
+- Python syntax compiles with top-level await; complete saved project state
+  validates through the real browser project loader for every new entry.
+- Existing catalogue entries and three Demo entries are retained.
+
+Actual Blockly runtime with mocked CJP transport, both target variants:
+- Four directional boundaries clamp correctly; exactly one pixel is lit.
+- Speed click edge toggles only once while held; fast/slow durations verified.
+- Three mood palettes and durations, 16-step countdown order and warning colors.
+- Memory grows through six correct rounds, wins, rejects wrong answers and
+  times out after ten virtual seconds; input release prevents repeated holds.
+
+Native Python with actual codynick.py and mocked browser bridge:
+- Same boundary, speed, mood, countdown and memory win/wrong/timeout cases pass
+  for both Simulation and Hardware versions. This is not a Pyodide browser test.
+
+Rendered Chrome:
+- Examples > Demo displays 13 entries, including all ten new variants.
+- Every new project loads stopped with matching Blocks/Python and valid state.
+- Real mouse input on simulated CJP joystick moves pixel to right boundary;
+  Run and Stop work without a connected board. No page errors or alerts.
+
+Installer:
+- .26 fixture upgrades, LF/CRLF, idempotence, exact rollback/new-file cleanup,
+  modified-source rejection, customized HTML/query preservation and automatic
+  website discovery checks pass. Backup directories are ignored.
+- Payload SHA256 and final ZIP integrity checked.
+
+Firmware remains 1.19.8. No physical board or production server validation.
+Local repository and Git were not updated by this local-patch task.
+
 # Validation for 3.21.1-ai.26
 
 3.21.1-ai.26 local validation

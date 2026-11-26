@@ -86,8 +86,15 @@ class _Sound:
         await _call(self.target, 'cn_sound_play_until_done', note=note, duration_ms=duration_ms)
 
 
+class _Air:
+    def __init__(self, target):
+        self.temperature = _Sensor(target, 'cn_air_temperature')
+        self.humidity = _Sensor(target, 'cn_air_humidity')
+
+
 class _Target:
     def __init__(self, target):
+        self.air = _Air(target)
         self.light = _Sensor(target, 'cn_light_read')
         self.temperature = _Sensor(target, 'cn_temperature_read')
         self.soil = _Sensor(target, 'cn_soil_read')

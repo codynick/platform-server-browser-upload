@@ -1,7 +1,7 @@
 {
   "sensor-test-soil-moisture": {
     "title": "Sensor Test: Soil Moisture",
-    "help": "Simulation only. Insert BOTH gold probe tips in the soil. Drag the bare watering can to overlap the pot; it tilts 45 degrees and waters automatically. Move it away to stop. Double-click the can to remove it. Double-click the pot to reset moisture to 0%. Water soaks in gradually; soil type affects soaking, retention and drainage. The bar in the pot bottom strip shows current moisture. The simulated display shows 0\u2013100 moisture; LED 0 is red below 30%, green otherwise. Air is a dry reference (0%), not a calibrated hardware measurement. Choose Blocks or Python, then Run; Stop ends the program. No CJP, Dashboard or Sprites required.",
+    "help": "Simulation only. Insert BOTH gold probe tips in the soil. Drag the bare watering can to overlap the pot; it tilts 45 degrees and waters automatically. Move it away to stop. Double-click the can to remove it. Double-click the pot to reset moisture to 0%. Water soaks in gradually; soil type affects soaking, retention and drainage. The bar in the pot bottom strip shows current moisture. The simulated display shows 0–100 moisture; LED 0 is red below 30%, green otherwise. Air is a dry reference (0%), not a calibrated hardware measurement. Choose Blocks or Python, then Run; Stop ends the program. No CJP, Dashboard or Sprites required.",
     "simulation": [
       "soil",
       "seven"
@@ -27,7 +27,7 @@
   },
   "sensor-test-ultrasonic": {
     "title": "Sensor Test: Ultrasonic",
-    "help": "Simulation only. Move the striped target from anywhere on its body. Aim the ultrasonic marker with the angle control. The seven-segment shows cm; LED 0 is red for a valid echo below 20 cm, green for farther targets, and blue for no echo (0). Target gear changes its size; 1 stage unit = 1 cm. Range 2\u2013400 cm, 30-degree cone. Choose Blocks or Python, then Run; Stop ends the test. No CJP, dashboard or sprite is required.",
+    "help": "Simulation only. Move the striped target from anywhere on its body. Aim the ultrasonic marker with the angle control. The seven-segment shows cm; LED 0 is red for a valid echo below 20 cm, green for farther targets, and blue for no echo (0). Target gear changes its size; 1 stage unit = 1 cm. Range 2–400 cm, 30-degree cone. Choose Blocks or Python, then Run; Stop ends the test. No CJP, dashboard or sprite is required.",
     "simulation": [
       "ultrasonic",
       "seven"
@@ -198,7 +198,7 @@
     "hardware": false
   },
   "sim-dashboard": {
-    "title": "Pretend sensor \u2192 dashboard and LED",
+    "title": "Pretend sensor → dashboard and LED",
     "help": "No CJP required. Adds a simulated temperature sensor. Change its slider in Simulation; view its gauge and graph in Dashboard. Press Stop to finish.",
     "simulation": [
       "temperature"
@@ -207,14 +207,14 @@
     "hardware": false
   },
   "mixed": {
-    "title": "Real temperature \u2192 dashboard and pretend LED",
-    "help": "Connect a CJP with a real temperature sensor. Open Dashboard for readings. The LED in Simulation becomes red above 30\u00b0C and blue otherwise.",
+    "title": "Real temperature → dashboard and pretend LED",
+    "help": "Connect a CJP with a real temperature sensor. Open Dashboard for readings. The LED in Simulation becomes red above 30°C and blue otherwise.",
     "simulation": [],
     "archive": "examples/mixed.codynick",
     "hardware": true
   },
   "cross-displays": {
-    "title": "Real and pretend readings \u2192 opposite displays",
+    "title": "Real and pretend readings → opposite displays",
     "help": "Connect CJP, real temperature sensor, and standalone seven-segment display. Adds a simulated ultrasonic sensor and seven-segment display. Real temperature appears on the simulated display; simulated distance on the real display.",
     "simulation": [
       "ultrasonic",
@@ -231,14 +231,14 @@
     "hardware": true
   },
   "temperature": {
-    "title": "Real temperature \u2192 display and dashboard",
+    "title": "Real temperature → display and dashboard",
     "help": "Connect a CJP, temperature sensor, and standalone seven-segment display. Open Dashboard to see the reading there too.",
     "simulation": [],
     "archive": "examples/temperature.codynick",
     "hardware": true
   },
   "joystick": {
-    "title": "CJP joystick click \u2192 real light",
+    "title": "CJP joystick click → real light",
     "help": "Connect a CJP. Press the joystick button to light RGB LED 0 green; release to turn it off.",
     "simulation": [],
     "archive": "examples/joystick.codynick",
@@ -291,7 +291,7 @@
   "demo-temperature-hw-sim": {
     "title": "Temperature sensor: HW and SIM",
     "hardware": true,
-    "help": "Requires: CJP, real temperature sensor and standalone seven-segment display. The real temperature is shown on the simulated seven-segment; the simulated temperature is shown on the real standalone seven-segment. On each CJP, the four internal square LEDs (12\u201315) show its own temperature: blue below 18 C, green from 18 to below 25 C, yellow from 25 to below 30 C, red at 30 C and above. Warm the real sensor or change simulated temperature independently. Dashboard gauges show both readings and two history graphs log the latest 200 samples each. Choose Blocks or Python, then Run. Press Stop to finish. Hardware outputs keep their last state after Stop.",
+    "help": "Requires: CJP, real temperature sensor and standalone seven-segment display. The real temperature is shown on the simulated seven-segment; the simulated temperature is shown on the real standalone seven-segment. On each CJP, the four internal square LEDs (12–15) show its own temperature: blue below 18 C, green from 18 to below 25 C, yellow from 25 to below 30 C, red at 30 C and above. Warm the real sensor or change simulated temperature independently. Dashboard gauges show both readings and two history graphs log the latest 200 samples each. Choose Blocks or Python, then Run. Press Stop to finish. Hardware outputs keep their last state after Stop.",
     "simulation": [
       "temperature",
       "seven"
@@ -403,5 +403,135 @@
     "archive": "examples/ai-voice-question-answer.codynick",
     "ai": true,
     "category": "AI"
+  },
+  "demo-joy-pixel-walker-sim": {
+    "title": "Joy Pixel Walker (Simulation)",
+    "hardware": false,
+    "help": "No CJP required. Move the joystick to move one cyan pixel on the 4x4 RGB panel. Hold a direction to repeat; edges clamp at 0 and 3. Up moves toward the top of the panel. Change move_seconds or the pixel color to experiment. In Simulation, use the CJP arrow buttons and center click button. Choose Blocks or Python, then Run. Press Stop to finish.",
+    "simulation": [
+      "cjp"
+    ],
+    "stage": false,
+    "dashboard": false,
+    "archive": "examples/demo-joy-pixel-walker-sim.codynick",
+    "demo": true,
+    "demoOrder": 4,
+    "category": "General"
+  },
+  "demo-joy-pixel-walker-hw": {
+    "title": "Joy Pixel Walker (Hardware)",
+    "hardware": true,
+    "help": "Requires: CJP with gateway firmware. Move the joystick to move one cyan pixel on the 4x4 RGB panel. Hold a direction to repeat; edges clamp at 0 and 3. Up moves toward the top of the panel. Change move_seconds or the pixel color to experiment. Keep this browser open with the CJP connected; this runs through the gateway firmware, not an uploaded standalone program. Choose Blocks or Python, then Run. Press Stop to finish. Hardware outputs keep their last state after Stop.",
+    "simulation": [],
+    "stage": false,
+    "dashboard": false,
+    "archive": "examples/demo-joy-pixel-walker-hw.codynick",
+    "demo": true,
+    "demoOrder": 5,
+    "category": "General"
+  },
+  "demo-mood-light-composer-sim": {
+    "title": "Mood Light Composer (Simulation)",
+    "hardware": false,
+    "help": "No CJP required. Watch three moods rotate: calm blue/cyan, happy yellow/green and alert red/white. Each mood lasts mood_seconds (default 2). Change the timing and colors to compose your own. In Simulation, use the CJP arrow buttons and center click button. Choose Blocks or Python, then Run. Press Stop to finish.",
+    "simulation": [
+      "cjp"
+    ],
+    "stage": false,
+    "dashboard": false,
+    "archive": "examples/demo-mood-light-composer-sim.codynick",
+    "demo": true,
+    "demoOrder": 6,
+    "category": "General"
+  },
+  "demo-mood-light-composer-hw": {
+    "title": "Mood Light Composer (Hardware)",
+    "hardware": true,
+    "help": "Requires: CJP with gateway firmware. Watch three moods rotate: calm blue/cyan, happy yellow/green and alert red/white. Each mood lasts mood_seconds (default 2). Change the timing and colors to compose your own. Keep this browser open with the CJP connected; this runs through the gateway firmware, not an uploaded standalone program. Choose Blocks or Python, then Run. Press Stop to finish. Hardware outputs keep their last state after Stop.",
+    "simulation": [],
+    "stage": false,
+    "dashboard": false,
+    "archive": "examples/demo-mood-light-composer-hw.codynick",
+    "demo": true,
+    "demoOrder": 7,
+    "category": "General"
+  },
+  "demo-speed-switch-sim": {
+    "title": "Speed Switch (Simulation)",
+    "hardware": false,
+    "help": "No CJP required. Move the pixel with the joystick. Click once to toggle slow (0.30 seconds per step, blue) and fast (0.08 seconds per step, green). Holding the click does not toggle repeatedly. Edges clamp at the panel boundary. In Simulation, use the CJP arrow buttons and center click button. Choose Blocks or Python, then Run. Press Stop to finish.",
+    "simulation": [
+      "cjp"
+    ],
+    "stage": false,
+    "dashboard": false,
+    "archive": "examples/demo-speed-switch-sim.codynick",
+    "demo": true,
+    "demoOrder": 8,
+    "category": "General"
+  },
+  "demo-speed-switch-hw": {
+    "title": "Speed Switch (Hardware)",
+    "hardware": true,
+    "help": "Requires: CJP with gateway firmware. Move the pixel with the joystick. Click once to toggle slow (0.30 seconds per step, blue) and fast (0.08 seconds per step, green). Holding the click does not toggle repeatedly. Edges clamp at the panel boundary. Keep this browser open with the CJP connected; this runs through the gateway firmware, not an uploaded standalone program. Choose Blocks or Python, then Run. Press Stop to finish. Hardware outputs keep their last state after Stop.",
+    "simulation": [],
+    "stage": false,
+    "dashboard": false,
+    "archive": "examples/demo-speed-switch-hw.codynick",
+    "demo": true,
+    "demoOrder": 9,
+    "category": "General"
+  },
+  "demo-countdown-signal-sim": {
+    "title": "Countdown Signal (Simulation)",
+    "hardware": false,
+    "help": "No CJP required. Sixteen green LEDs turn off one by one at step_seconds (default 0.25). The remaining LEDs change to yellow with 8 left and red with 4 left. The panel flashes white at zero, then resets automatically. In Simulation, use the CJP arrow buttons and center click button. Choose Blocks or Python, then Run. Press Stop to finish.",
+    "simulation": [
+      "cjp"
+    ],
+    "stage": false,
+    "dashboard": false,
+    "archive": "examples/demo-countdown-signal-sim.codynick",
+    "demo": true,
+    "demoOrder": 10,
+    "category": "General"
+  },
+  "demo-countdown-signal-hw": {
+    "title": "Countdown Signal (Hardware)",
+    "hardware": true,
+    "help": "Requires: CJP with gateway firmware. Sixteen green LEDs turn off one by one at step_seconds (default 0.25). The remaining LEDs change to yellow with 8 left and red with 4 left. The panel flashes white at zero, then resets automatically. Keep this browser open with the CJP connected; this runs through the gateway firmware, not an uploaded standalone program. Choose Blocks or Python, then Run. Press Stop to finish. Hardware outputs keep their last state after Stop.",
+    "simulation": [],
+    "stage": false,
+    "dashboard": false,
+    "archive": "examples/demo-countdown-signal-hw.codynick",
+    "demo": true,
+    "demoOrder": 11,
+    "category": "General"
+  },
+  "demo-pattern-memory-sim": {
+    "title": "Pattern Memory (Simulation)",
+    "hardware": false,
+    "help": "No CJP required. Click the joystick to start. Watch the pattern, then repeat it: Up=top red, Right=right yellow, Down=bottom blue, Left=left green. Release between moves. A new random step is added after every correct round, up to 6. Ten seconds are allowed for each answer. Green means a correct round; red means wrong/timeout; white means six rounds completed. Release and click to play again. The sequence is encoded as base-4 digits in sequence_code; position selects a digit, preserving all earlier steps without list blocks. In Simulation, use the CJP arrow buttons and center click button. Choose Blocks or Python, then Run. Press Stop to finish.",
+    "simulation": [
+      "cjp"
+    ],
+    "stage": false,
+    "dashboard": false,
+    "archive": "examples/demo-pattern-memory-sim.codynick",
+    "demo": true,
+    "demoOrder": 12,
+    "category": "General"
+  },
+  "demo-pattern-memory-hw": {
+    "title": "Pattern Memory (Hardware)",
+    "hardware": true,
+    "help": "Requires: CJP with gateway firmware. Click the joystick to start. Watch the pattern, then repeat it: Up=top red, Right=right yellow, Down=bottom blue, Left=left green. Release between moves. A new random step is added after every correct round, up to 6. Ten seconds are allowed for each answer. Green means a correct round; red means wrong/timeout; white means six rounds completed. Release and click to play again. The sequence is encoded as base-4 digits in sequence_code; position selects a digit, preserving all earlier steps without list blocks. Keep this browser open with the CJP connected; this runs through the gateway firmware, not an uploaded standalone program. Choose Blocks or Python, then Run. Press Stop to finish. Hardware outputs keep their last state after Stop.",
+    "simulation": [],
+    "stage": false,
+    "dashboard": false,
+    "archive": "examples/demo-pattern-memory-hw.codynick",
+    "demo": true,
+    "demoOrder": 13,
+    "category": "General"
   }
 }

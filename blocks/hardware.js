@@ -30,6 +30,10 @@ class CjpHardware {
  return send(`CN@@7TXT@@${String(i).padStart(2,'0')}${text.padEnd(4,' ')}____`);}
  case 'cn_seven_segment_display':{const i=this.device(a.device,'seven');if(![0,2].includes(i))throw Error('Display device must be 0 or 2');this.number(a.value,-99999,999999,'Display value');const n=String(a.value);if(n.length>6||!/^-?\d+(\.\d+)?$/.test(n))throw Error('Display number must fit six characters');return send(`CN@@7SEG@@${String(i).padStart(2,'0')}${n.padEnd(6,' ')}__`);}
  case 'cn_sound_play':case 'cn_sound_play_until_done':{const m=/^([A-G])([#bB]?)(-?\d)$/.exec(String(a.note).trim());if(!m)throw Error('Use a note such as C4 or F#4');const semitones={C:0,D:2,E:4,F:5,G:7,A:9,B:11};const midi=(Number(m[3])+1)*12+semitones[m[1]]+(m[2]==='#'?1:m[2]?-1:0);const f=Math.round(440*2**((midi-69)/12));this.integer(f,30,5000,'Note frequency');const duration=this.integer(a.duration_ms,1,32767,'Duration in ms');await send(`CN@@BUZ@@${String(f).padStart(4,'0')}${String(duration).padStart(5,'0')}`);if(type.endsWith('until_done'))await this.wait(duration,signal);return;}
+ case 'cn_air_temperature':case 'cn_air_humidity':{
+ const humidity=type==='cn_air_humidity',prefix=humidity?'CN@@AIRH@@':'CN@@AIRT@@',raw=await read(prefix,prefix);
+ if(raw==='ERR')throw Error('Air Temp/Hum is unavailable. Check its connection.');
+ const value=Number(raw);if(!/^-?(?:\d+(?:\.\d+)?|\.\d+)$/.test(raw)||!Number.isFinite(value)||value<(humidity?0:-55)||value>(humidity?100:125))throw Error('Invalid air '+(humidity?'humidity':'temperature')+' reading');return value;}
  case 'cn_light_read':{const prefix='CN@@LIGHT@@';const raw=await read(prefix,prefix);
  if(raw==='ERR'||raw==='-1'||raw==='-1.0')throw Error('Light sensor is unavailable. Check its connection.');
  const value=Number(raw);if(!/^(?:\d+(?:\.\d+)?|\.\d+)$/.test(raw)||!Number.isFinite(value)||value<0||value>100)throw Error('Invalid light intensity reading');return value;}

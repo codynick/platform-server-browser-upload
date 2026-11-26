@@ -1,3 +1,11 @@
+CodyNick 3.21.1-ai.28 — Air Temp/Hum with mist and heater
+
+Add Air Temp/Hum numeric temperature and relative-humidity reporters with Hardware/Simulation routing and Python hardware.air/simulation.air APIs. Include the supplied probe cutout, draggable water mist spray and heater, gradual coupled environmental behavior, ambient/manual settings and saved state. CodyPi 1.19.9 reads and validates the shared four-byte I2C 98 payload with caching and timeout handling. Retain all five paired Demo projects and every prior cumulative feature. Physical sensor validation remains pending.
+
+CodyNick 3.21.1-ai.27 — Five welcome projects in Demo
+
+Add Joy Pixel Walker, Mood Light Composer, Speed Switch, Countdown Signal and Pattern Memory to Examples > Demo. Each has matching editable Blocks/Python programs and separate Simulation/Hardware entries. Retain all earlier demos and cumulative Light Sensor, RGB LED, display and editor features. Pattern Memory uses a numeric base-4 sequence, grows to six steps, detects wrong answers and enforces a ten-second answer timeout. No new runtime blocks or firmware are required.
+
 CodyNick 3.21.1-ai.26 — Restore Light Sensor photo
 
 Restore the supplied Light Sensor photo and the marked sensing point on the gadget image. Hand lights automatically aim at that point. Keep the simplified controls below the image: intensity label, numeric box and measured-intensity progress bar only.
