@@ -47,6 +47,7 @@
   return {format:'codynick-webserial',version:3,projectSchema:'codynick-project/1',applicationVersion:window.CODYNICK_VERSION,workspace,python:source,editor:{...editorState,space:['simulator','dashboard','sprites','ai'].find(n=>$('show-'+n).getAttribute('aria-pressed')==='true')||'simulator',collapsed:$('liveMain').classList.contains('stage-collapsed')},state:{live,sprite:CodySpriteStage.snapshotProject(),layout,simulatorView}};
  }
  async function apply(s){
+  window.CodyDFPlayer?.resetSimulation();
   window.CodyAI?.clear();
   editor.load(s.workspace);window.CodyPublication?.restore(s.editor.publication||null,{legacy:!Object.hasOwn(s.editor,'publication')});CodyLiveStore.restoreProject(s.state.live);CodySpriteStage.restoreProject(s.state.sprite);
   const clean={};for(const [id,r] of Object.entries(s.state.layout))Object.defineProperty(clean,id,{value:CodyDashboardLayout.clean(r),enumerable:true});

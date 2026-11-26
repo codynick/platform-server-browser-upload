@@ -64,7 +64,7 @@ const {chromium}=require('playwright'),assert=require('assert/strict'),fs=requir
   }
   await p.evaluate(()=>{testHW.keys=[];});await stop();
   console.log('PASS reused Blocks sprite project responds to all four real joystick directions');
-  await p.locator('#headerExamples').click();await p.locator('.example-categories button').filter({hasText:'Demo'}).click();assert.equal(await p.locator('.example-card').count(),13);
+  await p.locator('#headerExamples').click();await p.locator('.example-categories button').filter({hasText:'Demo'}).click();assert.equal(await p.locator('.example-card').count(),21);
   assert.deepEqual((await p.locator('.example-card strong').allTextContents()).slice(0,3),['Temperature sensor: HW and SIM','Soil Moisture: SIM to HW','Move Sprite with HW Joystick']);
   if(process.env.REVIEW_SHOTS){fs.mkdirSync(process.env.REVIEW_SHOTS,{recursive:true});await p.screenshot({path:path.join(process.env.REVIEW_SHOTS,'demo-category.png')});}
   assert.deepEqual(errors,[]);assert.deepEqual(alerts,[]);

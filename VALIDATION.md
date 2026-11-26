@@ -1,3 +1,67 @@
+# Validation for 3.21.1-ai.29
+
+Repository checks: all DFPlayer, paired example, existing Air Temp/Hum and earlier Demo regressions pass. Actual recorded-audio browser checks were repeated against the repository files. Media verification rejects missing, modified, duplicate, excluded and invalid-path entries. Installer shell syntax and package-lock checks pass.
+
+CodyNick 3.21.1-ai.29 cumulative local validation
+
+Firmware:
+- Compiled CodyPi 1.19.10 for Uno with the installed AVR 7.3.0 toolchain,
+  recompiling the sketch and linking the unchanged Arduino/CodyNick objects.
+- Flash 30,332 / 32,256 bytes; static RAM 1,525 / 2,048 bytes.
+- Actual HEX parser and mocked bootloader upload/readback regressions pass:
+  fragmented replies, wrong MCU, corruption, unplug, startup noise, delayed
+  probes, bounded retries and no writes on failed synchronization.
+- I2C address 16 bridge limits writes to five bytes, validates hex payloads,
+  checks transmission status, validates busy replies and applies Wire timeout.
+  Long waits execute in the browser, not as blocking Uno routines.
+
+Runtime, API and examples:
+- Exact wire packets for volume, track modes and signed hundredths verified.
+- Number vocabulary sequences match supplied STM32 myTD.h, including negative
+  numbers, zero, fractional leading zero, thousands and safe numeric bounds.
+- Planned clips exist for representative values in all four number languages.
+- Mock audio verifies pause/resume, actual completion signalling, busy state,
+  Stop cancellation, missing recordings, independent Hardware/Simulation routing,
+  I2C errors, all block target roundtrips and Python bridge calls.
+- Public native Python APIs verified for both targets. Generated desktop Python
+  helper executes against mocked serial, validating 20-byte framing, menus,
+  waits, bounds, errors and timeout restoration. This is not a Pyodide test.
+- All eight new example Python sources compile. Actual Blockly execution with
+  mocked transport verifies Basics controls, joystick edge announcements,
+  weather sensor values and dry/wet soil transitions for both targets.
+
+Rendered Chrome with real audio files:
+- 21 Demo entries; all eight new projects load stopped with matching
+  Blocks/Python and valid saved scenes.
+- Real MP3 playback/decoding verifies Welcome, Happy and Hello; real pause/
+  resume and media completion, not a fake busy timer.
+- Negative decimal speech fetches the exact minus/one/dot/twenty clips.
+- Audio continues with Simulation hidden. Stop cancels playback. Volume and
+  project restore work. No JavaScript page errors or unexpected alert dialogs.
+- Existing Air Temp/Hum spray, heater, settings, state restoration and hidden
+  sensing browser regressions pass against the cumulative .29 overlay.
+
+Assets and installer:
+- All 838 selected MP3s contain valid MPEG Layer III headers. All catalogue
+  entries resolve; Hafez/folder 07 and folder 16 are excluded. Named emotion
+  alternatives chosen explicitly; source names/collisions are recorded.
+- Optional prepare-sd.py creates 838 matching files in an empty folder;
+  generated SD output bytes match every catalogue entry.
+- All Demo archive manifests/file SHA256 values verified.
+- .28 local-patch and current Git-base fixtures pass LF/CRLF upgrades,
+  idempotence, exact rollback/new-file cleanup and unknown-source rejection.
+- Customized HTML and unrelated URL queries/fragments are preserved;
+  DFPlayer module is inserted exactly once and required caches are refreshed.
+- Website discovery ignores backups and rejects zero/multiple live roots.
+- Payload SHA256 and final ZIP integrity checked.
+
+Physical gadget, installed SD-card playback, STM32 flashing and production
+server deployment were not performed. Supplied STM32 firmware can defer stop
+commands until a synchronous number sequence completes. A clean matching SD
+selection is necessary for audible parity where the original has duplicate
+track prefixes. The cumulative source is applied to the local repository; deployment also verifies every bundled recording SHA256 before backups or writes.
+
+
 # Validation for 3.21.1-ai.28
 
 CodyNick 3.21.1-ai.28 cumulative local validation

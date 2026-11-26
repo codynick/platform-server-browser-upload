@@ -92,8 +92,49 @@ class _Air:
         self.humidity = _Sensor(target, 'cn_air_humidity')
 
 
+class _DFPlayer:
+    def __init__(self, target):
+        self.target = target
+
+    async def _play(self, kind, wait=False, timeout=None, **args):
+        if timeout is not None:
+            args['timeout'] = timeout
+        return await _call(self.target, 'cn_df_' + kind + ('_wait' if wait else ''), **args)
+
+    async def is_busy(self):
+        return await _call(self.target, 'cn_df_busy')
+
+    async def set_volume(self, volume):
+        return await _call(self.target, 'cn_df_volume', volume=volume)
+
+    async def control(self, action):
+        return await _call(self.target, 'cn_df_control', action=action)
+
+    async def wait_until_done(self, timeout=0):
+        return await _call(self.target, 'cn_df_wait', timeout=timeout)
+
+    async def say_whole_number(self, value, wait=False, timeout=None):
+        return await self._play('whole', wait, timeout, value=value)
+
+    async def say_persian(self, phrase, wait=False, timeout=None):
+        return await self._play('persian', wait, timeout, phrase=phrase)
+
+    async def say_number(self, value, language='English', wait=False, timeout=None):
+        return await self._play('number', wait, timeout, value=value, language=language)
+
+    async def say_phrase(self, phrase, language='English', wait=False, timeout=None):
+        return await self._play('phrase', wait, timeout, phrase=phrase, language=language)
+
+    async def play_emotion(self, emotion, wait=False, timeout=None):
+        return await self._play('emotion', wait, timeout, emotion=emotion)
+
+    async def play_track(self, folder, track, large=False, wait=False, timeout=None):
+        return await self._play('track', wait, timeout, folder=folder, track=track, mode='large' if large else 'standard')
+
+
 class _Target:
     def __init__(self, target):
+        self.dfplayer = _DFPlayer(target)
         self.air = _Air(target)
         self.light = _Sensor(target, 'cn_light_read')
         self.temperature = _Sensor(target, 'cn_temperature_read')

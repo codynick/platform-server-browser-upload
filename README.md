@@ -1,18 +1,22 @@
-# CodyNick Portal 3.21.1-ai.28
+# CodyNick Portal 3.21.1-ai.29
 
-Air Temp/Hum now provides temperature and humidity blocks, with mist spray and
-heater simulation assets. Hardware requires bundled CodyPi firmware 1.19.9.
+DFPlayer now supports prerecorded phrases, numbers, emotions, playback controls
+and real-audio simulation. Four new paired examples are under Demo. Hardware
+requires bundled CodyPi 1.19.10. See blocks/examples/DFPLAYER_EXAMPLES.md.
 
-Five new projects are available in Examples > Demo, each with Simulation and
+Air Temp/Hum also provides temperature and humidity blocks, with mist spray and
+heater simulation assets. Hardware requires bundled CodyPi firmware 1.19.10.
+
+The five earlier welcome projects are also available in Examples > Demo, each with Simulation and
 Hardware versions and matching Blocks/Python. See blocks/examples/WELCOME_DEMOS.md.
 
-This release also includes a Light Sensor intensity block for Hardware and Simulation.
+This release includes a Light Sensor intensity block for Hardware and Simulation.
 The simulator uses the supplied gadget photo and draggable hand lights: moving
 a light toward the marked sensing point increases the measured percentage.
 Below the photo are the intensity label, numeric box and progress bar.
 All earlier editor, RGB LED, display and branded-block improvements are retained.
 
-Hardware light and Air Temp/Hum readings use CodyPi 1.19.9, bundled with this release.
+CodyPi 1.19.10 is bundled for Sound Player, Light Sensor and Air Temp/Hum hardware.
 Reconnect the CJP and accept its firmware update. Simulation needs no board.
 
 Cumulative hardware block update: number/variable sockets, RGB LED naming, and
@@ -262,7 +266,21 @@ The editor checks the bundled CodyPi release when connecting and offers confirme
 
 See [PYTHON_PILOT.md](PYTHON_PILOT.md) for ZIP installation, testing and rollback instructions.
 
+## Recorded audio and matching microSD
+
+DFPlayer recordings are checked against catalogue SHA256 values before deployment.
+Only selected non-Hafez audio is bundled; recordings load on demand in Simulation.
+For a matching SD folder tree, run `python3 tools/prepare-dfplayer-sd.py EMPTY_OUTPUT_DIRECTORY`
+from this checkout. The destination must be empty; source recordings are preserved.
+See [DFPlayer examples and mapping](blocks/examples/DFPLAYER_EXAMPLES.md) for the
+emotion duplicate choices, number ranges and hardware stop limitation.
+
 ## Revision history
+
+### 3.21.1-ai.29 — DFPlayer recorded-audio simulation and examples
+
+- Add DFPlayer sound-player blocks and Python APIs with Hardware/Simulation targets, recorded-audio playback and signed/two-decimal number sequencing matching the supplied gadget firmware. Include 838 selected recordings with explicitly named emotion files, a speaker gadget, playback status/progress/volume and four paired Demo projects. Exclude Hafez and folder 16 voice recordings. CodyPi 1.19.10 adds a short I2C bridge; browser-managed waits remain interruptible. Retain every prior cumulative feature. Physical gadget validation remains pending.
+
 
 ### 3.21.1-ai.28 — Air Temp/Hum with mist and heater
 

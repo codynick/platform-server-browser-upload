@@ -18,7 +18,7 @@
 #include <I2A_WiFi_IoT_v2.h>
 
 // ---------- Version ----------
-const char CODYPI_VERSION[] = "1.19.9"; //2000ms delay commented in setup()::check Joystick functionality
+const char CODYPI_VERSION[] = "1.19.10"; //2000ms delay commented in setup()::check Joystick functionality
 
 // ---------- Config ----------
 const uint8_t PKT_LEN   = 20; // 4 bytes header + 16 bytes payload
@@ -215,6 +215,33 @@ void handleSerialPackets() {
               if (rxBuf[12+i]<32 || rxBuf[12+i]>126) printable=false;
             }
             if (printable) write_to_sevensegment_Text_V2(text, rxBuf[11]-'0');
+          }
+          continue;
+        }
+
+        // DFPlayer I2C bridge: at most five bytes; browser manages long waits.
+        if (memcmp(rxBuf, "CN@@DF@@", 8) == 0) {
+#if defined(WIRE_HAS_TIMEOUT)
+          Wire.setWireTimeout(25000UL, true); Wire.clearWireTimeoutFlag();
+#endif
+          if (rxBuf[8] == 'B') {
+            const uint8_t count = Wire.requestFrom((uint8_t)16, (uint8_t)1);
+            const int value = count == 1 && Wire.available() ? Wire.read() : -1;
+            writeFixedTextResponse("CN@@DF@@B", 9, value == 255 ? "1" : value == 0 ? "0" : "ERR", 11);
+          } else {
+            uint8_t bytes[5]; const uint8_t count = rxBuf[9] - '0';
+            bool valid = rxBuf[8] == 'W' && count >= 1 && count <= 5;
+            for (uint8_t i=0; valid && i<count; i++) {
+              uint8_t value=0;
+              for(uint8_t j=0;j<2;j++) {
+                const char c=rxBuf[10+i*2+j];
+                const int digit=c>='0'&&c<='9'?c-'0':c>='A'&&c<='F'?c-'A'+10:-1;
+                if(digit<0){valid=false;break;} value=(value<<4)|digit;
+              }
+              bytes[i]=value;
+            }
+            if(valid){Wire.beginTransmission((uint8_t)16);Wire.write(bytes,count);valid=Wire.endTransmission()==0;}
+            writeFixedTextResponse("CN@@DF@@", 8, valid ? "OK" : "ERR", 12);
           }
           continue;
         }

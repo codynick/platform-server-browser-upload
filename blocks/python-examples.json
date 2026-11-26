@@ -533,5 +533,111 @@
     "demo": true,
     "demoOrder": 13,
     "category": "General"
+  },
+  "demo-dfplayer-basics-sim": {
+    "title": "Sound Player Basics (Simulation)",
+    "hardware": false,
+    "help": "No CJP required. Listen to Welcome, then a short Happy effect. The program lowers volume, pauses/resumes the effect, stops it, and says Hello. Use Stop at any time. The demonstration runs once; its main loop then waits silently. The Sound Player uses prerecorded SD-card audio; Hafez is excluded. Choose Blocks or Python, then Run. Press Stop to finish.",
+    "simulation": [
+      "dfplayer"
+    ],
+    "stage": false,
+    "dashboard": false,
+    "archive": "examples/demo-dfplayer-basics-sim.codynick",
+    "demo": true,
+    "demoOrder": 14,
+    "category": "General"
+  },
+  "demo-dfplayer-basics-hw": {
+    "title": "Sound Player Basics (Hardware)",
+    "hardware": true,
+    "help": "Requires: CJP and Sound Player. Listen to Welcome, then a short Happy effect. The program lowers volume, pauses/resumes the effect, stops it, and says Hello. Use Stop at any time. The demonstration runs once; its main loop then waits silently. The Sound Player uses prerecorded SD-card audio; Hafez is excluded. Choose Blocks or Python, then Run. Press Stop to finish. Hardware outputs keep their last state after Stop.",
+    "simulation": [],
+    "stage": false,
+    "dashboard": false,
+    "archive": "examples/demo-dfplayer-basics-hw.codynick",
+    "demo": true,
+    "demoOrder": 15,
+    "category": "General"
+  },
+  "demo-dfplayer-joystick-sim": {
+    "title": "Talking Joystick (Simulation)",
+    "hardware": false,
+    "help": "No CJP required. Move the joystick or press its center: the speaker announces Up, Down, Left, Right or Click in English. Release between choices; wait for the current phrase to finish. Held directions are announced only once. The Sound Player uses prerecorded SD-card audio; Hafez is excluded. Choose Blocks or Python, then Run. Press Stop to finish.",
+    "simulation": [
+      "dfplayer"
+    ],
+    "stage": false,
+    "dashboard": false,
+    "archive": "examples/demo-dfplayer-joystick-sim.codynick",
+    "demo": true,
+    "demoOrder": 16,
+    "category": "General"
+  },
+  "demo-dfplayer-joystick-hw": {
+    "title": "Talking Joystick (Hardware)",
+    "hardware": true,
+    "help": "Requires: CJP and Sound Player. Move the joystick or press its center: the speaker announces Up, Down, Left, Right or Click in English. Release between choices; wait for the current phrase to finish. Held directions are announced only once. The Sound Player uses prerecorded SD-card audio; Hafez is excluded. Choose Blocks or Python, then Run. Press Stop to finish. Hardware outputs keep their last state after Stop.",
+    "simulation": [],
+    "stage": false,
+    "dashboard": false,
+    "archive": "examples/demo-dfplayer-joystick-hw.codynick",
+    "demo": true,
+    "demoOrder": 17,
+    "category": "General"
+  },
+  "demo-dfplayer-weather-sim": {
+    "title": "Talking Weather Station (Simulation)",
+    "hardware": false,
+    "help": "No CJP required. The speaker announces air temperature and humidity in English, including the measured numbers. In Simulation add a mist spray or heater, or set manual Air Temp/Hum values. Readings repeat after a three-second pause. The Sound Player uses prerecorded SD-card audio; Hafez is excluded. Choose Blocks or Python, then Run. Press Stop to finish.",
+    "simulation": [
+      "dfplayer",
+      "air"
+    ],
+    "stage": false,
+    "dashboard": false,
+    "archive": "examples/demo-dfplayer-weather-sim.codynick",
+    "demo": true,
+    "demoOrder": 18,
+    "category": "General"
+  },
+  "demo-dfplayer-weather-hw": {
+    "title": "Talking Weather Station (Hardware)",
+    "hardware": true,
+    "help": "Requires: CJP and Sound Player and Air Temp/Hum sensor. The speaker announces air temperature and humidity in English, including the measured numbers. In Simulation add a mist spray or heater, or set manual Air Temp/Hum values. Readings repeat after a three-second pause. The Sound Player uses prerecorded SD-card audio; Hafez is excluded. Choose Blocks or Python, then Run. Press Stop to finish. Hardware outputs keep their last state after Stop.",
+    "simulation": [],
+    "stage": false,
+    "dashboard": false,
+    "archive": "examples/demo-dfplayer-weather-hw.codynick",
+    "demo": true,
+    "demoOrder": 19,
+    "category": "General"
+  },
+  "demo-dfplayer-plant-sim": {
+    "title": "Thirsty Plant (Simulation)",
+    "hardware": false,
+    "help": "No CJP required. Below 25% soil moisture the plant says I am thirsty; after sufficient watering it says I am quenched. Only changes between dry/wet trigger speech. Red/green LED 0 reflects dry/wet. In Simulation put both probe tips in soil and overlap the watering can with the pot. The Sound Player uses prerecorded SD-card audio; Hafez is excluded. Choose Blocks or Python, then Run. Press Stop to finish.",
+    "simulation": [
+      "dfplayer",
+      "soil"
+    ],
+    "stage": false,
+    "dashboard": false,
+    "archive": "examples/demo-dfplayer-plant-sim.codynick",
+    "demo": true,
+    "demoOrder": 20,
+    "category": "General"
+  },
+  "demo-dfplayer-plant-hw": {
+    "title": "Thirsty Plant (Hardware)",
+    "hardware": true,
+    "help": "Requires: CJP and Sound Player and soil moisture sensor. Below 25% soil moisture the plant says I am thirsty; after sufficient watering it says I am quenched. Only changes between dry/wet trigger speech. Red/green LED 0 reflects dry/wet. In Simulation put both probe tips in soil and overlap the watering can with the pot. The Sound Player uses prerecorded SD-card audio; Hafez is excluded. Choose Blocks or Python, then Run. Press Stop to finish. Hardware outputs keep their last state after Stop.",
+    "simulation": [],
+    "stage": false,
+    "dashboard": false,
+    "archive": "examples/demo-dfplayer-plant-hw.codynick",
+    "demo": true,
+    "demoOrder": 21,
+    "category": "General"
   }
 }

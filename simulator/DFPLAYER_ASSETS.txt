@@ -1,0 +1,62 @@
+Transparent CodyNick block icon
+
+Input: the user's CodyNick Logo - No Background.ico, converted to PNG for inspection.
+The ICO actually contained opaque white pixels rather than an alpha cutout.
+The user explicitly requested removal of that white background.
+
+Method: built-in image_gen tool, background-extraction edit, transparent_background=true.
+The generated alpha channel was preserved. The generated image was copied into
+the patch without resampling; Blockly renders it at 32 by 22 CSS pixels.
+
+Final project asset: payload/assets/codynick-block-icon.png
+Workspace asset: D:/Documents/codex/block-icons-patch/package/payload/assets/codynick-block-icon.png
+
+Edit prompt:
+Use case: background-extraction. Edit target: the supplied original CodyNick
+logo/icon (32 by 22 pixels). Remove only its solid white rectangular background
+to produce a clean transparent cutout for use on colored coding blocks. Preserve
+the exact original logo design, geometry, proportions, shapes, orange/green colors,
+and all internal white details. Do not redesign, redraw, add text, add a border,
+add shadows, or change the logo identity. Keep the original wide aspect ratio and
+crop snugly to the existing mark with minimal transparent padding. Output actual
+alpha transparency, never a painted checkerboard or white rectangle.
+
+
+.24 Light Sensor photo: supplied by user at
+D:/Documents/codex/codynick-v6.6-shop/img/products/Light Sensor (2).png
+Copied unchanged to payload/simulator/light-sensor-photo.png; SVG viewBox
+95 255 899 435 displays the gadget without the large transparent margins.
+
+Hand light: user-supplied flashlight reference, edited using built-in imagegen
+with transparent_background=true. Output: payload/simulator/hand-light.png.
+Prompt: Remove only the white background to create an actual transparent PNG
+cutout. Preserve the black/dark-gray body, thick outlines, pale yellow lens,
+switch, diagonal orientation (lens bottom-left, rear top-right), proportions
+and yellow rays. Do not add a hand, objects, text or shadows. Square framing,
+small transparent margin, readable edges at small size.
+Runtime rotates the illustration around its lens and draws the light beam.
+
+
+.28 Air Temp/Hum probe
+Input: D:/Downloads/Air TempHum Gadget.jpg, supplied by user.
+Method: built-in image_gen, transparent_background=true.
+Final: payload/simulator/air-th-probe.png (generated alpha preserved).
+Prompt: Cut out only the black ventilated Air Temp/Hum probe, its coiled cable
+and female USB connector from the supplied photograph. Preserve the vented
+housing, mounting hole, green sensor glimpses, coil and connector. Remove the
+orange/gray controller, Lego bricks, tabletop and other objects. Cleanly end
+the cable at the removed controller. Square transparent framing with small
+margin. No text, hands, new objects or cast background shadows.
+Mist sprayer and heater: original project-native SVG illustrations, authored
+in code to match the simulator's existing vector assets.
+
+
+.29 DFPlayer assets
+Photo: user's D:/Documents/codex/codynick-v6.82-header-footer/img/products/Sound Player.png
+Copied unchanged to payload/simulator/dfplayer/player.png. SVG viewBox framing
+changes only its displayed viewport; no image generation or bitmap editing.
+Audio: original user microSD folder (not normalized), excluding folders 07/16.
+838 recordings selected by folder/track. Explicitly named emotion alternatives
+are used where duplicate numeric prefixes exist; catalogue records all choices.
+Final recordings: payload/simulator/dfplayer/audio/*.mp3
+Catalogue and source-name mapping: payload/simulator/dfplayer/catalog.json

@@ -1,3 +1,7 @@
+CodyNick 3.21.1-ai.29 — DFPlayer recorded-audio simulation and examples
+
+Add DFPlayer sound-player blocks and Python APIs with Hardware/Simulation targets, recorded-audio playback and signed/two-decimal number sequencing matching the supplied gadget firmware. Include 838 selected recordings with explicitly named emotion files, a speaker gadget, playback status/progress/volume and four paired Demo projects. Exclude Hafez and folder 16 voice recordings. CodyPi 1.19.10 adds a short I2C bridge; browser-managed waits remain interruptible. Retain every prior cumulative feature. Physical gadget validation remains pending.
+
 CodyNick 3.21.1-ai.28 — Air Temp/Hum with mist and heater
 
 Add Air Temp/Hum numeric temperature and relative-humidity reporters with Hardware/Simulation routing and Python hardware.air/simulation.air APIs. Include the supplied probe cutout, draggable water mist spray and heater, gradual coupled environmental behavior, ambient/manual settings and saved state. CodyPi 1.19.9 reads and validates the shared four-byte I2C 98 payload with caching and timeout handling. Retain all five paired Demo projects and every prior cumulative feature. Physical sensor validation remains pending.
